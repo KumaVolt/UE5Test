@@ -30,6 +30,12 @@ Source/Outlaw/
   UI/
     OutlawHUDLayout.h/.cpp                     Root HUD widget (CommonActivatableWidget)
     OutlawStatBar.h/.cpp                       Reusable attribute-bound stat bar (CommonUserWidget)
+  Progression/
+    OutlawProgressionTypes.h                   Enums, structs, delegates for leveling & class system
+    OutlawLevelingConfig.h/.cpp                Data-driven XP table (thresholds, skill points per level)
+    OutlawSkillTreeNodeDefinition.h/.cpp       Skill tree node (manual/auto-unlock, multi-rank, prerequisites)
+    OutlawClassDefinition.h/.cpp               Class definition (fixed or ascendancy, stat growth, skill tree)
+    OutlawProgressionComponent.h/.cpp          XP, leveling, class selection, skill allocation, save/load
   Weapon/
     OutlawWeaponTypes.h                        Shared enums (weapon types, affix slot) & structs (affix, socket)
     OutlawShooterWeaponData.h/.cpp             Shooter weapon data asset (firepower, RPM, magazine)
@@ -756,6 +762,312 @@ Weapon instance state (ammo, affixes, socketed gems, mods, quality) is automatic
    → affixes (def path + rolled value), gems, quality all persisted
 ```
 
+## Leveling & Class System
+
+The progression system supports two class styles through a unified data-driven architecture:
+
+| Style | Inspired By | Features |
+|---|---|---|
+| **Fixed Classes** | Outriders | Predefined class with skill tree + auto-unlock abilities per level |
+| **Ascendancy Classes** | Path of Exile 2 | Base class → ascendancy specialization with node-based skill tree |
+
+Both styles share the same GAS infrastructure, using `UOutlawAbilitySet` for granting abilities and `SetNumericAttributeBase()` for stat scaling.
+
+### Architecture
+
+```
+Layer 3: UOutlawProgressionComponent     (XP, leveling, skill allocation, class selection, save/load)
+Layer 2: Data Assets                      (LevelingConfig, ClassDefinition, SkillTreeNodeDefinition)
+Layer 1: Existing GAS + Character         (ASC, UOutlawAttributeSet, UOutlawAbilitySet)
+```
+
+### Key Concepts
+
+**Leveling Config (`UOutlawLevelingConfig`)** — A data asset that defines the XP table. Each entry maps to a level (index 0 = level 1) and specifies the total XP required and skill points awarded. Classes can override the default config.
+
+**Class Definition (`UOutlawClassDefinition`)** — A data asset that defines a character class. Contains an `EOutlawClassMode` flag:
+- `FixedClass` — Outriders-style: flat skill tree with auto-unlock nodes at specific levels
+- `AscendancyClass` — PoE 2-style: base class with ascendancy sub-classes and prerequisite chains
+
+Each class has a stat growth table (e.g. MaxHealth +15/level), a class ability set granted on selection, and a list of skill tree nodes.
+
+**Skill Tree Node (`UOutlawSkillTreeNodeDefinition`)** — A data asset for a single allocable point on the skill tree. Two unlock types:
+- `Manual` — player spends skill points, must meet prerequisites and level requirement
+- `AutoOnLevel` — auto-granted when the character reaches a specific level (free, no points consumed)
+
+Nodes support multi-rank allocation (e.g. +5% damage per rank, up to 5 ranks) with per-rank ability sets and cumulative stat bonuses.
+
+**Progression Component (`UOutlawProgressionComponent`)** — The main component added to the character Blueprint. Manages XP, level-ups, class selection, ascendancy, skill tree allocation, and save/load. Accesses the ASC via `IAbilitySystemInterface` (same pattern as the weapon manager).
+
+**Stat Growth** — Class stat scaling and node stat bonuses use `SetNumericAttributeBase()` on the existing `UOutlawAttributeSet` attributes. This means GE-based buffs/debuffs stack properly on top of the base values set by the progression system.
+
+---
+
+### Blueprint Setup — Outriders-Style (Fixed Classes)
+
+**Step 1: Create a Leveling Config**
+
+1. Content Browser > right-click > Miscellaneous > Data Asset > select `OutlawLevelingConfig`
+2. Name it `DA_LevelingConfig_Standard`
+3. Configure `LevelTable` — click `+` to add entries (one per level):
+   - Index 0 (Level 1): RequiredXP = 0, SkillPointsAwarded = 0
+   - Index 1 (Level 2): RequiredXP = 100, SkillPointsAwarded = 1
+   - Index 2 (Level 3): RequiredXP = 300, SkillPointsAwarded = 1
+   - Index 3 (Level 4): RequiredXP = 600, SkillPointsAwarded = 1
+   - ...continue up to your max level (e.g. 50 entries)
+4. Set `DefaultSkillPointsPerLevel` = 1 (used when an entry's SkillPointsAwarded is 0)
+
+**Step 2: Create Skill Tree Nodes**
+
+1. Data Asset > select `OutlawSkillTreeNodeDefinition`
+2. Create manual nodes (player-chosen):
+   - `DA_Node_HeavySlam`: NodeTag = `Skill.Devastator.HeavySlam`, UnlockType = Manual, MaxRank = 1, PointCostPerRank = 1, RequiredLevel = 1, GrantedAbilitySet = your slam ability set
+   - `DA_Node_ArmorBoost`: NodeTag = `Skill.Devastator.ArmorBoost`, UnlockType = Manual, MaxRank = 5, PointCostPerRank = 1, RequiredLevel = 5, StatBonusesPerRank = [{Attribute = MaxHealth, ValuePerLevel = 10}]
+3. Create auto-unlock nodes (granted at specific levels):
+   - `DA_Node_GravityLeap`: NodeTag = `Skill.Devastator.GravityLeap`, UnlockType = AutoOnLevel, AutoUnlockLevel = 10, GrantedAbilitySet = your gravity leap set
+4. Set up prerequisites (node B requires node A):
+   - On `DA_Node_ArmorBoost`: Prerequisites = [{RequiredNodeTag = `Skill.Devastator.HeavySlam`, RequiredRank = 1}]
+
+**Step 3: Create Class Definitions**
+
+1. Data Asset > select `OutlawClassDefinition`
+2. Create `DA_Class_Devastator`:
+   - ClassTag = `Class.Devastator`, ClassMode = FixedClass, bIsBaseClass = true
+   - StatGrowthTable: [{Attribute = MaxHealth, ValuePerLevel = 15}, {Attribute = Strength, ValuePerLevel = 3}]
+   - ClassAbilitySet = a set with passive effects granted on class selection
+   - SkillTreeNodes = [DA_Node_HeavySlam, DA_Node_ArmorBoost, DA_Node_GravityLeap]
+   - LevelingConfig = DA_LevelingConfig_Standard (or leave null to use component default)
+3. Create more classes (DA_Class_Trickster, DA_Class_Technomancer, etc.)
+
+**Step 4: Add Progression Component to Your Character**
+
+1. Open your player Blueprint (e.g. `BP_OutlawPlayerCharacter`)
+2. Add Component > search `Outlaw Progression Component`
+3. Configure:
+   - `DefaultLevelingConfig` = DA_LevelingConfig_Standard
+   - `AvailableClasses` = [DA_Class_Devastator, DA_Class_Trickster, ...]
+
+**Step 5: Class Selection (Blueprint)**
+
+```
+// During character creation or class selection screen
+Get Progression Component → Select Class (ClassTag = Class.Devastator)
+  → grants class ability set
+  → recalculates base stats (MaxHealth = 15 * level, Strength = 3 * level)
+  → processes auto-unlock nodes for current level
+  → fires On Class Changed delegate
+```
+
+**Step 6: Awarding XP (Blueprint)**
+
+```
+// On enemy kill, quest completion, etc.
+Get Progression Component → Award XP (Amount = 50)
+  → fires On XP Changed (NewXP, DeltaXP)
+  → if enough XP: levels up, awards skill points, fires On Player Leveled Up
+  → auto-unlock nodes trigger at their designated levels
+  → base stats recalculated for new level
+```
+
+**Step 7: Skill Tree Allocation (Blueprint)**
+
+```
+// Player opens skill tree UI, clicks a node
+Get Progression Component → Can Allocate Node (NodeTag = Skill.Devastator.ArmorBoost)
+  → returns true if: enough points, level met, prerequisites met, not at max rank
+
+Get Progression Component → Allocate Skill Node (NodeTag = Skill.Devastator.ArmorBoost)
+  → deducts skill points, grants abilities/stat bonuses, fires On Skill Node Allocated
+
+// Read current state for UI
+Get Progression Component → Get Allocated Rank (NodeTag) → int32
+Get Progression Component → Get Available Skill Points → int32
+Get Progression Component → Get Allocable Nodes → TArray<FGameplayTag> (all currently eligible)
+```
+
+**Step 8: Deallocating and Respec (Blueprint)**
+
+```
+// Remove a single rank (only if no other nodes depend on this rank)
+Get Progression Component → Deallocate Skill Node (NodeTag)
+  → refunds points, revokes abilities, fires On Skill Node Deallocated
+
+// Full respec — refund everything
+Get Progression Component → Respec All Nodes
+  → revokes all node abilities, refunds all manual skill points
+  → auto-unlock nodes are re-applied automatically
+```
+
+**Step 9: UI Delegates**
+
+```
+// In your HUD / skill tree widget:
+Bind Event to On Player Leveled Up      → show level-up VFX, update level display
+Bind Event to On XP Changed             → update XP bar (use Get XP Progress for 0-1 float)
+Bind Event to On Skill Node Allocated   → refresh skill tree node visual state
+Bind Event to On Skill Node Deallocated → refresh skill tree node visual state
+Bind Event to On Class Changed          → update class icon, rebuild skill tree UI
+```
+
+**Step 10: Save/Load**
+
+```
+Save:  Save Data = Get Progression Component → Save Progression
+         → stores level, XP, skill points, class, ascendancy, all allocated nodes
+         → store this struct in your save game object
+
+Load:  Get Progression Component → Load Progression (Save Data)
+         → restores level, class, ascendancy, re-allocates all nodes
+         → recalculates stats, re-grants all abilities
+```
+
+---
+
+### Blueprint Setup — Path of Exile 2-Style (Ascendancy Classes)
+
+**Step 1: Create Base Class Definitions**
+
+1. Data Asset > select `OutlawClassDefinition`
+2. Create `DA_Class_Warrior`:
+   - ClassTag = `Class.Warrior`, ClassMode = AscendancyClass, bIsBaseClass = true
+   - StatGrowthTable: [{Attribute = MaxHealth, ValuePerLevel = 12}, {Attribute = Strength, ValuePerLevel = 4}]
+   - ClassAbilitySet = base warrior passives
+   - SkillTreeNodes = base warrior skill tree nodes (all Manual, with prerequisite chains)
+   - AscendancyRequiredLevel = 30
+
+**Step 2: Create Ascendancy Sub-Classes**
+
+1. Create `DA_Ascendancy_Slayer`:
+   - ClassTag = `Ascendancy.Slayer`, ClassMode = AscendancyClass, bIsBaseClass = false
+   - StatGrowthTable: [{Attribute = Strength, ValuePerLevel = 2}] (stacks on top of base class)
+   - ClassAbilitySet = slayer passives
+   - SkillTreeNodes = slayer-specific nodes with prerequisites
+2. Create `DA_Ascendancy_Berserker` similarly
+
+**Step 3: Link Ascendancies to Base Class**
+
+On `DA_Class_Warrior`:
+- AvailableAscendancies = [DA_Ascendancy_Slayer, DA_Ascendancy_Berserker]
+- AscendancyRequiredLevel = 30
+
+**Step 4: Create Prerequisite Chains**
+
+Skill tree nodes for ascendancy classes use prerequisite chains to form a tree:
+
+```
+DA_Node_BrutalFervour (root node, no prerequisites)
+  └─ DA_Node_Headsman (requires BrutalFervour at rank 1)
+       └─ DA_Node_OverwhelmingSalve (requires Headsman at rank 1)
+```
+
+On `DA_Node_Headsman`:
+- Prerequisites = [{RequiredNodeTag = Skill.Slayer.BrutalFervour, RequiredRank = 1}]
+
+**Step 5: Add Progression Component**
+
+Same as the Outriders setup — add the component, set DefaultLevelingConfig and AvailableClasses.
+
+**Step 6: Game Flow (Blueprint)**
+
+```
+// At game start — select base class
+Get Progression Component → Select Class (ClassTag = Class.Warrior)
+
+// Award XP through gameplay...
+Get Progression Component → Award XP (Amount)
+
+// When player reaches level 30 and completes the ascendancy trial:
+Get Progression Component → Select Ascendancy (AscendancyTag = Ascendancy.Slayer)
+  → validates level >= AscendancyRequiredLevel
+  → grants ascendancy ability set
+  → slayer skill tree nodes become available
+  → fires On Ascendancy Selected delegate
+
+// Allocate nodes from both base class tree AND ascendancy tree
+Get Progression Component → Allocate Skill Node (NodeTag = Skill.Slayer.BrutalFervour)
+```
+
+**Step 7: Reading Class Info (Blueprint)**
+
+```
+// Get the active class (returns ascendancy if selected, else base class)
+Get Progression Component → Get Active Class Definition → DisplayName, ClassIcon, etc.
+
+// Get specific class info
+Get Progression Component → Get Selected Class       → base class definition
+Get Progression Component → Get Selected Ascendancy   → ascendancy definition (or null)
+```
+
+---
+
+### Replication
+
+- All progression state replicates via standard `DOREPLIFETIME` (level, XP, skill points, class tags, allocated nodes)
+- All mutations are server-authoritative (`HasAuthority()` checks)
+- Ability grant/revoke handles are server-only (clients see the effects through standard GAS replication)
+
+---
+
+### Complete Example — Fixed Class Flow
+
+```
+1. Designer creates data assets:
+   DA_LevelingConfig_Standard (50 levels, increasing XP thresholds)
+   DA_Node_HeavySlam, DA_Node_ArmorBoost, DA_Node_GravityLeap (skill nodes)
+   DA_Class_Devastator (ClassMode = FixedClass, nodes = above)
+
+2. Player creates character:
+   ProgressionComponent → SelectClass(Class.Devastator)
+   → class passives granted, base stats set for level 1
+
+3. Player kills enemies, gains XP:
+   ProgressionComponent → AwardXP(50)
+   → accumulates XP, eventually hits level thresholds
+   → level 2: +1 skill point, MaxHealth base = 30, Strength base = 6
+   → level 10: GravityLeap auto-unlocked (AutoOnLevel node)
+
+4. Player opens skill tree, allocates:
+   AllocateSkillNode(Skill.Devastator.HeavySlam) → rank 1, slam ability granted
+   AllocateSkillNode(Skill.Devastator.ArmorBoost) → rank 1, +10 MaxHealth
+   AllocateSkillNode(Skill.Devastator.ArmorBoost) → rank 2, +20 MaxHealth total
+
+5. Player respecs:
+   RespecAllNodes → all manual node abilities revoked, points refunded
+   GravityLeap stays (auto-unlock, re-applied automatically)
+
+6. Save game:
+   SaveProgression → stores level 10, XP, 8 skill points, Class.Devastator,
+                      [HeavySlam rank 1, ArmorBoost rank 2, GravityLeap rank 1]
+```
+
+---
+
+### Complete Example — Ascendancy Flow
+
+```
+1. Designer creates data assets:
+   DA_Class_Warrior (base class, AscendancyRequiredLevel = 30)
+   DA_Ascendancy_Slayer (bIsBaseClass = false, skill tree with prerequisites)
+   Link: Warrior.AvailableAscendancies = [Slayer, Berserker]
+
+2. Player starts as Warrior:
+   SelectClass(Class.Warrior) → base warrior passives + stats
+
+3. Player levels to 30, completes ascendancy trial:
+   SelectAscendancy(Ascendancy.Slayer)
+   → slayer passives granted
+   → slayer skill tree nodes now allocable
+   → stat growth stacks: base MaxHealth +12/level + slayer Strength +2/level
+
+4. Player allocates nodes from BOTH trees:
+   AllocateSkillNode(Skill.Warrior.IronSkin)        → base class node
+   AllocateSkillNode(Skill.Slayer.BrutalFervour)    → ascendancy node
+   AllocateSkillNode(Skill.Slayer.Headsman)          → requires BrutalFervour rank 1 ✓
+
+5. Save/load preserves everything:
+   class, ascendancy, all allocated nodes from both trees
+```
+
 ## Content Assets
 
 | Asset | Type | Location |
@@ -796,3 +1108,7 @@ Weapon instance state (ammo, affixes, socketed gems, mods, quality) is automatic
 10. **UObject item instances** — `UOutlawItemInstance` enables per-item mutable state (ammo, affixes, gems) while the shared `UOutlawItemDefinition` remains immutable and reusable.
 11. **Weapon attribute set** — Abilities read weapon stats from GAS attributes, not from weapon data directly. This lets buffs/debuffs modify weapon stats through standard GAS effects.
 12. **SetByCaller affix effects** — Each affix uses a GE with SetByCaller magnitude, passing the rolled value via tag. No custom code per affix type — one GE class per stat modification.
+13. **Self-contained progression system** — The `UOutlawProgressionComponent` requires zero modifications to existing files. It accesses the ASC via `IAbilitySystemInterface` (same helper pattern as the weapon manager).
+14. **Dual-mode class system** — `EOutlawClassMode` on `UOutlawClassDefinition` determines behavior. FixedClass = Outriders-style (flat skill tree with auto-unlocks). AscendancyClass = PoE 2-style (base class → specialization with node prerequisites).
+15. **SetNumericAttributeBase for stat growth** — Class stat scaling and node stat bonuses use `SetNumericAttributeBase()` on existing attributes. GE-based buffs/debuffs stack properly on top of the progression-set base values.
+16. **Multi-rank skill nodes** — Supports both single-point nodes (grant one ability set) and multi-rank nodes (e.g. +5% damage per rank, up to 5 ranks) via `PerRankAbilitySets` and `StatBonusesPerRank`.

@@ -20,6 +20,7 @@ public class Outlaw : ModuleRules
 			"UMG",
 			"CommonUI",
 			"CommonInput",
+			"NetCore",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

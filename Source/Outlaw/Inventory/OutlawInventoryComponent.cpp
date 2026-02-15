@@ -2,9 +2,18 @@
 
 #include "OutlawInventoryComponent.h"
 #include "OutlawItemDefinition.h"
+#include "OutlawItemInstance.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "AbilitySystem/OutlawAbilitySet.h"
+#include "Weapon/OutlawWeaponManagerComponent.h"
+#include "Weapon/OutlawShooterWeaponData.h"
+#include "Weapon/OutlawARPGWeaponData.h"
+#include "Weapon/OutlawAffixDefinition.h"
+#include "Weapon/OutlawSkillGemDefinition.h"
+#include "Weapon/OutlawWeaponModDefinition.h"
+#include "Weapon/OutlawWeaponTypes.h"
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogOutlawInventory, Log, All);
@@ -203,8 +212,12 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 					break;
 				}
 				const int32 NewId = GenerateInstanceId();
-				InventoryList.AddEntry(ItemDef, ActualStack, NewId, PlaceX, PlaceY);
+				const int32 EntryIdx = InventoryList.AddEntry(ItemDef, ActualStack, NewId, PlaceX, PlaceY);
 				SetOccupancy(PlaceX, PlaceY, ItemDef->GridWidth, ItemDef->GridHeight, NewId);
+				if (ItemDef->IsWeapon())
+				{
+					InventoryList.Entries[EntryIdx].ItemInstance = CreateItemInstance(ItemDef, NewId);
+				}
 			}
 			else
 			{
@@ -212,7 +225,12 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 				{
 					break;
 				}
-				InventoryList.AddEntry(ItemDef, ActualStack, GenerateInstanceId());
+				const int32 NewId = GenerateInstanceId();
+				const int32 EntryIdx = InventoryList.AddEntry(ItemDef, ActualStack, NewId);
+				if (ItemDef->IsWeapon())
+				{
+					InventoryList.Entries[EntryIdx].ItemInstance = CreateItemInstance(ItemDef, NewId);
+				}
 			}
 
 			Remaining -= ActualStack;
@@ -227,8 +245,12 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 				break;
 			}
 			const int32 NewId = GenerateInstanceId();
-			InventoryList.AddEntry(ItemDef, StackSize, NewId, PlaceX, PlaceY);
+			const int32 EntryIdx = InventoryList.AddEntry(ItemDef, StackSize, NewId, PlaceX, PlaceY);
 			SetOccupancy(PlaceX, PlaceY, ItemDef->GridWidth, ItemDef->GridHeight, NewId);
+			if (ItemDef->IsWeapon())
+			{
+				InventoryList.Entries[EntryIdx].ItemInstance = CreateItemInstance(ItemDef, NewId);
+			}
 		}
 		else
 		{
@@ -236,7 +258,12 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 			{
 				break;
 			}
-			InventoryList.AddEntry(ItemDef, StackSize, GenerateInstanceId());
+			const int32 NewId = GenerateInstanceId();
+			const int32 EntryIdx = InventoryList.AddEntry(ItemDef, StackSize, NewId);
+			if (ItemDef->IsWeapon())
+			{
+				InventoryList.Entries[EntryIdx].ItemInstance = CreateItemInstance(ItemDef, NewId);
+			}
 		}
 
 		Remaining -= StackSize;
@@ -525,6 +552,15 @@ bool UOutlawInventoryComponent::EquipItem(int32 InstanceId)
 		}
 	}
 
+	// Notify weapon manager if this is a weapon with an instance
+	if (Entry->ItemInstance)
+	{
+		if (UOutlawWeaponManagerComponent* WeaponMgr = GetWeaponManager())
+		{
+			WeaponMgr->OnWeaponEquipped(Entry->ItemInstance, Slot->SlotTag);
+		}
+	}
+
 	OnItemEquipped.Broadcast(ItemDef, Slot->SlotTag);
 	BroadcastInventoryChanged();
 	return true;
@@ -545,6 +581,15 @@ bool UOutlawInventoryComponent::UnequipItem(FGameplayTag SlotTag)
 
 	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
 	const UOutlawItemDefinition* ItemDef = Entry ? Entry->ItemDef : nullptr;
+
+	// Notify weapon manager before revoking
+	if (Entry && Entry->ItemInstance)
+	{
+		if (UOutlawWeaponManagerComponent* WeaponMgr = GetWeaponManager())
+		{
+			WeaponMgr->OnWeaponUnequipped(Entry->ItemInstance, SlotTag);
+		}
+	}
 
 	// Revoke ability set
 	UAbilitySystemComponent* ASC = GetASC();
@@ -659,6 +704,40 @@ FOutlawInventorySaveData UOutlawInventoryComponent::SaveInventory() const
 			}
 		}
 
+		// Save weapon instance state
+		if (Entry.ItemInstance)
+		{
+			UOutlawItemInstance* Inst = Entry.ItemInstance;
+			SaveEntry.CurrentAmmo = Inst->CurrentAmmo;
+			SaveEntry.Quality = Inst->Quality;
+
+			// Save affixes
+			for (const FOutlawItemAffix& Affix : Inst->Affixes)
+			{
+				FOutlawSavedAffix SavedAffix;
+				SavedAffix.AffixDefPath = FSoftObjectPath(Affix.AffixDef);
+				SavedAffix.RolledValue = Affix.RolledValue;
+				SavedAffix.Slot = static_cast<uint8>(Affix.Slot);
+				SaveEntry.SavedAffixes.Add(SavedAffix);
+			}
+
+			// Save socketed gems
+			for (const FOutlawSocketSlot& Socket : Inst->SocketSlots)
+			{
+				SaveEntry.SavedSocketedGems.Add(Socket.SocketedGem ? FSoftObjectPath(Socket.SocketedGem) : FSoftObjectPath());
+			}
+
+			// Save mods
+			if (Inst->InstalledModTier1)
+			{
+				SaveEntry.SavedModTier1 = FSoftObjectPath(Inst->InstalledModTier1);
+			}
+			if (Inst->InstalledModTier2)
+			{
+				SaveEntry.SavedModTier2 = FSoftObjectPath(Inst->InstalledModTier2);
+			}
+		}
+
 		SaveData.Items.Add(SaveEntry);
 	}
 
@@ -703,11 +782,59 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 		}
 
 		const int32 NewInstanceId = GenerateInstanceId();
-		InventoryList.AddEntry(ItemDef, SaveEntry.StackCount, NewInstanceId, SaveEntry.GridX, SaveEntry.GridY);
+		const int32 EntryIdx = InventoryList.AddEntry(ItemDef, SaveEntry.StackCount, NewInstanceId, SaveEntry.GridX, SaveEntry.GridY);
 
 		if (IsGridMode() && SaveEntry.GridX != INDEX_NONE)
 		{
 			SetOccupancy(SaveEntry.GridX, SaveEntry.GridY, ItemDef->GridWidth, ItemDef->GridHeight, NewInstanceId);
+		}
+
+		// Restore weapon instance if this is a weapon
+		if (ItemDef->IsWeapon())
+		{
+			UOutlawItemInstance* Inst = CreateItemInstance(ItemDef, NewInstanceId);
+			InventoryList.Entries[EntryIdx].ItemInstance = Inst;
+
+			Inst->CurrentAmmo = SaveEntry.CurrentAmmo;
+			Inst->Quality = SaveEntry.Quality;
+
+			// Restore affixes
+			Inst->Affixes.Reset();
+			for (const FOutlawSavedAffix& SavedAffix : SaveEntry.SavedAffixes)
+			{
+				UOutlawAffixDefinition* AffixDef = Cast<UOutlawAffixDefinition>(SavedAffix.AffixDefPath.TryLoad());
+				if (AffixDef)
+				{
+					FOutlawItemAffix Affix;
+					Affix.AffixDef = AffixDef;
+					Affix.RolledValue = SavedAffix.RolledValue;
+					Affix.Slot = static_cast<EOutlawAffixSlot>(SavedAffix.Slot);
+					Inst->Affixes.Add(Affix);
+				}
+			}
+
+			// Restore socketed gems
+			for (int32 i = 0; i < SaveEntry.SavedSocketedGems.Num() && i < Inst->SocketSlots.Num(); ++i)
+			{
+				if (SaveEntry.SavedSocketedGems[i].IsValid())
+				{
+					UOutlawSkillGemDefinition* GemDef = Cast<UOutlawSkillGemDefinition>(SaveEntry.SavedSocketedGems[i].TryLoad());
+					if (GemDef)
+					{
+						Inst->SocketSlots[i].SocketedGem = GemDef;
+					}
+				}
+			}
+
+			// Restore mods
+			if (SaveEntry.SavedModTier1.IsValid())
+			{
+				Inst->InstalledModTier1 = Cast<UOutlawWeaponModDefinition>(SaveEntry.SavedModTier1.TryLoad());
+			}
+			if (SaveEntry.SavedModTier2.IsValid())
+			{
+				Inst->InstalledModTier2 = Cast<UOutlawWeaponModDefinition>(SaveEntry.SavedModTier2.TryLoad());
+			}
 		}
 
 		if (SaveEntry.EquippedSlotTag.IsValid())
@@ -725,7 +852,59 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 	BroadcastInventoryChanged();
 }
 
+// ── Item Instance API ────────────────────────────────────────────
+
+UOutlawItemInstance* UOutlawInventoryComponent::GetItemInstance(FGameplayTag SlotTag) const
+{
+	const FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
+	if (!Slot || Slot->EquippedItemInstanceId == INDEX_NONE)
+	{
+		return nullptr;
+	}
+
+	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
+	return Entry ? Entry->ItemInstance : nullptr;
+}
+
+UOutlawItemInstance* UOutlawInventoryComponent::GetItemInstanceById(int32 InstanceId) const
+{
+	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	return Entry ? Entry->ItemInstance : nullptr;
+}
+
 // ── Private Helpers ─────────────────────────────────────────────
+
+UOutlawItemInstance* UOutlawInventoryComponent::CreateItemInstance(UOutlawItemDefinition* ItemDef, int32 InstanceId)
+{
+	if (!ItemDef || !ItemDef->IsWeapon())
+	{
+		return nullptr;
+	}
+
+	UOutlawItemInstance* Instance = NewObject<UOutlawItemInstance>(GetOwner());
+	Instance->ItemDef = ItemDef;
+	Instance->InstanceId = InstanceId;
+
+	// Initialize shooter state
+	if (ItemDef->ShooterWeaponData)
+	{
+		Instance->CurrentAmmo = ItemDef->ShooterWeaponData->MagazineSize;
+	}
+
+	// Initialize ARPG state — copy default socket layout
+	if (ItemDef->ARPGWeaponData)
+	{
+		Instance->SocketSlots = ItemDef->ARPGWeaponData->DefaultSocketLayout;
+	}
+
+	return Instance;
+}
+
+UOutlawWeaponManagerComponent* UOutlawInventoryComponent::GetWeaponManager() const
+{
+	AActor* Owner = GetOwner();
+	return Owner ? Owner->FindComponentByClass<UOutlawWeaponManagerComponent>() : nullptr;
+}
 
 UAbilitySystemComponent* UOutlawInventoryComponent::GetASC() const
 {

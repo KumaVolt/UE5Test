@@ -9,7 +9,11 @@
 #include "OutlawInventoryTypes.generated.h"
 
 class UOutlawItemDefinition;
+class UOutlawItemInstance;
 class UOutlawInventoryComponent;
+class UOutlawWeaponModDefinition;
+class UOutlawSkillGemDefinition;
+class UOutlawAffixDefinition;
 
 // ────────────────────────────────────────────────────────────────
 // FOutlawInventoryEntry — A single inventory slot (FFastArraySerializer item)
@@ -48,6 +52,10 @@ struct FOutlawInventoryEntry : public FFastArraySerializerItem
 	/** Grid Y position (top-left cell). INDEX_NONE when not using grid mode. */
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory|Grid")
 	int32 GridY;
+
+	/** Per-item mutable state (ammo, affixes, gems, etc.). Only set for weapons. */
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	TObjectPtr<UOutlawItemInstance> ItemInstance;
 
 	// FFastArraySerializerItem callbacks
 	void PreReplicatedRemove(const struct FOutlawInventoryList& InArraySerializer);
@@ -136,6 +144,28 @@ struct FOutlawEquipmentSlotInfo
 };
 
 // ────────────────────────────────────────────────────────────────
+// FOutlawSavedAffix — Serialized affix for save/load
+// ────────────────────────────────────────────────────────────────
+
+USTRUCT(BlueprintType)
+struct FOutlawSavedAffix
+{
+	GENERATED_BODY()
+
+	/** Path to the affix definition asset. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save")
+	FSoftObjectPath AffixDefPath;
+
+	/** The rolled value. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save")
+	float RolledValue = 0.0f;
+
+	/** Prefix or suffix. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save")
+	uint8 Slot = 0;
+};
+
+// ────────────────────────────────────────────────────────────────
 // FOutlawInventoryItemSaveEntry — Single item save record
 // ────────────────────────────────────────────────────────────────
 
@@ -163,6 +193,32 @@ struct FOutlawInventoryItemSaveEntry
 	/** Grid position Y (for grid-mode inventories). INDEX_NONE if flat mode. */
 	UPROPERTY(BlueprintReadWrite, Category = "Save")
 	int32 GridY = INDEX_NONE;
+
+	// ── Weapon Instance Save Fields ─────────────────────────────
+
+	/** Current ammo in magazine (shooter weapons). */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	int32 CurrentAmmo = 0;
+
+	/** Quality value (ARPG weapons). */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	int32 Quality = 0;
+
+	/** Saved affix definitions and rolled values. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	TArray<FOutlawSavedAffix> SavedAffixes;
+
+	/** Saved socketed gem paths per socket index. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	TArray<FSoftObjectPath> SavedSocketedGems;
+
+	/** Saved Tier 1 mod path. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	FSoftObjectPath SavedModTier1;
+
+	/** Saved Tier 2 mod path. */
+	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
+	FSoftObjectPath SavedModTier2;
 };
 
 // ────────────────────────────────────────────────────────────────

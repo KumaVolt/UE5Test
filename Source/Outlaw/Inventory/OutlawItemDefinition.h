@@ -10,6 +10,8 @@
 class UOutlawAbilitySet;
 class UGameplayAbility;
 class UTexture2D;
+class UOutlawShooterWeaponData;
+class UOutlawARPGWeaponData;
 
 /** Rarity tier for inventory items. Determines sort order and UI presentation. */
 UENUM(BlueprintType)
@@ -107,4 +109,17 @@ public:
 	/** Which equipment slot this item occupies (e.g. Equipment.Slot.MainHand). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (EditCondition = "bCanBeEquipped", Categories = "Equipment.Slot"))
 	FGameplayTag EquipmentSlotTag;
+
+	// ── Weapon Data (Composition) ───────────────────────────────
+
+	/** Shooter weapon data (Outriders-style). Set for shooter weapons, null for non-weapons. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UOutlawShooterWeaponData> ShooterWeaponData;
+
+	/** ARPG weapon data (Path of Exile 2-style). Set for ARPG weapons, null for non-weapons. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UOutlawARPGWeaponData> ARPGWeaponData;
+
+	/** Whether this item definition has weapon data attached. */
+	bool IsWeapon() const { return ShooterWeaponData != nullptr || ARPGWeaponData != nullptr; }
 };

@@ -10,6 +10,8 @@
 #include "OutlawInventoryComponent.generated.h"
 
 class UAbilitySystemComponent;
+class UOutlawItemInstance;
+class UOutlawWeaponManagerComponent;
 
 /** Criteria for sorting inventory entries. */
 UENUM(BlueprintType)
@@ -151,6 +153,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Use")
 	bool UseItem(int32 InstanceId);
 
+	// ── Item Instance API ───────────────────────────────────────
+
+	/**
+	 * Get the item instance for a weapon equipped in the given slot.
+	 * @param SlotTag  The equipment slot tag.
+	 * @return The item instance, or nullptr if no weapon equipped or no instance.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Weapon")
+	UOutlawItemInstance* GetItemInstance(FGameplayTag SlotTag) const;
+
+	/**
+	 * Get the item instance by instance ID.
+	 * @param InstanceId  The unique instance ID.
+	 * @return The item instance, or nullptr if not found or not a weapon.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Weapon")
+	UOutlawItemInstance* GetItemInstanceById(int32 InstanceId) const;
+
 	// ── Save/Load ───────────────────────────────────────────────
 
 	/** Serialize the full inventory state for saving. */
@@ -252,6 +272,12 @@ public:
 	TArray<FOutlawEquipmentSlotInfo> EquipmentSlots;
 
 private:
+	/** Create an item instance for a weapon item definition. */
+	UOutlawItemInstance* CreateItemInstance(UOutlawItemDefinition* ItemDef, int32 InstanceId);
+
+	/** Notify the weapon manager when a weapon is equipped/unequipped. */
+	UOutlawWeaponManagerComponent* GetWeaponManager() const;
+
 	/** Resolve the ASC from the owning actor via IAbilitySystemInterface. */
 	UAbilitySystemComponent* GetASC() const;
 

@@ -1,0 +1,30 @@
+Setting up bundled DotNet SDK
+/Users/Shared/Epic Games/UE_5.7/Engine/Binaries/ThirdParty/DotNet/8.0.412/mac-arm64
+Running dotnet Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll OutlawEditor Mac Development /Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject
+Log file: /Users/miqueldelafuente/Library/Application Support/Epic/UnrealBuildTool/Log.txt
+Using 'git status' to determine working set for adaptive non-unity build (/Users/miqueldelafuente/Projects/Outlaw).
+Invalidating makefile for OutlawEditor (ispc deleted)
+Choosing MODERN XCODE based on .ini settings
+/Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject does not list plugin 'StateTree' as a dependency, but module 'Outlaw' depends on 'StateTreeModule'.
+/Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject does not list plugin 'GameplayStateTree' as a dependency, but module 'Outlaw' depends on 'GameplayStateTreeModule'.
+UHT compiled-in object format Default
+Compiling with Mac SDK 26.2, minimum Target OS version 14.00
+Building OutlawEditor...
+[Adaptive Build] Excluded from Outlaw unity file: OutlawSTTask_Search.cpp
+Determining max actions to execute in parallel (10 physical cores, 10 logical cores)
+  Executing up to 10 processes, one per physical core
+Using Unreal Build Accelerator local executor to run 3 action(s)
+  Storage capacity 40Gb
+---- Starting trace ----
+UbaSessionServer - Disable remote execution (remote sessions will finish current processes)
+[1/3] Compile [Apple] Module.Outlaw.5.cpp
+[2/3] Compile [Apple] OutlawSTTask_Search.cpp
+[3/3] Link [Apple] UnrealEditor-Outlaw.dylib
+
+Trace written to file /Users/miqueldelafuente/Library/Application Support/Epic/UnrealBuildTool/Log.uba with size 2.3kb
+Total time in Unreal Build Accelerator local executor: 8.21 seconds
+Deploying OutlawEditor Mac Development...
+Deploying now!
+
+Result: Succeeded
+Total execution time: 10.73 seconds

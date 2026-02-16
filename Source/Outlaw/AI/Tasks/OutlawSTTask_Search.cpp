@@ -3,9 +3,9 @@
 #include "AI/Tasks/OutlawSTTask_Search.h"
 #include "AIController.h"
 #include "GameFramework/Actor.h"
+#include "StateTreeExecutionContext.h"
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
-#include "StateTreeExecutionContext.h"
 
 EStateTreeRunStatus FOutlawSTTask_Search::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {

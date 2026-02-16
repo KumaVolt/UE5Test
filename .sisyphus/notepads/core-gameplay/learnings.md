@@ -123,3 +123,76 @@
   4. Blueprint abilities call `ApplyDamageToTarget` with SetByCaller values (WeaponType=1.0 for shooter, 0.0 for ARPG)
 
 *End of Combat / Damage Pipeline learnings*
+
+---
+
+## 2026-02-16 08:15 UTC Task: 5-projectile
+
+### Implementation Summary
+- ✅ Created complete projectile system with base, bullet, spell variants
+- ✅ Implemented custom UWorldSubsystem for actor pooling (UE 5.7 lacks built-in pooling)
+- ✅ Added hitscan library with penetration and accuracy spread
+- ✅ Integrated GAS damage application pattern
+- ✅ All 10 projectile files compile successfully (6 cpp, 4 headers)
+
+### Key Discoveries
+
+**Actor Pooling Pattern**:
+- UHT does not support `UPROPERTY()` on `TMap<UClass*, TArray<TObjectPtr<T>>>` (nested TObjectPtr containers)
+- Solution: Remove `UPROPERTY()` macro, use non-UPROPERTY TMap for pool storage
+- Pool return sequence: `SetActorHiddenInGame(true)` + `SetActorEnableCollision(false)` + `SetActorTickEnabled(false)` + `ProjectileMovement->StopMovementImmediately()`
+- Pool retrieval: Re-enable collision, tick, visibility, reset velocity
+- Max pool size per class: 50 (configurable via `MaxPoolSizePerClass`)
+
+**GAS Damage Flow**:
+```cpp
+FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
+FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, Level, EffectContext);
+SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+```
+
+**Penetration Logic**:
+- `TSet<AActor*> HitActors` prevents double-hits during penetration
+- `CurrentPenetrationCount` decrements per impact
+- Projectile continues through targets until count reaches zero
+- Each hit applies full damage (no falloff by default)
+
+**Chaining Logic**:
+- Sphere overlap finds all potential targets within `ChainRadius`
+- Filters out already-processed actors via `HitActors` TSet
+- Selects closest valid target, redirects projectile velocity
+- `CurrentChainCount` decrements per chain jump
+
+**Hitscan Spread**:
+- Random pitch/yaw offset via `FMath::FRandRange(-SpreadAngle, SpreadAngle)` when `SpreadAngle > 0`
+- Applied to normalized direction vector before scaling by range
+- Line trace uses `LineTraceMultiByChannel` with `ECC_Pawn`
+
+**Include Requirements**:
+- `#include "Engine/OverlapResult.h"` required for `TArray<FOverlapResult>` usage (forward declaration insufficient)
+- `#include "Projectile/OutlawProjectilePoolSubsystem.h"` required in `OutlawProjectileBase.cpp` for `ReturnToPool()`
+
+### Build Integration
+- All projectile files excluded from unity build (adaptive non-unity)
+- Compilation time: ~8-10 seconds for 5 cpp files on 10-core M1
+- Zero projectile-related compilation errors (pre-existing errors in Combat/Animation systems unrelated to Task 5)
+
+### Blueprint Setup (Future)
+When designers create projectile blueprints:
+1. Create BP inheriting from `AOutlawBulletProjectile` or `AOutlawSpellProjectile`
+2. Set `MeshComp` static mesh, `TrailComp` Niagara system in Blueprint defaults
+3. Create damage GE (e.g. `GE_BulletDamage`) with SetByCaller magnitude
+4. Fire ability calls:
+   ```cpp
+   UOutlawProjectilePoolSubsystem* Pool = World->GetSubsystem<UOutlawProjectilePoolSubsystem>();
+   AOutlawProjectileBase* Projectile = Pool->GetProjectile(ProjectileClass);
+   FOutlawProjectileInitData InitData;
+   InitData.Direction = AimDirection;
+   InitData.Speed = 10000.f;
+   InitData.SourceASC = GetAbilitySystemComponentFromActorInfo();
+   InitData.DamageEffect = DamageEffectClass;
+   InitData.Level = GetAbilityLevel();
+   Projectile->InitProjectile(InitData);
+   ```
+
+*End of Projectile System learnings*

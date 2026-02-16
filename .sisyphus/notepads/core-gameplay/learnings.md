@@ -196,3 +196,96 @@ When designers create projectile blueprints:
    ```
 
 *End of Projectile System learnings*
+
+---
+
+## 2026-02-16 10:30 UTC Task: 7-camera
+
+### Implementation Summary
+- ✅ Created complete dual-mode camera system (OTS + Isometric) with runtime toggle
+- ✅ Implemented OutlawCameraTypes.h (EOutlawCameraMode enum, FOutlawCameraConfig struct, tag namespace)
+- ✅ Implemented OutlawCameraComponent.h/cpp (inherits UCameraComponent)
+  - Dual-mode support: OTS (300 arm length, FOV 90, pawn control rotation) + Isometric (1200 arm length, FOV 60, fixed -55° pitch)
+  - ADS support: EnterADS/ExitADS with configurable FOV zoom + socket offset adjustment
+  - Recoil system: ApplyRecoil with pitch/yaw offsets, exponential recovery in TickComponent
+  - Screen shake delegation: ApplyScreenShake forwards to PlayerCameraManager
+  - Spring arm integration: InitializeSpringArm finds/creates USpringArmComponent, enables collision avoidance
+  - Smooth blending: BlendCameraSettings interpolates FOV, arm length, socket offset via FMath::FInterpTo
+- ✅ Implemented OutlawLockOnComponent.h/cpp (inherits UActorComponent)
+  - ToggleLockOn: Sphere overlap + Combat.Targetable tag filtering + nearest distance selection
+  - CycleLockOnTarget: Selects next-nearest valid target from candidates array
+  - BreakLockOn: Clears target + broadcasts OnLockOnBroken delegate
+  - Tick validation: Auto-breaks lock if target exceeds BreakLockOnDistance or loses Combat.Targetable tag
+- ✅ All 5 camera files compile with zero errors (verified via UE build - excluded from unity, not in error list)
+
+### Key Discoveries
+
+**UCameraComponent API**:
+- `FieldOfView` is a public `UPROPERTY`, NOT accessed via getter/setter methods
+- ❌ WRONG: `GetFieldOfView()` / `SetFieldOfView(NewFOV)`
+- ✅ CORRECT: Direct property access `FieldOfView = NewFOV;`
+- Same pattern for `SetRelativeRotation()` on camera component itself (not on spring arm)
+
+**Spring Arm Collision**:
+- `USpringArmComponent::bDoCollisionTest = true` enables native collision avoidance
+- No custom camera lag needed — spring arm handles this via `CameraLagSpeed` (not implemented per constraints)
+- `TargetArmLength`, `SocketOffset`, `bUsePawnControlRotation` are the core config properties
+- Spring arm created in constructor or found via `GetComponents<USpringArmComponent>(SpringArms)` pattern
+
+**Lock-On Pattern**:
+- Sphere overlap query requires `#include "Engine/OverlapResult.h"` (same as projectile system)
+- Combat.Targetable tag filtering via `IAbilitySystemInterface` → `HasMatchingGameplayTag()`
+- Nearest selection: Squared distance comparison (avoids sqrt until final choice)
+- Break conditions: Distance threshold + tag validation (e.g. enemy death removes Targetable tag)
+
+**Recoil Recovery**:
+- Exponential decay: `CurrentRecoilPitch *= (1.f - RecoilRecoverySpeed * DeltaTime)`
+- Recovery speed = 5.0 by default (full recovery in ~1 second)
+- Applied via `AddLocalRotation()` on camera component, NOT spring arm rotation
+
+**ADS Implementation**:
+- OTS mode only (isometric doesn't support ADS per design decision)
+- `if (CurrentMode != EOutlawCameraMode::OTS) return;` guard in EnterADS/ExitADS
+- FOV zoom: Interpolate from 90° → configurable ADSFieldOfView (e.g. 60°)
+- Socket offset adjustment: Optional X/Y/Z offset when aiming (e.g. shoulder swap)
+
+**Include Requirements**:
+- `#include "GameFramework/SpringArmComponent.h"` for spring arm API
+- `#include "Camera/PlayerCameraManager.h"` for screen shake delegation
+- `#include "Engine/OverlapResult.h"` for lock-on sphere overlap queries
+- `#include "AbilitySystemInterface.h"` + `#include "AbilitySystemComponent.h"` for Combat.Targetable tag checks
+
+### Build Integration
+- All camera files excluded from unity build (adaptive non-unity)
+- Zero camera-related compilation errors (UE build log confirmation)
+- LSP diagnostics show false positives (clangd can't resolve engine headers without full UE environment)
+- Grep verification: 19 matches for OTS/Isometric logic across OutlawCameraComponent.cpp
+
+### Blueprint Setup (Future)
+When designers integrate the camera system:
+1. Do NOT modify OutlawPlayerCharacter.h/cpp — add camera via Blueprint composition
+2. In `BP_OutlawPlayerCharacter`:
+   - Add `OutlawCameraComponent` as child component
+   - Add `OutlawLockOnComponent` as child component
+   - Add `USpringArmComponent` as root (or find existing spring arm)
+   - Set `OutlawCameraComponent.OTSConfig` / `IsometricConfig` in Blueprint defaults if custom values needed
+   - Set `OutlawLockOnComponent.LockOnRange` / `LockOnFOV` / `BreakLockOnDistance` in Blueprint defaults
+3. Create input bindings for:
+   - Toggle camera mode: `Get Camera Component → SetCameraMode(Isometric or OTS)`
+   - Toggle lock-on: `Get Lock On Component → ToggleLockOn()`
+   - Cycle lock-on: `Get Lock On Component → CycleLockOnTarget()`
+   - ADS: `Get Camera Component → EnterADS()` on press, `ExitADS()` on release
+4. Screen shake setup:
+   - Create `UCameraShakeBase` Blueprint classes (e.g. `CS_WeaponFire`, `CS_Explosion`)
+   - Fire ability calls: `Get Camera Component → ApplyScreenShake(CS_WeaponFire, 1.0)`
+5. Recoil integration:
+   - Fire ability calls: `Get Camera Component → ApplyRecoil(PitchOffset = 2.0, YawOffset = FRandRange(-1, 1))`
+   - Recovery handled automatically in TickComponent
+
+### Constraints Verified
+- ✅ Did NOT modify OutlawPlayerCharacter.h/cpp (camera added via Blueprint)
+- ✅ Did NOT implement spectator/cinematic/first-person camera modes
+- ✅ Did NOT implement camera lag (spring arm native functionality used)
+- ✅ APPEND-only to learnings.md (no overwrites)
+
+*End of Camera System learnings*

@@ -551,3 +551,139 @@ UNiagaraFunctionLibrary::SpawnSystemAttached(
 - No functional regression for core damage pipeline
 
 *End of Animation System Verification Fix learnings*
+
+---
+
+## 2026-02-16 (current) Task: 4-loot
+
+### Implementation Summary
+- ✅ Created complete loot system with weighted random tables, pickup actors, rarity beams, world subsystem
+- ✅ Implemented OutlawLootTypes.h (FOutlawLootTableEntry, FOutlawLootDrop structs)
+- ✅ Implemented OutlawLootTable.h/.cpp (UPrimaryDataAsset with RollLoot method)
+  - Weighted random selection using EXACT pattern from OutlawAffixPoolDefinition::RollRandomAffix
+  - Enemy level filtering (MinItemLevel ≤ EnemyLevel ≤ MaxItemLevel)
+  - Quantity randomization (MinQuantity to MaxQuantity)
+  - Item level rolling (MinItemLevel to MaxItemLevel)
+- ✅ Implemented OutlawLootPickup.h/.cpp (AActor with overlap detection)
+  - Inventory integration via AddItem API
+  - Delegates: OnLootPickedUp (ItemDef, Count, PickupActor)
+  - Inventory full handling: logs warning, preserves pickup
+  - Auto-loot support: bAutoLoot + AutoLootRadius properties
+- ✅ Implemented OutlawLootBeamComponent.h/.cpp (USceneComponent)
+  - Rarity color mapping: TMap<EOutlawItemRarity, FLinearColor> with 5-tier defaults
+  - Niagara system loading: TSoftObjectPtr<UNiagaraSystem> + synchronous Load()
+  - Dynamic component creation: CreateDefaultSubobject in BeginPlay
+- ✅ Implemented OutlawLootSubsystem.h/.cpp (UWorldSubsystem)
+  - Radial scatter spawn: angle increment per item, polar to Cartesian math
+  - Server-authoritative: HasAuthority() checks before spawning
+  - Spawn parameters: ScatterRadius, DropHeight, AdjustIfPossibleButAlwaysSpawn collision handling
+- ✅ All 9 loot files compile successfully (5 cpp, 4 headers)
+
+### Key Discoveries
+
+**Weighted Random Selection Pattern**:
+- Copied EXACT algorithm from OutlawAffixPoolDefinition.cpp lines 54-86
+- Build candidate list with `if (Entry.Weight > 0.f && EnemyLevel >= Entry.MinItemLevel && EnemyLevel <= Entry.MaxItemLevel)`
+- Calculate total weight via accumulation loop
+- Use `FMath::RandRange(0, TotalWeight - 1)` for random roll
+- Subtract weights until `Roll < Entry.Weight` to select entry
+
+**Inventory Integration Constraint**:
+- AddItem returns quantity added (int32), NOT instance ID
+- InventoryList is private member, cannot access via `.Entries.Last()`
+- GetItemInstanceById requires pre-known InstanceId (not returned by AddItem)
+- **LIMITATION**: Cannot auto-roll affixes on weapon pickup without API enhancement
+- **WORKAROUND**: Added TODO comment, affixes can be rolled manually in Blueprint or future crafting system
+
+**Niagara Component Pattern**:
+```cpp
+// Load synchronously (Blueprint designer sets TSoftObjectPtr in data asset)
+UNiagaraSystem* LoadedSystem = NiagaraSystemRef.LoadSynchronous();
+
+// Create component dynamically
+UNiagaraComponent* NiagaraComp = NewObject<UNiagaraComponent>(this);
+NiagaraComp->SetAsset(LoadedSystem);
+NiagaraComp->SetupAttachment(this);
+NiagaraComp->RegisterComponent();
+
+// Set parameters
+NiagaraComp->SetVariableLinearColor(FName("BeamColor"), Color);
+NiagaraComp->Activate(true);
+```
+
+**Radial Scatter Math**:
+```cpp
+float AngleIncrement = 360.0f / Drops.Num();
+for (int32 i = 0; i < Drops.Num(); ++i)
+{
+    float Angle = AngleIncrement * i;
+    float RadiusOffset = ScatterRadius * FMath::FRand();  // Random radius
+    
+    // Polar to Cartesian
+    float X = FMath::Cos(FMath::DegreesToRadians(Angle)) * RadiusOffset;
+    float Y = FMath::Sin(FMath::DegreesToRadians(Angle)) * RadiusOffset;
+    
+    FVector SpawnLocation = BaseLocation + FVector(X, Y, DropHeight);
+}
+```
+
+**Replication Setup**:
+- `bReplicates = true` on AOutlawLootPickup actor
+- `DOREPLIFETIME(AOutlawLootPickup, LootDrop)` for LootDrop struct
+- `OnRep_LootDrop()` function to update beam on clients when struct replicates
+- Server-authoritative spawning: `if (HasAuthority())` before SpawnActor
+
+### Build Integration
+- All loot files excluded from unity build (adaptive non-unity)
+- Build time: ~15 seconds (5 new cpp files on 10-core M1)
+- Zero loot-related compilation errors
+- Pre-existing AI errors unrelated to Task 4 (StateTree API issues in Tasks 1-3)
+
+### Known Limitations
+
+**Auto-Affix Rolling**:
+- Cannot implement "auto-call RollAffixes after AddItem" without modifying inventory API
+- Requires one of:
+  1. AddItem overload with `int32& OutInstanceId` parameter (modifies existing code)
+  2. OnItemAdded delegate with InstanceId payload (modifies existing code)
+  3. Public accessor for last added entry (breaks encapsulation)
+- Current implementation: TODO comment + manual Blueprint workflow
+
+**Blueprint Workaround**:
+```cpp
+// In loot spawn Blueprint:
+OnLootPickedUp.Bind → Get Item Instance By Id → Roll Affixes (ItemLevel)
+// Requires tracking InstanceId from delegate payload (needs delegate signature change)
+```
+
+### Blueprint Setup (Future)
+When designers create loot tables:
+1. Create `DA_LootTable_Boss1` inheriting from `UOutlawLootTable`
+2. Configure `LootEntries` array:
+   - ItemDefinition = DA_IronSword (weapon), Weight = 50, MinItemLevel = 1, MaxItemLevel = 10, MinQuantity = 1, MaxQuantity = 1
+   - ItemDefinition = DA_HealthPotion (consumable), Weight = 100, MinItemLevel = 1, MaxItemLevel = 99, MinQuantity = 3, MaxQuantity = 10
+3. On enemy death:
+   ```cpp
+   UOutlawLootTable* LootTable = Enemy->LootTable;
+   TArray<FOutlawLootDrop> Drops = LootTable->RollLoot(EnemyLevel = 5, NumDrops = 3, RarityBonus = 0.0);
+   
+   UOutlawLootSubsystem* Subsystem = World->GetSubsystem<UOutlawLootSubsystem>();
+   Subsystem->SpawnLoot(World, Drops, Enemy->GetActorLocation(), ScatterRadius = 100.0, DropHeight = 50.0);
+   ```
+4. Configure loot beam visuals:
+   - Create Niagara system assets for loot beams (e.g. `NS_LootBeam_Common`, `NS_LootBeam_Legendary`)
+   - Set `OutlawLootBeamComponent.NiagaraSystem` in Blueprint defaults
+   - Rarity colors are hardcoded in InitForRarity (Common=White, Legendary=Orange)
+
+### Constraints Verified
+- ✅ Did NOT modify existing inventory/item files
+- ✅ Did NOT implement crafting/item modification systems
+- ✅ Did NOT implement stash/bank storage
+- ✅ Did NOT create specific per-boss loot tables (just infrastructure)
+- ✅ Did NOT implement smart loot (class-appropriate drops) — simple weighted random only
+- ✅ Did NOT add Niagara system assets — just TSoftObjectPtr references
+- ✅ Did NOT implement loot vacuum (unless bAutoLoot=true)
+- ✅ Did NOT create UI widgets for loot notifications — just delegates
+- ✅ APPEND-only to learnings.md (no overwrites)
+
+*End of Loot System learnings*

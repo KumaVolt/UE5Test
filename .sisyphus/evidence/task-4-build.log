@@ -1,0 +1,219 @@
+Setting up bundled DotNet SDK
+/Users/Shared/Epic Games/UE_5.7/Engine/Binaries/ThirdParty/DotNet/8.0.412/mac-arm64
+Running dotnet Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll OutlawEditor Mac Development /Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject
+Log file: /Users/miqueldelafuente/Library/Application Support/Epic/UnrealBuildTool/Log.txt
+Using 'git status' to determine working set for adaptive non-unity build (/Users/miqueldelafuente/Projects/Outlaw).
+Invalidating makefile for OutlawEditor (source file added)
+Choosing MODERN XCODE based on .ini settings
+/Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject does not list plugin 'StateTree' as a dependency, but module 'Outlaw' depends on 'StateTreeModule'.
+/Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject does not list plugin 'GameplayStateTree' as a dependency, but module 'Outlaw' depends on 'GameplayStateTreeModule'.
+UHT compiled-in object format Default
+Parsing headers for OutlawEditor
+  Running Internal UnrealHeaderTool /Users/miqueldelafuente/Projects/Outlaw/Outlaw.uproject /Users/miqueldelafuente/Projects/Outlaw/Intermediate/Build/Mac/OutlawEditor/Development/OutlawEditor.uhtmanifest -WarningsAsErrors -installed
+UHT processed OutlawEditor in 1.5140099 seconds (7 files written)
+Compiling with Mac SDK 26.2, minimum Target OS version 14.00
+Building OutlawEditor...
+[Adaptive Build] Excluded from Outlaw unity file: OutlawLootTable.cpp, OutlawLootSubsystem.cpp, OutlawLootPickup.cpp, OutlawLootBeamComponent.cpp, OutlawAIController.cpp, OutlawSTTask_Chase.cpp, OutlawSTTask_Attack.cpp, OutlawSTTask_Patrol.cpp, OutlawSTTask_Search.cpp, OutlawSTTask_Flee.cpp, OutlowSTCondition_InRange.cpp, OutlawSTCondition_HasTarget.cpp, OutlawSTCondition_HealthThreshold.cpp
+Determining max actions to execute in parallel (10 physical cores, 10 logical cores)
+  Executing up to 10 processes, one per physical core
+Using Unreal Build Accelerator local executor to run 13 action(s)
+  Storage capacity 40Gb
+---- Starting trace ----
+UbaServer - Listening on 0.0.0.0:1345
+[1/13] Compile [Apple] OutlawSTTask_Chase.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:17:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   17 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:44:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   44 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:64:61: error: member access into incomplete type 'const UPathFollowingComponent'
+   64 |     const EPathFollowingStatus::Type MoveStatus = PathFollowing->GetStatus();
+      |                                                                ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Intermediate/Build/Mac/UnrealEditor/Inc/AIModule/UHT/AIController.generated.h:26:7: note: forward declaration of 'UPathFollowingComponent'
+   26 | class UPathFollowingComponent;
+      |       ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:66:42: error: no member named 'Idle' in namespace 'EPathFollowingStatus'
+   66 |     if (MoveStatus == EPathFollowingStatus::Idle)
+      |                       ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:70:47: error: no member named 'Moving' in namespace 'EPathFollowingStatus'
+   70 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                            ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:70:93: error: no member named 'Waiting' in namespace 'EPathFollowingStatus'
+   70 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                                                                          ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Chase.cpp:80:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   80 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+7 errors generated.
+[2/13] Compile [Apple] OutlawSTTask_Flee.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:18:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   18 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:60:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   60 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:78:61: error: member access into incomplete type 'const UPathFollowingComponent'
+   78 |     const EPathFollowingStatus::Type MoveStatus = PathFollowing->GetStatus();
+      |                                                                ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Intermediate/Build/Mac/UnrealEditor/Inc/AIModule/UHT/AIController.generated.h:26:7: note: forward declaration of 'UPathFollowingComponent'
+   26 | class UPathFollowingComponent;
+      |       ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:80:42: error: no member named 'Idle' in namespace 'EPathFollowingStatus'
+   80 |     if (MoveStatus == EPathFollowingStatus::Idle)
+      |                       ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:84:47: error: no member named 'Moving' in namespace 'EPathFollowingStatus'
+   84 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                            ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:84:93: error: no member named 'Waiting' in namespace 'EPathFollowingStatus'
+   84 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                                                                          ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Flee.cpp:94:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   94 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+7 errors generated.
+[3/13] Compile [Apple] OutlawSTTask_Attack.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Attack.cpp:30:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   30 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Attack.cpp:49:27: error: cannot initialize a variable of type 'IAbilitySystemInterface *' with an rvalue of type 'TCopyQualifiersFromTo_T<const AActor, IAbilitySystemInterface> *' (aka 'const IAbilitySystemInterface *')
+   49 |     IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(OwnerActor);
+      |                              ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.
+[4/13] Compile [Apple] OutlawAIController.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/OutlawAIController.cpp:8:10: fatal error: 'StateTreeComponent.h' file not found
+    8 | #include "StateTreeComponent.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[5/13] Compile [Apple] OutlawLootPickup.cpp
+[6/13] Compile [Apple] OutlawSTTask_Search.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:16:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   16 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:57:17: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   57 |         const AActor* OwnerActor = Context.GetOwner();
+      |                       ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:75:62: error: member access into incomplete type 'const UPathFollowingComponent'
+   75 |         const EPathFollowingStatus::Type MoveStatus = PathFollowing->GetStatus();
+      |                                                                    ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Intermediate/Build/Mac/UnrealEditor/Inc/AIModule/UHT/AIController.generated.h:26:7: note: forward declaration of 'UPathFollowingComponent'
+   26 | class UPathFollowingComponent;
+      |       ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:77:43: error: no member named 'Idle' in namespace 'EPathFollowingStatus'
+   77 |         if (MoveStatus == EPathFollowingStatus::Idle)
+      |                           ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:81:48: error: no member named 'Moving' in namespace 'EPathFollowingStatus'
+   81 |         else if (MoveStatus != EPathFollowingStatus::Moving && MoveStatus != EPathFollowingStatus::Waiting)
+      |                                ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:81:94: error: no member named 'Waiting' in namespace 'EPathFollowingStatus'
+   81 |         else if (MoveStatus != EPathFollowingStatus::Moving && MoveStatus != EPathFollowingStatus::Waiting)
+      |                                                                              ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Search.cpp:92:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   92 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+7 errors generated.
+[7/13] Compile [Apple] OutlawSTTask_Patrol.cpp
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:17:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   17 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:44:16: error: no viable conversion from 'TNotNull<UObject *>' to 'const AActor *'
+   44 |     const AActor* OwnerActor = Context.GetOwner();
+      |                   ^            ~~~~~~~~~~~~~~~~~~
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:222:3: note: candidate function
+  222 |         operator bool() const = delete;
+      |         ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Misc/NotNull.h:125:4: note: candidate function
+  125 |             operator T*() const
+      |             ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:62:61: error: member access into incomplete type 'const UPathFollowingComponent'
+   62 |     const EPathFollowingStatus::Type MoveStatus = PathFollowing->GetStatus();
+      |                                                                ^
+/Users/Shared/Epic Games/UE_5.7/Engine/Intermediate/Build/Mac/UnrealEditor/Inc/AIModule/UHT/AIController.generated.h:26:7: note: forward declaration of 'UPathFollowingComponent'
+   26 | class UPathFollowingComponent;
+      |       ^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:64:42: error: no member named 'Idle' in namespace 'EPathFollowingStatus'
+   64 |     if (MoveStatus == EPathFollowingStatus::Idle)
+      |                       ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:70:47: error: no member named 'Moving' in namespace 'EPathFollowingStatus'
+   70 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                            ~~~~~~~~~~~~~~~~~~~~~~^
+/Users/miqueldelafuente/Projects/Outlaw/Source/Outlaw/AI/Tasks/OutlawSTTask_Patrol.cpp:70:93: error: no member named 'Waiting' in namespace 'EPathFollowingStatus'
+   70 |     else if (MoveStatus == EPathFollowingStatus::Moving || MoveStatus == EPathFollowingStatus::Waiting)
+      |                                                                          ~~~~~~~~~~~~~~~~~~~~~~^
+6 errors generated.
+[8/13] Compile [Apple] Module.Outlaw.3.cpp
+[9/13] Compile [Apple] Module.Outlaw.4.cpp
+[10/13] Compile [Apple] Module.Outlaw.1.cpp
+[11/13] Compile [Apple] Module.Outlaw.2.cpp
+[12/13] Compile [Apple] Module.Outlaw.5.cpp
+Trace written to file /Users/miqueldelafuente/Library/Application Support/Epic/UnrealBuildTool/Log.uba with size 21.5kb
+Total time in Unreal Build Accelerator local executor: 11.52 seconds
+
+Result: Failed (OtherCompilationError)
+Total execution time: 15.54 seconds

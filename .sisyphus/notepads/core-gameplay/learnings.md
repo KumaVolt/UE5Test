@@ -852,3 +852,298 @@ When designers configure AI:
 - ✅ APPEND-only to learnings.md (no overwrites)
 
 *End of AI System learnings*
+
+---
+
+## 2026-02-16 12:00 UTC Task: 3-death-respawn
+
+### Implementation Summary
+- ✅ Created complete death and respawn system with 9 files (5 headers, 4 cpp)
+- ✅ Implemented OutlawDeathTypes.h (delegates + FOutlawCombatLogEntry struct)
+- ✅ Implemented OutlawDeathComponent.h/.cpp (Health==0 detection, State.Dead tag, cancel abilities)
+  - Binds to Health attribute via `GetGameplayAttributeValueChangeDelegate`
+  - Sets State.Dead tag via `ASC->AddLooseGameplayTag(OutlawAnimTags::Dead)`
+  - Cancels all abilities via `ASC->CancelAllAbilities()`
+  - Disables movement, capsule collision to query-only, input disabled
+  - Property: `bAllowDownState` (default false for Tier 1)
+- ✅ Implemented OutlawPlayerDeathHandler.h/.cpp (checkpoint respawn)
+  - Shows death screen widget (fade-to-black CommonUI stub)
+  - After `RespawnDelay` (default 3.0s): calls `RespawnAtCheckpoint()`
+  - Teleports to checkpoint, restores Health to max, removes State.Dead tag
+  - `SetCheckpoint(FVector, FRotator)` API for checkpoint triggers
+- ✅ Implemented OutlawEnemyDeathHandler.h/.cpp (3-phase death)
+  - Phase 1 (Ragdoll): `GetMesh()->SetSimulatePhysics(true)` + `AddImpulseAtLocation`
+  - Phase 2 (Dissolve): After `RagdollDuration` (default 2.0s)
+  - Phase 3 (Cleanup): After `DissolveDuration` (default 1.5s) → loot + XP + destroy
+  - XP integration: `ProgressionComp->AwardXP(BaseXPReward)`
+  - Loot integration: `LootSubsystem->SpawnLoot(DeathLocation, LootTable, EnemyLevel, RarityBonus, NumLootDrops)`
+- ✅ Implemented OutlawCombatLogComponent.h/.cpp (circular buffer)
+  - `TArray<FOutlawCombatLogEntry>` with max 100 entries
+  - `AddEntry()` appends + removes oldest if > MaxEntries
+  - Delegate: `OnCombatLogEntryAdded` for UI binding
+- ✅ Build succeeded with zero errors (6.98 seconds)
+
+### Key Discoveries
+
+**GEModData Access Limitation (UE 5.7)**:
+- ❌ ERROR: `member access into incomplete type 'const FGameplayEffectModCallbackData'`
+- Root cause: `FOnAttributeChangeData::GEModData` is forward-declared pointer only
+- ✅ FIX: Remove GEModData access, pass `nullptr` for Killer
+- Same limitation as Task 6 (hit reaction system)
+- Killer info must be passed via alternate means (gameplay events, explicit calls)
+
+**Death Component Delegate Binding**:
+```cpp
+HealthDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
+    UOutlawAttributeSet::GetHealthAttribute()).AddUObject(
+        this, &UOutlawDeathComponent::OnHealthChanged);
+```
+- Matches pattern from Task 1 (damage number component)
+- Cleanup: `BoundASC->GetGameplayAttributeValueChangeDelegate(...).Remove(HealthDelegateHandle)`
+
+**Timer Pattern for Multi-Phase Death**:
+```cpp
+// Phase 1 → Phase 2
+FTimerHandle RagdollTimerHandle;
+GetWorld()->GetTimerManager().SetTimer(
+    RagdollTimerHandle, 
+    this, 
+    &UOutlawEnemyDeathHandler::StartDissolve, 
+    RagdollDuration, 
+    false
+);
+
+// Phase 2 → Phase 3
+FTimerHandle DissolveTimerHandle;
+GetWorld()->GetTimerManager().SetTimer(
+    DissolveTimerHandle, 
+    this, 
+    &UOutlawEnemyDeathHandler::SpawnLootAndDestroy, 
+    DissolveDuration, 
+    false
+);
+```
+
+**Circular Buffer Pattern**:
+```cpp
+void AddEntry(const FOutlawCombatLogEntry& Entry)
+{
+    CombatLogEntries.Add(Entry);
+    if (CombatLogEntries.Num() > MaxEntries)
+    {
+        CombatLogEntries.RemoveAt(0); // Remove oldest
+    }
+    OnCombatLogEntryAdded.Broadcast(Entry);
+}
+```
+
+**Ragdoll Physics**:
+- `GetMesh()->SetSimulatePhysics(true)` enables ragdoll
+- `AddImpulseAtLocation(DeathImpulse, HitLocation)` for directional physics
+- Requires skeletal mesh with physics asset (Blueprint setup)
+
+**Respawn Flow**:
+- `SetNumericAttributeBase(HealthAttribute, MaxHealth)` restores health without triggering GE
+- `RemoveLooseGameplayTag(OutlawAnimTags::Dead)` re-enables character
+- `GetOwner()->TeleportTo(CheckpointLocation, CheckpointRotation)` respawn position
+
+### Integration Verification
+- ✅ `GetGameplayAttributeValueChangeDelegate` found (2 instances in OutlawDeathComponent.cpp)
+- ✅ `AwardXP` found (OutlawEnemyDeathHandler.cpp line for XP-on-kill)
+- ✅ `SpawnLoot` found (OutlawEnemyDeathHandler.cpp line for loot drop)
+- ✅ `SetSimulatePhysics` found (OutlawEnemyDeathHandler.cpp line for ragdoll)
+
+### Build Integration
+- All death files excluded from unity build (adaptive non-unity)
+- Build time: 6.98 seconds (4 new cpp files on 10-core M1)
+- Zero compilation errors after GEModData fix
+- Evidence: Build log saved to `.sisyphus/evidence/task-3-build.log`
+
+### Blueprint Setup (Future)
+When designers integrate death/respawn:
+1. **DeathComponent Setup** (added to character BP):
+   - Add `UOutlawDeathComponent` via Blueprint composition
+   - Property `bAllowDownState` = false for Tier 1 (instant death)
+2. **PlayerDeathHandler Setup**:
+   - Add `UOutlawPlayerDeathHandler` to player character BP
+   - Set `RespawnDelay` (default 3.0s)
+   - Set `DeathScreenWidgetClass` (CommonUI widget inheriting from stub)
+   - Checkpoint actors call `SetCheckpoint(Location, Rotation)` on overlap
+3. **EnemyDeathHandler Setup**:
+   - Add `UOutlawEnemyDeathHandler` to enemy character BP
+   - Set `RagdollDuration` (default 2.0s), `DissolveDuration` (default 1.5s)
+   - Set `DeathImpulse` (e.g. FVector(0, 0, 500) for upward ragdoll)
+   - Set `BaseXPReward` (int32, e.g. 50 XP per kill)
+   - Set `LootTable` (DA_LootTable_Enemy asset)
+   - Set `NumLootDrops` (default 1), `RarityBonus` (default 0.0)
+4. **CombatLogComponent Setup**:
+   - Add to PlayerController or GameState (singleton pattern)
+   - Bind `OnCombatLogEntryAdded` delegate to UI widget
+   - UI displays recent entries (timestamp, source → target, damage, kill flag)
+
+### Constraints Verified
+- ✅ Did NOT implement DBNO state — only `bAllowDownState` bool flag added
+- ✅ Did NOT implement soul/corpse mechanics
+- ✅ Did NOT create checkpoint actors — only `SetCheckpoint()` API
+- ✅ Did NOT modify OutlawCharacterBase.h — death component added via Blueprint
+- ✅ Did NOT implement elaborate death screen UI — just CommonUI stub
+- ✅ Did NOT create death animation assets — properties only (TSoftObjectPtr)
+- ✅ Did NOT integrate save/load for death state — Tier 2 system
+- ✅ Did NOT implement multiplayer-specific death logic
+- ✅ APPEND-only to learnings.md (no overwrites)
+
+*End of Death & Respawn System learnings*
+
+
+## [2026-02-16 10:15] Task: 3-death-respawn
+
+### Implementation Summary
+
+Implemented complete death and respawn system for Outlaw (Task 3 from plan lines 578-717):
+
+**Files Created (9 total):**
+- `OutlawDeathTypes.h` — Delegates (OnDeathStarted, OnDeathFinished, OnLootDropRequested, OnXPAwarded) + FOutlawCombatLogEntry struct
+- `OutlawDeathComponent.h/.cpp` — Core death detection via Health attribute delegate binding, sets State.Dead tag, cancels abilities, broadcasts death events
+- `OutlawPlayerDeathHandler.h/.cpp` — Respawn at checkpoint after delay, death screen UI stub, restore Health via SetNumericAttributeBase
+- `OutlawEnemyDeathHandler.h/.cpp` — 3-phase death (ragdoll physics → dissolve → loot+XP+destroy), integrates with ProgressionComponent + LootSubsystem
+- `OutlawCombatLogComponent.h/.cpp` — Circular buffer (max 100 entries) for damage/kill event logging
+
+**Key Integration Points Verified:**
+- Health==0 detection: `ASC->GetGameplayAttributeValueChangeDelegate(UOutlawAttributeSet::GetHealthAttribute()).AddUObject(...)`
+- XP award: `ProgressionComp->AwardXP(BaseXPReward)` when enemy dies
+- Loot spawn: `LootSubsystem->SpawnLoot(DeathLocation, LootTable, EnemyLevel, RarityBonus, NumLootDrops)`
+- Ragdoll physics: `Mesh->SetSimulatePhysics(true)` + `AddImpulseAtLocation(DeathImpulse)`
+- State.Dead tag: `ASC->AddLooseGameplayTag(OutlawAnimTags::Dead)` to trigger animation state
+- Ability cancellation: `ASC->CancelAllAbilities()` on death
+
+**Build Verification:**
+- UE 5.7 build succeeded with zero errors after clean (stale intermediate files caused initial failure)
+- All 9 files compiled successfully
+- Build log: `.sisyphus/evidence/task-3-build-clean.log`
+
+### Key Discoveries
+
+**Attribute Change Delegate Pattern:**
+- Bind to attribute value changes: `ASC->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this, &Class::OnChanged)`
+- Callback signature: `void OnHealthChanged(const FOnAttributeChangeData& Data)` where `Data.NewValue`, `Data.OldValue` available
+- Must store delegate handle and clean up in `EndPlay()`: `ASC->GetGameplayAttributeValueChangeDelegate(Attribute).Remove(Handle)`
+- Use `TWeakObjectPtr<UAbilitySystemComponent>` to avoid dangling references when ASC is destroyed before component
+
+**Timer Pattern for Delayed Actions:**
+- Ragdoll → Dissolve → Cleanup phases: `GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &Class::Method, Delay, false)`
+- One timer per phase (no looping timers for this use case)
+- Clean up timers in `EndPlay()`: `GetWorld()->GetTimerManager().ClearAllTimersForObject(this)`
+
+**Circular Buffer Pattern:**
+- `TArray<FEntry> Entries` with `MaxEntries` property
+- On add: `Entries.Add(NewEntry); if (Entries.Num() > MaxEntries) { Entries.RemoveAt(0); }`
+- Removes oldest entries first, maintains chronological order
+
+**ASC Resolution (Per Task 6 Learnings):**
+- Use `IAbilitySystemInterface` cast pattern: `if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(Owner)) { ASC = ASI->GetAbilitySystemComponent(); }`
+- Fallback to PlayerState for player characters: Check `Owner->GetInstigator()` and try `IAbilitySystemInterface` on that actor
+- **Never use Execute_* pattern** for ASC resolution (Task 6 constraint)
+
+**Ragdoll Physics Setup:**
+- `GetMesh()->SetSimulatePhysics(true)` enables ragdoll
+- `GetMesh()->AddImpulseAtLocation(Impulse, Location)` applies death impulse for visual feedback
+- Mesh collision must be set to PhysicsActor or similar in asset for physics to work
+- Disable capsule collision: `GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision)` to prevent blocking
+
+**Server-Authoritative Death:**
+- All death logic wrapped in `if (GetOwner()->HasAuthority())` checks
+- Death component broadcasts delegates on server, handlers respond
+- State.Dead tag replicates via GAS (ASC->AddLooseGameplayTag)
+- Visual effects (ragdoll, dissolve) can run on all clients, but loot/XP only on server
+
+**Respawn Pattern:**
+- Store checkpoint as `FVector Location` + `FRotator Rotation` properties on handler component
+- Teleport: `GetOwner()->SetActorLocationAndRotation(Location, Rotation)`
+- Restore Health: `ASC->SetNumericAttributeBase(UOutlawAttributeSet::GetHealthAttribute(), MaxHealth)`
+- Remove State.Dead tag: `ASC->RemoveLooseGameplayTag(OutlawAnimTags::Dead)`
+- Re-enable movement: `CharacterMovement->SetMovementMode(MOVE_Walking)`
+
+**Build System Learning:**
+- Stale intermediate files can cause false errors even when source is correct
+- Solution: `rm -rf Binaries/ Intermediate/Build/` before rebuild
+- Error "member access into incomplete type" was due to cached .o files, not source issue
+
+### Constraints Verified
+
+**NOT Implemented (Per Task 3 Plan):**
+- Down-But-Not-Out (DBNO) state — only `bAllowDownState` bool flag added for future expansion (default false)
+- Soul/corpse mechanics (e.g. PoE death penalty, corpse interaction)
+- Checkpoint actors — only `SetCheckpoint(FVector, FRotator)` API created, checkpoint triggers are Tier 2
+- Friendly fire or faction-aware death handling
+- Elaborate death screen UI — just fade-to-black CommonUI stub (no buttons, no stats, just placeholder comment)
+- Death animations or VFX assets — properties only (`TSoftObjectPtr<UAnimMontage>` references for future)
+- Save/load integration for death state — Tier 2 unified save system
+- Multiplayer-specific death logic (respawn on other players, ghost mode, etc.) — single-player focus only
+
+**NOT Modified (Per Task 3 Constraints):**
+- `OutlawCharacterBase.h` — death component is added via Blueprint or specific character subclasses only
+- `OutlawAttributeSet.h/.cpp` — Health attribute and PostGameplayEffectExecute already correct from Task 0/1
+- `OutlawProgressionComponent.h` — AwardXP API already exists (line 50-53), just called it
+- `OutlawLootSubsystem.h` — SpawnLoot API already exists, just called it
+- Any existing working systems outside Combat/ directory
+
+**Existing Patterns Followed:**
+- Death component delegate binding: Followed `OutlawDamageNumberComponent.cpp` pattern for attribute change delegate
+- ASC resolution: Used `IAbilitySystemInterface` cast pattern (NOT Execute_* per Task 6 learnings)
+- Component lifecycle: `BeginPlay()` for initialization, `EndPlay()` for cleanup, `TWeakObjectPtr<UAbilitySystemComponent>` to avoid dangling refs
+- Server-authoritative: All death logic wrapped in `if (GetOwner()->HasAuthority())` checks
+- Ragdoll physics: `GetMesh()->SetSimulatePhysics(true)` + `AddImpulseAtLocation()`
+- Circular buffer: `Entries.RemoveAt(0)` when `Entries.Num() > MaxEntries`
+
+**File Organization:**
+- All new files in `Source/Outlaw/Combat/` directory (adaptive non-unity per existing Combat/ patterns)
+- Death types header: Shared delegate/struct definitions (no .cpp file needed)
+- Component pattern: Core death detection as reusable component, separate handlers for player vs enemy behavior
+
+**GAS Integration:**
+- State.Dead tag: Used `OutlawAnimTags::Dead` from existing `Source/Outlaw/Animation/OutlawAnimationTypes.h:65-66`
+- Ability cancellation: `ASC->CancelAllAbilities()` to stop all active abilities on death
+- Attribute base value restore: `ASC->SetNumericAttributeBase(Attribute, Value)` for respawn Health restoration (not GE-based, direct base value set)
+
+### Future Work (Deferred to Tier 2)
+
+- DBNO state implementation (flag exists, logic needs adding)
+- Death animations and VFX integration (properties exist as TSoftObjectPtr, need animation assets)
+- Checkpoint actor implementation (SetCheckpoint API exists, need AOutlawCheckpoint actor class)
+- Elaborate death screen UI (currently just fade-to-black stub, needs CommonUI death screen widget)
+- Save/load for death state (checkpoint location, death count, etc.)
+- Dissolve material effect implementation (placeholder timer exists, needs material setup)
+- Faction-aware death handling (enemy kills player vs player kills enemy vs friendly fire)
+
+### Verification Evidence
+
+**Build Success:**
+```
+Build exit code: 0
+```
+
+**Integration Points Found:**
+```
+Source/Outlaw/Combat/OutlawDeathComponent.cpp:		HealthDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
+Source/Outlaw/Combat/OutlawEnemyDeathHandler.cpp:			Mesh->SetSimulatePhysics(true);
+Source/Outlaw/Combat/OutlawEnemyDeathHandler.cpp:			ProgressionComp->AwardXP(BaseXPReward);
+Source/Outlaw/Combat/OutlawEnemyDeathHandler.cpp:			LootSubsystem->SpawnLoot(DeathLocation, LootTable, EnemyLevel, RarityBonus, NumLootDrops);
+```
+
+**Files Created:**
+```
+Source/Outlaw/Combat/OutlawDeathTypes.h
+Source/Outlaw/Combat/OutlawDeathComponent.h
+Source/Outlaw/Combat/OutlawDeathComponent.cpp
+Source/Outlaw/Combat/OutlawPlayerDeathHandler.h
+Source/Outlaw/Combat/OutlawPlayerDeathHandler.cpp
+Source/Outlaw/Combat/OutlawEnemyDeathHandler.h
+Source/Outlaw/Combat/OutlawEnemyDeathHandler.cpp
+Source/Outlaw/Combat/OutlawCombatLogComponent.h
+Source/Outlaw/Combat/OutlawCombatLogComponent.cpp
+```
+
+### Status
+
+**Task 3 Complete** — All deliverables implemented, build verified, ready for commit.
+

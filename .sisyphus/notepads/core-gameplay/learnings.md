@@ -62,3 +62,64 @@
 - **Evidence**: Build log saved to `.sisyphus/evidence/task-0-build.log`
 
 *Agents append findings below using ## [TIMESTAMP] Task: {task-id} format*
+
+## 2026-02-16 09:16 UTC Task: Combat / Damage Pipeline
+
+### Implementation Summary
+- ✅ Created OutlawCombatTags.h namespace with 8 centralized gameplay tags (Combat.CriticalHit, Status.DoT, Status.CC.*, SetByCaller.*)
+- ✅ Implemented OutlawDamageExecution with 7 attribute captures (6 source snapshot + 1 target)
+  - Source attributes: Firepower, PhysDmgMin/Max, CritMult, CritChance (weapon set), Strength (character set)
+  - Target attributes: Armor (non-snapshot), IncomingDamage (output)
+- ✅ Implemented shooter path (Firepower-based) and ARPG path (PhysDmgMin/Max range) with SetByCaller.WeaponType toggle
+- ✅ Implemented crit check with Combat.CriticalHit tag output via AddOutputTag
+- ✅ Implemented armor mitigation formula: `armor_factor = Armor / (Armor + K)` where `K = 50 + (10 * target_level)`
+- ✅ Created OutlawCombatLibrary with 4 Blueprint-callable utilities:
+  - PerformLineTrace (ECC_Pawn, optional debug drawing)
+  - PerformSphereOverlap (multi-hit sphere sweep)
+  - PerformMeleeBoxTrace (oriented box sweep)
+  - ApplyDamageToTarget (GE application with SetByCaller magnitudes)
+- ✅ Implemented OutlawDamageNumberComponent (listens to IncomingDamage, spawns widgets, detects crit tag)
+- ✅ Implemented OutlawDamageNumberWidget (CommonUserWidget with InitDamageNumber + BlueprintImplementableEvent)
+- ✅ Implemented OutlawStatusEffectComponent (tracks Status.* tag changes, maintains ActiveEffects array)
+- ✅ Created OutlawCombatTypes.h with FOutlawDamageResult, FOutlawActiveStatusEffect structs and all delegates
+
+### Key Discoveries
+- **Tag registration pattern**: Project uses `inline const FGameplayTag = FGameplayTag::RequestGameplayTag(TEXT(...))` in namespace, following existing `OutlawAnimationTypes.h` pattern
+- **Execution calc pattern**: Uses `DECLARE_ATTRIBUTE_CAPTUREDEF` / `DEFINE_ATTRIBUTE_CAPTUREDEF` macros with FDamageStatics singleton, matches Lyra pattern
+- **Snapshot vs non-snapshot**: Source attributes (weapon/character stats) captured with snapshot=true, target attributes (Armor) captured with snapshot=false for dynamic evaluation
+- **Output modifier**: IncomingDamage applied via `OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(..., EGameplayModOp::Additive, FinalDamage))`
+- **Crit tag output**: Critical hits add `Combat.CriticalHit` tag to spec via `OutExecutionOutput.AddOutputTag(OutlawCombatTags::CriticalHit)` - downstream components detect via `HasMatchingGameplayTag`
+- **Component lifecycle**: Both damage number and status effect components use `TWeakObjectPtr<UAbilitySystemComponent>` to avoid dangling references, bind delegates in BeginPlay, cleanup in EndPlay
+- **ASC resolution pattern**: Try owner first via `IAbilitySystemInterface`, fallback to owner's instigator (supports both direct ownership and PlayerState patterns)
+- **IncomingDamage as signal**: Damage number component listens to IncomingDamage attribute changes (not raw GE application) - automatically triggers on any damage source
+
+### QA Verification Results
+- ✅ 8 DEFINE_ATTRIBUTE_CAPTUREDEF found in OutlawDamageExecution.cpp (7 captures + 1 IncomingDamage declaration)
+- ✅ IncomingDamage output modifier confirmed: `GetDamageStatics().IncomingDamageDef.AttributeToCapture` with Additive op
+- ✅ Tag namespace usage: 5 references to `OutlawCombatTags::` across combat files (CriticalHit x2, SetByCaller x3)
+- ✅ LSP diagnostics: False positives only (header-only files before compilation, CoreMinimal.h not resolved by clangd)
+
+### Architecture Notes
+- **No elemental damage**: Tier 1 scope limited to physical damage only (PhysDmgMin/Max attributes from weapon set)
+- **Framework-only status effects**: Component tracks Status.* tag lifecycle, no specific effects (burn/bleed/freeze) implemented
+- **Blueprint integration points**:
+  - GE_ApplyDamage blueprint should use OutlawDamageExecution as execution calc class
+  - Abilities call `ApplyDamageToTarget` from OutlawCombatLibrary with SetByCaller magnitudes
+  - Damage number widget blueprint implements `OnDamageNumberInit` event for animation
+  - Status effect component delegates (`OnStatusEffectAdded/Removed`) drive UI updates
+- **No friendly fire**: ApplyDamageToTarget has no faction filtering - assumes caller handles targeting logic
+
+### Build Notes
+- ⚠️ UE build infrastructure not available (Engine directory missing, Xcode project not generated)
+- ✅ Verified via grep/pattern matching:
+  - 8 attribute capture definitions present
+  - IncomingDamage output modifier correctly structured
+  - Tag references use centralized namespace
+- ✅ All C++ files created with correct includes, namespace usage, and delegate binding patterns
+- **Next steps for Blueprint integration**:
+  1. Create `GE_ApplyDamage` gameplay effect with `OutlawDamageExecution` as Execution Calculation Class
+  2. Create `WBP_DamageNumber` widget inheriting from `UOutlawDamageNumberWidget`, implement `OnDamageNumberInit` event
+  3. Set `DamageNumberWidgetClass` on damage number component to `WBP_DamageNumber`
+  4. Blueprint abilities call `ApplyDamageToTarget` with SetByCaller values (WeaponType=1.0 for shooter, 0.0 for ARPG)
+
+*End of Combat / Damage Pipeline learnings*

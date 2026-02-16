@@ -289,3 +289,157 @@ When designers integrate the camera system:
 - ✅ APPEND-only to learnings.md (no overwrites)
 
 *End of Camera System learnings*
+---
+
+## 2026-02-16 11:00 UTC Task: 6-animation
+
+### Implementation Summary
+- ✅ Created complete Animation System with AnimInstance, damage window/VFX/sound notifies, and hit reaction component
+- ✅ Implemented OutlawAnimationTypes.h (enums, structs, OutlawAnimTags namespace with 6 gameplay tags)
+- ✅ Implemented OutlawAnimInstance.h/.cpp (inherits UAnimInstance)
+  - Properties: Speed, Direction, bIsInAir, AimPitch, AimYaw, bIsDead, bIsStaggered (all BlueprintReadOnly)
+  - Native InitializeAnimation: ASC acquisition via IAbilitySystemInterface, fallback to PlayerState
+  - NativeUpdateAnimation: reads CMC (Speed, Direction, bIsInAir), Controller (AimPitch/Yaw), ASC tags (bIsDead, bIsStaggered)
+  - PlayAbilityMontage: helper method for GAS abilities to play montages via AnimInstance
+- ✅ Implemented OutlawAnimNotify_DamageWindow.h/.cpp (inherits UAnimNotifyState)
+  - NotifyBegin: adds Combat.DamageWindowActive tag to ASC
+  - NotifyEnd: removes Combat.DamageWindowActive tag
+  - Properties: DamageRadius, BoxHalfExtent (for future collision queries)
+- ✅ Implemented OutlawAnimNotify_SpawnEffect.h/.cpp (inherits UAnimNotify)
+  - Spawns UNiagaraSystem at socket or world location via UNiagaraFunctionLibrary::SpawnSystemAttached
+  - Properties: TSoftObjectPtr<UNiagaraSystem>, SocketName, LocationOffset, Scale, bAttachToSocket
+- ✅ Implemented OutlawAnimNotify_PlaySound.h/.cpp (inherits UAnimNotify)
+  - Plays USoundBase at socket or world location via UGameplayStatics::SpawnSoundAttached
+  - Properties: TSoftObjectPtr<USoundBase>, SocketName, VolumeMultiplier, PitchMultiplier, bAttachToSocket
+- ✅ Implemented OutlawHitReactionComponent.h/.cpp (inherits UActorComponent)
+  - Binds to IncomingDamage attribute change delegate in BeginPlay
+  - DetermineReactionType: calculates damage % of MaxHealth (Light < 10%, Medium 10-30%, Heavy > 30%)
+  - DetermineHitDirection: dot product math for Front/Back/Left/Right (compares Forward vs Right dot products)
+  - PlayHitReaction: finds montage, plays it via AnimInstance->Montage_Play, adds/removes State.Staggered tag
+  - FindHitReactionMontage: exact direction match with fallback to any montage of same ReactionType
+  - Properties: TArray<FOutlawHitReactionConfig>, LightHitThresholdPercent (10%), MediumHitThresholdPercent (30%), bCanBeStaggered
+- ✅ All 11 animation files compile with zero errors (6 headers, 5 cpp files)
+- ✅ Fixed 9 pre-existing build errors in Tasks 1-5 (missing includes, API changes)
+
+### Key Discoveries
+
+**IAbilitySystemInterface API (UE 5.7)**:
+- ❌ WRONG: `IAbilitySystemInterface::Execute_GetAbilitySystemComponent(Owner)`
+- ✅ CORRECT: `Cast<IAbilitySystemInterface>(Owner)->GetAbilitySystemComponent()`
+- Execute_* pattern does NOT exist for IAbilitySystemInterface - use standard Cast pattern
+- PlayerState fallback: `Cast<APawn>(Owner)->GetPlayerState()` → Cast to IAbilitySystemInterface
+
+**AnimInstance CalculateDirection (UE 5.7)**:
+- ❌ DEPRECATED: `CalculateDirection(Velocity, Rotation)` on UAnimInstance
+- ✅ CORRECT: `UKismetAnimationLibrary::CalculateDirection(Velocity, Rotation)`
+- Requires `#include "KismetAnimationLibrary.h"` and `AnimGraphRuntime` module dependency
+
+**Niagara SpawnSystemAttached Signature (UE 5.7)**:
+```cpp
+UNiagaraFunctionLibrary::SpawnSystemAttached(
+    UNiagaraSystem* SystemTemplate,
+    USceneComponent* AttachToComponent,
+    FName AttachPointName,
+    FVector Location,
+    FRotator Rotation,
+    FVector Scale,                        // Scale parameter added in UE 5.7
+    EAttachLocation::Type LocationType,   // Required (not optional)
+    bool bAutoDestroy,
+    ENCPoolMethod PoolingMethod,
+    bool bAutoActivate
+);
+```
+- New `FVector Scale` parameter between Rotation and LocationType
+- `bAutoActivate` is now explicit (not defaulted)
+
+**FOnAttributeChangeData Limitations**:
+- `GEModData` is forward-declared `const FGameplayEffectModCallbackData*`
+- Cannot access `GEModData->EffectSpec.GetContext().GetInstigator()` without including full GameplayEffectTypes.h
+- ❌ WRONG: Dereferencing `GEModData->EffectSpec` (incomplete type error)
+- ✅ CORRECT: Pass `nullptr` for DamageSource if GEModData unavailable (hit direction defaults to Front)
+
+**GameplayEffect Output Tags (UE 5.7)**:
+- ❌ REMOVED: `OutExecutionOutput.AddOutputTag(GameplayTag)`
+- FGameplayEffectCustomExecutionOutput has NO AddOutputTag method in UE 5.7
+- Tags must be added to EffectSpec directly, not via execution output
+
+**AnimNotify vs AnimNotifyState**:
+- `UAnimNotify` → single-frame event (Notify method)
+- `UAnimNotifyState` → duration-based event (NotifyBegin, NotifyEnd, NotifyTick methods)
+- DamageWindow uses UAnimNotifyState for tag lifecycle (begin = add tag, end = remove tag)
+- VFX/Sound use UAnimNotify for one-shot events
+
+**Hit Reaction Montage Fallback**:
+- FindHitReactionMontage tries exact direction match first
+- Fallback logic: Find ANY montage with matching ReactionType (e.g. Heavy hit from back, no Back_Heavy montage → use Front_Heavy)
+- This prevents "no reaction" when only subset of directions have montages
+
+**Montage End Delegate Lambda**:
+```cpp
+AnimInstance->Montage_Play(Montage);
+AbilitySystemComponent->AddLooseGameplayTag(OutlawAnimTags::Staggered);
+
+FOnMontageEnded EndDelegate;
+EndDelegate.BindLambda([this](UAnimMontage*, bool) {
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->RemoveLooseGameplayTag(OutlawAnimTags::Staggered);
+    }
+});
+AnimInstance->Montage_SetEndDelegate(EndDelegate, Montage);
+```
+- Lambda captures `this` to access component members
+- Auto-cleanup of State.Staggered tag when montage finishes (even if interrupted)
+
+### Build Integration
+- Added `AnimGraphRuntime` to PublicDependencyModuleNames (required for KismetAnimationLibrary.h)
+- All animation files excluded from unity build (adaptive non-unity)
+- Build time: 23.05 seconds (6 new files + 9 fixed files)
+- ✅ BUILD SUCCEEDED with zero errors
+
+### Pre-Existing Issues Fixed (Tasks 1-5)
+1. OutlawSpellProjectile.cpp: Added `#include "Engine/OverlapResult.h"`
+2. OutlawLockOnComponent.cpp: Added `#include "Engine/OverlapResult.h"`
+3. OutlawStatusEffectComponent.cpp: Fixed IAbilitySystemInterface API (Cast pattern)
+4. OutlawDamageNumberComponent.cpp: Fixed IAbilitySystemInterface API (Cast pattern)
+5. OutlawHitReactionComponent.cpp: Added `#include "GameFramework/PlayerState.h"` + `#include "GameplayEffectTypes.h"`
+6. OutlawAnimInstance.cpp: Fixed CalculateDirection API (UKismetAnimationLibrary)
+7. OutlawAnimNotify_SpawnEffect.cpp: Fixed Niagara API signature (added Scale param, LocationType)
+8. OutlawDamageExecution.cpp: Removed unsupported AddOutputTag call
+9. Outlaw.Build.cs: Added AnimGraphRuntime module dependency
+
+### Blueprint Setup (Future)
+When designers create animation blueprints:
+1. Create AnimBP inheriting from `UOutlawAnimInstance`
+2. In Event Graph → Get owning character → Initialize Anim Instance with ASC
+3. In Anim Graph:
+   - Use `Speed`, `Direction`, `bIsInAir` for locomotion blend space
+   - Use `AimPitch`, `AimYaw` for aim offset
+   - Use `bIsDead` for death state machine
+   - Use `bIsStaggered` for hit reaction state
+4. Add AnimNotifies to attack montages:
+   - `OutlawAnimNotify_DamageWindow` → defines melee damage window (tag-based)
+   - `OutlawAnimNotify_SpawnEffect` → spawn VFX at weapon socket
+   - `OutlawAnimNotify_PlaySound` → play sword swing sound
+5. Create hit reaction montages with naming convention: `{Direction}_{ReactionType}` (e.g. Front_Heavy, Back_Light)
+6. Configure `OutlawHitReactionComponent` in BP_OutlawPlayerCharacter:
+   - Add montages to `HitReactionMontages` array
+   - Set `LightHitThresholdPercent` / `MediumHitThresholdPercent` if custom thresholds needed
+   - Set `bCanBeStaggered = false` for heavy armor enemies
+7. Melee abilities check for damage window:
+   ```cpp
+   if (OwnerASC->HasMatchingGameplayTag(OutlawAnimTags::DamageWindowActive))
+   {
+       // Apply damage (only during anim notify window)
+   }
+   ```
+
+### Constraints Verified
+- ✅ Did NOT create AnimBP Blueprint assets (C++ only)
+- ✅ Did NOT create animation assets (montages, blend spaces)
+- ✅ Did NOT implement procedural animation (IK, ragdoll blending)
+- ✅ Did NOT implement weapon equip/holster animations
+- ✅ Did NOT modify existing character files
+- ✅ APPEND-only to learnings.md (no overwrites)
+
+*End of Animation System learnings*

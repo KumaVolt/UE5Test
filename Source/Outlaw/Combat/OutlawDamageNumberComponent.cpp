@@ -25,17 +25,17 @@ void UOutlawDamageNumberComponent::BeginPlay()
 	}
 
 	UAbilitySystemComponent* ASC = nullptr;
-	if (Owner->Implements<UAbilitySystemInterface>())
+	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(Owner))
 	{
-		ASC = IAbilitySystemInterface::Execute_GetAbilitySystemComponent(Owner);
+		ASC = ASI->GetAbilitySystemComponent();
 	}
 
 	if (!ASC && Owner->GetInstigator())
 	{
 		AActor* Instigator = Owner->GetInstigator();
-		if (Instigator && Instigator->Implements<UAbilitySystemInterface>())
+		if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(Instigator))
 		{
-			ASC = IAbilitySystemInterface::Execute_GetAbilitySystemComponent(Instigator);
+			ASC = ASI->GetAbilitySystemComponent();
 		}
 	}
 

@@ -100,8 +100,6 @@ void UOutlawDamageExecution::Execute_Implementation(
 	{
 		BaseDamage *= CritMultiplier;
 		bWasCritical = true;
-
-		OutExecutionOutput.AddOutputTag(OutlawCombatTags::CriticalHit);
 	}
 
 	const float K = ArmorConstantBase + (ArmorConstantPerLevel * TargetLevel);

@@ -24,6 +24,7 @@ public class Outlaw : ModuleRules
 		"AIModule",
 		"NavigationSystem",
 		"Niagara",
+		"AnimGraphRuntime",
 	});
 
 	PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "StateTreeModule", "GameplayStateTreeModule" });

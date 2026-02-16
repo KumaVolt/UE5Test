@@ -31,18 +31,19 @@ void UOutlawAnimNotify_SpawnEffect::Notify(USkeletalMeshComponent* MeshComp, UAn
 
 	if (bAttachToSocket && SocketName != NAME_None)
 	{
-        UNiagaraFunctionLibrary::SpawnSystemAttached(
-            NiagaraSystem.Get(),
-            MeshComp,
-            SocketName,
-            LocationOffset,
-            FRotator::ZeroRotator,
-            Scale,
-            EAttachLocation::SnapToTarget,
-            true,
-            ENCPoolMethod::None,
-            true
-        );
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			NiagaraSystem.Get(),
+			MeshComp,
+			SocketName,
+			LocationOffset,
+			FRotator::ZeroRotator,
+			Scale,
+			EAttachLocation::SnapToTarget,
+			true,
+			ENCPoolMethod::None,
+			true,
+			true
+		);
 	}
 	else
 	{

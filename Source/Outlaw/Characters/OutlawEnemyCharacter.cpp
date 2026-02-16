@@ -3,16 +3,19 @@
 
 #include "OutlawEnemyCharacter.h"
 #include "AbilitySystem/OutlawAbilitySystemComponent.h"
+#include "AI/OutlawAIController.h"
 
 // Sets default values
-AOutlawEnemyCharacter::AOutlawEnemyCharacter()
+AOutlawEnemyCharacter::AOutlawEnemyCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UOutlawAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
+	AIControllerClass = AOutlawAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned

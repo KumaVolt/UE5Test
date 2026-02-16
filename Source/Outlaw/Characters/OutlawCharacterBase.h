@@ -18,7 +18,7 @@ class OUTLAW_API AOutlawCharacterBase : public ACharacter, public IAbilitySystem
 	GENERATED_BODY()
 
 public:
-	AOutlawCharacterBase();
+	AOutlawCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

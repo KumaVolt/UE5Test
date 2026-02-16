@@ -4,7 +4,8 @@
 #include "AbilitySystem/OutlawAbilitySystemComponent.h"
 #include "AbilitySystem/OutlawAbilitySet.h"
 
-AOutlawCharacterBase::AOutlawCharacterBase()
+AOutlawCharacterBase::AOutlawCharacterBase(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

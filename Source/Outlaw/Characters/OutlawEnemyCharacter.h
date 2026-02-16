@@ -12,8 +12,7 @@ class OUTLAW_API AOutlawEnemyCharacter : public AOutlawCharacterBase
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	AOutlawEnemyCharacter();
+	AOutlawEnemyCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// Called when the game starts or when spawned

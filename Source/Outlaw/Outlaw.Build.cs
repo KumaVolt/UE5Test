@@ -8,22 +8,25 @@ public class Outlaw : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] {
-			"Core",
-			"CoreUObject",
-			"Engine",
-			"InputCore",
-			"EnhancedInput",
-			"GameplayAbilities",
-			"GameplayTags",
-			"GameplayTasks",
-			"UMG",
-			"CommonUI",
-			"CommonInput",
-			"NetCore",
-		});
+	PublicDependencyModuleNames.AddRange(new string[] {
+		"Core",
+		"CoreUObject",
+		"Engine",
+		"InputCore",
+		"EnhancedInput",
+		"GameplayAbilities",
+		"GameplayTags",
+		"GameplayTasks",
+		"UMG",
+		"CommonUI",
+		"CommonInput",
+		"NetCore",
+		"AIModule",
+		"NavigationSystem",
+		"Niagara",
+	});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+	PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "StateTreeModule", "GameplayStateTreeModule" });
 
 		PublicIncludePaths.Add("Outlaw");
 

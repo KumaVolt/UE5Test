@@ -10,6 +10,8 @@
 UOutlawAttributeSet::UOutlawAttributeSet()
 {
 	InitHealth(80.0f);
+	InitArmor(0.f);
+	InitMaxArmor(0.f);
 }
 
 void UOutlawAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -21,6 +23,8 @@ void UOutlawAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Strength, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxStrength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxArmor, COND_None, REPNOTIFY_Always);
 }
 
 void UOutlawAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -31,6 +35,10 @@ void UOutlawAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
 	}
+	else if (Attribute == GetArmorAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxArmor());
+	}
 }
 
 void UOutlawAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
@@ -40,6 +48,18 @@ void UOutlawAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffect
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+		}
 	}
 }
 
@@ -71,4 +91,14 @@ void UOutlawAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStreng
 void UOutlawAttributeSet::OnRep_MaxStrength(const FGameplayAttributeData& OldMaxStrength) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxStrength, OldMaxStrength);
+}
+
+void UOutlawAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, Armor, OldArmor);
+}
+
+void UOutlawAttributeSet::OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxArmor, OldMaxArmor);
 }

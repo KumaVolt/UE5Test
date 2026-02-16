@@ -42,6 +42,18 @@ public:
 	FGameplayAttributeData MaxStrength;
 	ATTRIBUTE_ACCESSORS_BASIC(UOutlawAttributeSet, MaxStrength);
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing= OnRep_Armor, Category = "Outlaw|AttributeSet")
+	FGameplayAttributeData Armor;
+	ATTRIBUTE_ACCESSORS_BASIC(UOutlawAttributeSet, Armor);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing= OnRep_MaxArmor, Category = "Outlaw|AttributeSet")
+	FGameplayAttributeData MaxArmor;
+	ATTRIBUTE_ACCESSORS_BASIC(UOutlawAttributeSet, MaxArmor);
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Outlaw|AttributeSet")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS_BASIC(UOutlawAttributeSet, IncomingDamage);
+	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	
@@ -59,4 +71,10 @@ public:
 	
 	UFUNCTION()
 	void OnRep_MaxStrength(const FGameplayAttributeData& OldMaxStrength) const;
+	
+	UFUNCTION()
+	void OnRep_Armor(const FGameplayAttributeData& OldArmor) const;
+	
+	UFUNCTION()
+	void OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor) const;
 };

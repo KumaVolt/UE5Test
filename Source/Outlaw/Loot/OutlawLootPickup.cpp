@@ -110,9 +110,23 @@ void AOutlawLootPickup::AttemptPickup(AActor* PickupActor)
 
 	if (AddedCount > 0)
 	{
-		// TODO: Auto-roll affixes on weapon pickup
-		// Requires inventory API enhancement to return instance ID from AddItem
-		// For now, affixes can be rolled manually via Blueprint or in a future crafting system
+		// Auto-equip into empty equipment slot if applicable
+		const UOutlawItemDefinition* ItemDef = LootDrop.ItemDefinition.Get();
+		if (ItemDef && ItemDef->bCanBeEquipped && ItemDef->EquipmentSlotTag.IsValid())
+		{
+			if (!InventoryComp->IsSlotOccupied(ItemDef->EquipmentSlotTag))
+			{
+				TArray<FOutlawInventoryEntry> Matching = InventoryComp->FindItemsForSlot(ItemDef->EquipmentSlotTag);
+				for (const auto& Entry : Matching)
+				{
+					if (Entry.ItemDef == ItemDef)
+					{
+						InventoryComp->EquipItem(Entry.InstanceId);
+						break;
+					}
+				}
+			}
+		}
 
 		OnLootPickedUp.Broadcast(LootDrop.ItemDefinition, AddedCount, this);
 		Destroy();

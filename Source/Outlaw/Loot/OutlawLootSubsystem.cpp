@@ -65,5 +65,6 @@ void UOutlawLootSubsystem::SpawnSinglePickup(const FOutlawLootDrop& Drop, const 
 	if (Pickup)
 	{
 		Pickup->InitializeLoot(Drop);
+		Pickup->bAutoLoot = bAutoLootPickups;
 	}
 }

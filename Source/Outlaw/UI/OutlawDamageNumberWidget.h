@@ -16,6 +16,7 @@ public:
 	void InitDamageNumber(float Amount, bool bCrit, FVector WorldLocation);
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Damage Number")
+	UFUNCTION(BlueprintNativeEvent, Category = "Damage Number")
 	void OnDamageNumberInit(float Amount, bool bIsCrit);
+	virtual void OnDamageNumberInit_Implementation(float Amount, bool bIsCrit) {}
 };

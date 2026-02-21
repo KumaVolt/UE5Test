@@ -74,6 +74,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grants")
 	TArray<FOutlawStatGrowthEntry> StatBonusesPerRank;
 
+	/** X position on the skill tree canvas (grid units, for UI layout). */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node|Layout")
+	float TreePositionX = 0.0f;
+
+	/** Y position on the skill tree canvas (grid units, for UI layout). */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node|Layout")
+	float TreePositionY = 0.0f;
+
 	/** Returns the ability set for the given rank (1-based). */
 	UFUNCTION(BlueprintCallable, Category = "Node")
 	UOutlawAbilitySet* GetAbilitySetForRank(int32 Rank) const;

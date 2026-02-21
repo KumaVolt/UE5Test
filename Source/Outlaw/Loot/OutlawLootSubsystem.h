@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Loot|Config")
 	float DropHeight = 50.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Loot|Config")
+	bool bAutoLootPickups = false;
+
 private:
 	void SpawnSinglePickup(const FOutlawLootDrop& Drop, const FVector& SpawnLocation);
 };

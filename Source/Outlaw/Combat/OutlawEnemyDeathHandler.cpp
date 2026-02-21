@@ -5,6 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Loot/OutlawLootSubsystem.h"
 #include "Loot/OutlawLootTable.h"
 #include "Progression/OutlawProgressionComponent.h"
@@ -44,14 +45,35 @@ void UOutlawEnemyDeathHandler::OnDeathStarted(AActor* Killer)
 
 	if (ACharacter* Character = Cast<ACharacter>(Owner))
 	{
+		// Try skeletal mesh ragdoll first
+		bool bHasSkeletalRagdoll = false;
 		if (USkeletalMeshComponent* Mesh = Character->GetMesh())
 		{
-			Mesh->SetSimulatePhysics(true);
-			Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			
-			if (DeathImpulse.SizeSquared() > 0.f)
+			if (Mesh->GetSkeletalMeshAsset())
 			{
-				Mesh->AddImpulseAtLocation(DeathImpulse, DeathLocation);
+				Mesh->SetSimulatePhysics(true);
+				Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				if (DeathImpulse.SizeSquared() > 0.f)
+				{
+					Mesh->AddImpulseAtLocation(DeathImpulse, DeathLocation);
+				}
+				bHasSkeletalRagdoll = true;
+			}
+		}
+
+		// Fallback: tumble the static body mesh for graybox characters
+		if (!bHasSkeletalRagdoll)
+		{
+			if (UStaticMeshComponent* BodyMesh = Character->FindComponentByClass<UStaticMeshComponent>())
+			{
+				BodyMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+				BodyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				BodyMesh->SetCollisionResponseToAllChannels(ECR_Block);
+				BodyMesh->SetSimulatePhysics(true);
+				if (DeathImpulse.SizeSquared() > 0.f)
+				{
+					BodyMesh->AddImpulse(DeathImpulse, NAME_None, true);
+				}
 			}
 		}
 	}

@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
 	bool bAllowDownState = false;
 
+	/** Manually bind to an ASC (for deferred init, e.g. player ASC on PlayerState). */
+	void BindToAbilitySystem(UAbilitySystemComponent* ASC);
+
 private:
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 

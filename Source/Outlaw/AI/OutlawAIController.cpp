@@ -89,7 +89,7 @@ void AOutlawAIController::ConfigurePerception()
 		return;
 	}
 
-	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	UAISenseConfig_Sight* SightConfig = NewObject<UAISenseConfig_Sight>(this);
 	SightConfig->SightRadius = SightRadius;
 	SightConfig->LoseSightRadius = LoseSightRadius;
 	SightConfig->PeripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
@@ -98,14 +98,14 @@ void AOutlawAIController::ConfigurePerception()
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
 
-	UAISenseConfig_Hearing* HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
+	UAISenseConfig_Hearing* HearingConfig = NewObject<UAISenseConfig_Hearing>(this);
 	HearingConfig->HearingRange = HearingRange;
 	HearingConfig->SetMaxAge(MaxAge);
 	HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
 	HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	HearingConfig->DetectionByAffiliation.bDetectFriendlies = false;
 
-	UAISenseConfig_Damage* DamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
+	UAISenseConfig_Damage* DamageConfig = NewObject<UAISenseConfig_Damage>(this);
 	DamageConfig->SetMaxAge(MaxAge);
 
 	AIPerceptionComponent->ConfigureSense(*SightConfig);

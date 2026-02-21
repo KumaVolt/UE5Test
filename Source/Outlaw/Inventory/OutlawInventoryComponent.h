@@ -242,6 +242,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
 	FOutlawInventoryEntry GetItemAtGridPosition(int32 X, int32 Y) const;
 
+	/** Get all inventory entries (read-only). */
+	const TArray<FOutlawInventoryEntry>& GetEntries() const { return InventoryList.Entries; }
+
 	/** Whether the component is operating in grid mode. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
 	bool IsGridMode() const;

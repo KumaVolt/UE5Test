@@ -48,6 +48,19 @@ void UOutlawDeathComponent::BeginPlay()
 	}
 }
 
+void UOutlawDeathComponent::BindToAbilitySystem(UAbilitySystemComponent* ASC)
+{
+	if (!ASC || BoundASC.IsValid())
+	{
+		return;
+	}
+
+	BoundASC = ASC;
+	HealthDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
+		UOutlawAttributeSet::GetHealthAttribute()).AddUObject(
+			this, &UOutlawDeathComponent::OnHealthChanged);
+}
+
 void UOutlawDeathComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (BoundASC.IsValid() && HealthDelegateHandle.IsValid())

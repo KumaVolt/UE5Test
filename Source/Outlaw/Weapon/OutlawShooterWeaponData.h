@@ -28,6 +28,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	EOutlawShooterWeaponType WeaponType = EOutlawShooterWeaponType::AssaultRifle;
 
+	// ── Fire Mode ──────────────────────────────────────────────
+
+	/** If true, weapon fires continuously while trigger is held. If false, fires once per click (or burst). */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Firing")
+	bool bAutomatic = true;
+
+	/** Number of shots per trigger pull in semi-auto mode. 1 = single shot, >1 = burst. Ignored when bAutomatic is true. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Firing", meta = (EditCondition = "!bAutomatic", ClampMin = "1"))
+	int32 BurstCount = 1;
+
 	// ── Core Stats ──────────────────────────────────────────────
 
 	/** Base damage per bullet. */

@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "OutlawLootTypes.generated.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "AtomLootTypes.generated.h"
 
-class UOutlawItemDefinition;
+class UAtomItemDefinition;
 
 /**
  * Single entry in a loot table with weight, item level range, and quantity range.
  */
 USTRUCT(BlueprintType)
-struct FOutlawLootTableEntry
+struct FAtomLootTableEntry
 {
 	GENERATED_BODY()
 
 	/** The item to drop (soft reference for lazy loading). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loot")
-	TSoftObjectPtr<UOutlawItemDefinition> ItemDefinition;
+	TSoftObjectPtr<UAtomItemDefinition> ItemDefinition;
 
 	/** Weight for random selection (higher = more likely). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loot", meta = (ClampMin = "0.0"))
@@ -46,13 +46,13 @@ struct FOutlawLootTableEntry
  * Result of a loot roll, containing the selected item, quantity, item level, and rarity.
  */
 USTRUCT(BlueprintType)
-struct FOutlawLootDrop
+struct FAtomLootDrop
 {
 	GENERATED_BODY()
 
 	/** The item definition that was selected. */
 	UPROPERTY(BlueprintReadOnly, Category = "Loot")
-	TObjectPtr<const UOutlawItemDefinition> ItemDefinition = nullptr;
+	TObjectPtr<const UAtomItemDefinition> ItemDefinition = nullptr;
 
 	/** Number of items to drop. */
 	UPROPERTY(BlueprintReadOnly, Category = "Loot")
@@ -64,10 +64,10 @@ struct FOutlawLootDrop
 
 	/** The rarity tier that was rolled (may differ from ItemDefinition->Rarity if rarity is randomized). */
 	UPROPERTY(BlueprintReadOnly, Category = "Loot")
-	EOutlawItemRarity RolledRarity = EOutlawItemRarity::Common;
+	EAtomItemRarity RolledRarity = EAtomItemRarity::Common;
 };
 
-namespace OutlawLootTags
+namespace AtomLootTags
 {
 	// Loot-related gameplay tags
 	// Example: Loot.Droppable, Loot.QuestItem, Loot.Currency

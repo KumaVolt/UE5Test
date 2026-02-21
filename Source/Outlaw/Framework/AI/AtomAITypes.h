@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawAITypes.generated.h"
+#include "AtomAITypes.generated.h"
 
 /**
  * AI perception mode enum
  */
 UENUM(BlueprintType)
-enum class EOutlawAIPerceptionMode : uint8
+enum class EAtomAIPerceptionMode : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
 	Alerted UMETA(DisplayName = "Alerted"),
@@ -21,7 +21,7 @@ enum class EOutlawAIPerceptionMode : uint8
  * Enemy spawner mode
  */
 UENUM(BlueprintType)
-enum class EOutlawSpawnerMode : uint8
+enum class EAtomSpawnerMode : uint8
 {
 	WaveBased UMETA(DisplayName = "Wave Based"),
 	Triggered UMETA(DisplayName = "Triggered"),
@@ -32,7 +32,7 @@ enum class EOutlawSpawnerMode : uint8
  * Wave spawn data
  */
 USTRUCT(BlueprintType)
-struct FOutlawWaveSpawnData
+struct FAtomWaveSpawnData
 {
 	GENERATED_BODY()
 
@@ -48,7 +48,7 @@ struct FOutlawWaveSpawnData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
 	float SpawnInterval = 0.5f;
 
-	FOutlawWaveSpawnData()
+	FAtomWaveSpawnData()
 		: Count(1)
 		, SpawnInterval(0.5f)
 	{}
@@ -58,7 +58,7 @@ struct FOutlawWaveSpawnData
  * StateTree context for AI controller
  */
 USTRUCT(BlueprintType)
-struct FOutlawAIContext
+struct FAtomAIContext
 {
 	GENERATED_BODY()
 
@@ -82,7 +82,7 @@ struct FOutlawAIContext
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float SearchTime = 0.f;
 
-	FOutlawAIContext()
+	FAtomAIContext()
 		: TargetActor(nullptr)
 		, HomeLocation(FVector::ZeroVector)
 		, CurrentPatrolIndex(0)
@@ -94,7 +94,7 @@ struct FOutlawAIContext
 /**
  * AI gameplay tags
  */
-namespace OutlawAITags
+namespace AtomAITags
 {
 	inline const FGameplayTag Behavior_Patrol = FGameplayTag::RequestGameplayTag(TEXT("AI.Behavior.Patrol"));
 	inline const FGameplayTag Behavior_Chase = FGameplayTag::RequestGameplayTag(TEXT("AI.Behavior.Chase"));

@@ -1,27 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawLootBeamComponent.h"
+#include "AtomLootBeamComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 
-UOutlawLootBeamComponent::UOutlawLootBeamComponent(const FObjectInitializer& ObjectInitializer)
+UAtomLootBeamComponent::UAtomLootBeamComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	RarityColors.Add(EOutlawItemRarity::Common, FLinearColor::White);
-	RarityColors.Add(EOutlawItemRarity::Uncommon, FLinearColor::Green);
-	RarityColors.Add(EOutlawItemRarity::Rare, FLinearColor(0.0f, 0.5f, 1.0f));
-	RarityColors.Add(EOutlawItemRarity::Epic, FLinearColor(0.6f, 0.0f, 1.0f));
-	RarityColors.Add(EOutlawItemRarity::Legendary, FLinearColor(1.0f, 0.5f, 0.0f));
+	RarityColors.Add(EAtomItemRarity::Common, FLinearColor::White);
+	RarityColors.Add(EAtomItemRarity::Uncommon, FLinearColor::Green);
+	RarityColors.Add(EAtomItemRarity::Rare, FLinearColor(0.0f, 0.5f, 1.0f));
+	RarityColors.Add(EAtomItemRarity::Epic, FLinearColor(0.6f, 0.0f, 1.0f));
+	RarityColors.Add(EAtomItemRarity::Legendary, FLinearColor(1.0f, 0.5f, 0.0f));
 }
 
-void UOutlawLootBeamComponent::BeginPlay()
+void UAtomLootBeamComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void UOutlawLootBeamComponent::InitForRarity(EOutlawItemRarity Rarity)
+void UAtomLootBeamComponent::InitForRarity(EAtomItemRarity Rarity)
 {
 	if (!BeamEffect.IsNull())
 	{

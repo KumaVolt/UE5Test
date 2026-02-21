@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawDeathComponent.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AtomDeathComponent.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
-#include "Animation/OutlawAnimationTypes.h"
+#include "Animation/AtomAnimationTypes.h"
 
-UOutlawDeathComponent::UOutlawDeathComponent(const FObjectInitializer& ObjectInitializer)
+UAtomDeathComponent::UAtomDeathComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawDeathComponent::BeginPlay()
+void UAtomDeathComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -43,12 +43,12 @@ void UOutlawDeathComponent::BeginPlay()
 	{
 		BoundASC = ASC;
 		HealthDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetHealthAttribute()).AddUObject(
-				this, &UOutlawDeathComponent::OnHealthChanged);
+			UAtomAttributeSet::GetHealthAttribute()).AddUObject(
+				this, &UAtomDeathComponent::OnHealthChanged);
 	}
 }
 
-void UOutlawDeathComponent::BindToAbilitySystem(UAbilitySystemComponent* ASC)
+void UAtomDeathComponent::BindToAbilitySystem(UAbilitySystemComponent* ASC)
 {
 	if (!ASC || BoundASC.IsValid())
 	{
@@ -57,22 +57,22 @@ void UOutlawDeathComponent::BindToAbilitySystem(UAbilitySystemComponent* ASC)
 
 	BoundASC = ASC;
 	HealthDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
-		UOutlawAttributeSet::GetHealthAttribute()).AddUObject(
-			this, &UOutlawDeathComponent::OnHealthChanged);
+		UAtomAttributeSet::GetHealthAttribute()).AddUObject(
+			this, &UAtomDeathComponent::OnHealthChanged);
 }
 
-void UOutlawDeathComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UAtomDeathComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (BoundASC.IsValid() && HealthDelegateHandle.IsValid())
 	{
 		BoundASC->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetHealthAttribute()).Remove(HealthDelegateHandle);
+			UAtomAttributeSet::GetHealthAttribute()).Remove(HealthDelegateHandle);
 	}
 
 	Super::EndPlay(EndPlayReason);
 }
 
-void UOutlawDeathComponent::OnHealthChanged(const FOnAttributeChangeData& Data)
+void UAtomDeathComponent::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	if (Data.NewValue > 0.f || bIsDead)
 	{
@@ -94,7 +94,7 @@ void UOutlawDeathComponent::OnHealthChanged(const FOnAttributeChangeData& Data)
 	if (BoundASC.IsValid())
 	{
 		BoundASC->CancelAllAbilities();
-		BoundASC->AddLooseGameplayTag(OutlawAnimTags::Dead);
+		BoundASC->AddLooseGameplayTag(AtomAnimTags::Dead);
 	}
 
 	OnDeathStarted.Broadcast(Killer);

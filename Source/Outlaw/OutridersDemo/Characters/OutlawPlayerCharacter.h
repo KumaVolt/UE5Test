@@ -3,28 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OutlawCharacterBase.h"
+#include "Characters/AtomCharacterBase.h"
 #include "InputMappingContext.h"
 #include "OutlawPlayerCharacter.generated.h"
 
 class UInputAction;
 struct FInputActionValue;
 class USpringArmComponent;
-class UOutlawCameraComponent;
-class UOutlawLockOnComponent;
-class UOutlawDeathComponent;
-class UOutlawPlayerDeathHandler;
-class UOutlawCombatLogComponent;
-class UOutlawDamageNumberComponent;
-class UOutlawHitReactionComponent;
-class UOutlawStatusEffectComponent;
-class UOutlawWeaponManagerComponent;
-class UOutlawInventoryComponent;
-class UOutlawProgressionComponent;
+class UAtomCameraComponent;
+class UAtomLockOnComponent;
+class UAtomDeathComponent;
+class UAtomPlayerDeathHandler;
+class UAtomCombatLogComponent;
+class UAtomDamageNumberComponent;
+class UAtomHitReactionComponent;
+class UAtomStatusEffectComponent;
+class UAtomWeaponManagerComponent;
+class UAtomInventoryComponent;
+class UAtomProgressionComponent;
 class UStaticMeshComponent;
 
 UCLASS()
-class OUTLAW_API AOutlawPlayerCharacter : public AOutlawCharacterBase
+class OUTLAW_API AOutlawPlayerCharacter : public AAtomCharacterBase
 {
 	GENERATED_BODY()
 
@@ -121,37 +121,37 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	TObjectPtr<UOutlawCameraComponent> CameraComponent;
+	TObjectPtr<UAtomCameraComponent> CameraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	TObjectPtr<UOutlawLockOnComponent> LockOnComponent;
+	TObjectPtr<UAtomLockOnComponent> LockOnComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawDeathComponent> DeathComponent;
+	TObjectPtr<UAtomDeathComponent> DeathComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawPlayerDeathHandler> PlayerDeathHandler;
+	TObjectPtr<UAtomPlayerDeathHandler> PlayerDeathHandler;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawCombatLogComponent> CombatLogComponent;
+	TObjectPtr<UAtomCombatLogComponent> CombatLogComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawDamageNumberComponent> DamageNumberComponent;
+	TObjectPtr<UAtomDamageNumberComponent> DamageNumberComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	TObjectPtr<UOutlawHitReactionComponent> HitReactionComponent;
+	TObjectPtr<UAtomHitReactionComponent> HitReactionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawStatusEffectComponent> StatusEffectComponent;
+	TObjectPtr<UAtomStatusEffectComponent> StatusEffectComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UOutlawWeaponManagerComponent> WeaponManagerComponent;
+	TObjectPtr<UAtomWeaponManagerComponent> WeaponManagerComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	TObjectPtr<UOutlawInventoryComponent> InventoryComponent;
+	TObjectPtr<UAtomInventoryComponent> InventoryComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Progression")
-	TObjectPtr<UOutlawProgressionComponent> ProgressionComponent;
+	TObjectPtr<UAtomProgressionComponent> ProgressionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual")
 	TObjectPtr<UStaticMeshComponent> BodyMesh;

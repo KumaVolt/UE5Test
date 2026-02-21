@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/OutlawHUDLayout.h"
+#include "UI/AtomHUDLayout.h"
 #include "OutlawDemoHUD.generated.h"
 
 class SOutlawDemoHUDSlate;
@@ -11,7 +11,7 @@ class SOutlawDemoHUDSlate;
  * Shows: Health bar, Stamina bar, Ammo counter, XP bar, Level, Crosshair.
  */
 UCLASS()
-class OUTLAW_API UOutlawDemoHUD : public UOutlawHUDLayout
+class OUTLAW_API UOutlawDemoHUD : public UAtomHUDLayout
 {
 	GENERATED_BODY()
 

@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "AttributeSet.h"
-#include "OutlawProgressionTypes.generated.h"
+#include "AtomProgressionTypes.generated.h"
 
 // ── Enums ───────────────────────────────────────────────────────
 
 /** Determines the class's skill tree behavior. */
 UENUM(BlueprintType)
-enum class EOutlawClassMode : uint8
+enum class EAtomClassMode : uint8
 {
 	/** Outriders-style: predefined class with skill tree + auto-unlock abilities per level. */
 	FixedClass,
@@ -21,7 +21,7 @@ enum class EOutlawClassMode : uint8
 
 /** How a skill tree node is unlocked. */
 UENUM(BlueprintType)
-enum class EOutlawSkillNodeUnlockType : uint8
+enum class EAtomSkillNodeUnlockType : uint8
 {
 	/** Player manually allocates using skill points. Requires prerequisites to be met. */
 	Manual,
@@ -33,7 +33,7 @@ enum class EOutlawSkillNodeUnlockType : uint8
 
 /** A single row in the XP table — defines XP required and points awarded for one level. */
 USTRUCT(BlueprintType)
-struct FOutlawXPLevelEntry
+struct FAtomXPLevelEntry
 {
 	GENERATED_BODY()
 
@@ -48,7 +48,7 @@ struct FOutlawXPLevelEntry
 
 /** Per-level stat scaling for a class (e.g. MaxHealth +12/level). */
 USTRUCT(BlueprintType)
-struct FOutlawStatGrowthEntry
+struct FAtomStatGrowthEntry
 {
 	GENERATED_BODY()
 
@@ -63,7 +63,7 @@ struct FOutlawStatGrowthEntry
 
 /** A prerequisite link to another skill tree node. */
 USTRUCT(BlueprintType)
-struct FOutlawSkillNodePrerequisite
+struct FAtomSkillNodePrerequisite
 {
 	GENERATED_BODY()
 
@@ -78,7 +78,7 @@ struct FOutlawSkillNodePrerequisite
 
 /** Runtime allocation state for a single skill node (replicated). */
 USTRUCT(BlueprintType)
-struct FOutlawAllocatedSkillNode
+struct FAtomAllocatedSkillNode
 {
 	GENERATED_BODY()
 
@@ -93,7 +93,7 @@ struct FOutlawAllocatedSkillNode
 
 /** Serializable snapshot of the full progression state for save/load. */
 USTRUCT(BlueprintType)
-struct FOutlawProgressionSaveData
+struct FAtomProgressionSaveData
 {
 	GENERATED_BODY()
 
@@ -113,7 +113,7 @@ struct FOutlawProgressionSaveData
 	FGameplayTag SelectedAscendancyTag;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<FOutlawAllocatedSkillNode> AllocatedNodes;
+	TArray<FAtomAllocatedSkillNode> AllocatedNodes;
 };
 
 // ── Delegates ───────────────────────────────────────────────────

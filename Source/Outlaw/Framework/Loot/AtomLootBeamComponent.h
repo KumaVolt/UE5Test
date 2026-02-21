@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "OutlawLootBeamComponent.generated.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "AtomLootBeamComponent.generated.h"
 
 class UNiagaraComponent;
 class UNiagaraSystem;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawLootBeamComponent : public USceneComponent
+class OUTLAW_API UAtomLootBeamComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawLootBeamComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomLootBeamComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 
@@ -24,10 +24,10 @@ public:
 	TSoftObjectPtr<UNiagaraSystem> BeamEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Loot Beam")
-	TMap<EOutlawItemRarity, FLinearColor> RarityColors;
+	TMap<EAtomItemRarity, FLinearColor> RarityColors;
 
 	UFUNCTION(BlueprintCallable, Category = "Loot Beam")
-	void InitForRarity(EOutlawItemRarity Rarity);
+	void InitForRarity(EAtomItemRarity Rarity);
 
 private:
 	UPROPERTY()

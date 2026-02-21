@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
-#include "OutlawDamageNumberWidget.generated.h"
+#include "AtomDamageNumberWidget.generated.h"
 
 UCLASS(Abstract, Blueprintable)
-class OUTLAW_API UOutlawDamageNumberWidget : public UCommonUserWidget
+class OUTLAW_API UAtomDamageNumberWidget : public UCommonUserWidget
 {
 	GENERATED_BODY()
 

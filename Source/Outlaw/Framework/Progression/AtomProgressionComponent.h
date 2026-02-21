@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
-#include "AbilitySystem/OutlawAbilityTypes.h"
-#include "OutlawProgressionTypes.h"
-#include "OutlawProgressionComponent.generated.h"
+#include "AbilitySystem/AtomAbilityTypes.h"
+#include "AtomProgressionTypes.h"
+#include "AtomProgressionComponent.generated.h"
 
 class UAbilitySystemComponent;
-class UOutlawLevelingConfig;
-class UOutlawClassDefinition;
-class UOutlawSkillTreeNodeDefinition;
+class UAtomLevelingConfig;
+class UAtomClassDefinition;
+class UAtomSkillTreeNodeDefinition;
 
 /**
  * Main progression system component — manages XP, leveling, class selection,
@@ -25,12 +25,12 @@ class UOutlawSkillTreeNodeDefinition;
  * matching the existing WeaponManagerComponent pattern.
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawProgressionComponent : public UActorComponent
+class OUTLAW_API UAtomProgressionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawProgressionComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomProgressionComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -39,11 +39,11 @@ public:
 
 	/** Fallback XP table (used if the selected class has no LevelingConfig override). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Progression|Config")
-	TObjectPtr<UOutlawLevelingConfig> DefaultLevelingConfig;
+	TObjectPtr<UAtomLevelingConfig> DefaultLevelingConfig;
 
 	/** Classes the player can choose from. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Progression|Config")
-	TArray<TObjectPtr<UOutlawClassDefinition>> AvailableClasses;
+	TArray<TObjectPtr<UAtomClassDefinition>> AvailableClasses;
 
 	// ── Leveling API ────────────────────────────────────────────
 
@@ -80,15 +80,15 @@ public:
 
 	/** Returns the selected base class definition, or nullptr. */
 	UFUNCTION(BlueprintCallable, Category = "Progression|Class")
-	UOutlawClassDefinition* GetSelectedClass() const;
+	UAtomClassDefinition* GetSelectedClass() const;
 
 	/** Returns the selected ascendancy definition, or nullptr. */
 	UFUNCTION(BlueprintCallable, Category = "Progression|Class")
-	UOutlawClassDefinition* GetSelectedAscendancy() const;
+	UAtomClassDefinition* GetSelectedAscendancy() const;
 
 	/** Returns ascendancy if selected, else base class. */
 	UFUNCTION(BlueprintCallable, Category = "Progression|Class")
-	UOutlawClassDefinition* GetActiveClassDefinition() const;
+	UAtomClassDefinition* GetActiveClassDefinition() const;
 
 	// ── Skill Tree API ──────────────────────────────────────────
 
@@ -120,11 +120,11 @@ public:
 
 	/** Creates a serializable snapshot of the full progression state. */
 	UFUNCTION(BlueprintCallable, Category = "Progression|SaveLoad")
-	FOutlawProgressionSaveData SaveProgression() const;
+	FAtomProgressionSaveData SaveProgression() const;
 
 	/** Restores progression state from saved data. Recalculates everything. */
 	UFUNCTION(BlueprintCallable, Category = "Progression|SaveLoad")
-	void LoadProgression(const FOutlawProgressionSaveData& Data);
+	void LoadProgression(const FAtomProgressionSaveData& Data);
 
 	// ── Delegates ───────────────────────────────────────────────
 
@@ -153,7 +153,7 @@ private:
 	UAbilitySystemComponent* GetASC() const;
 
 	/** Returns the class's leveling config override, or DefaultLevelingConfig. */
-	UOutlawLevelingConfig* GetEffectiveLevelingConfig() const;
+	UAtomLevelingConfig* GetEffectiveLevelingConfig() const;
 
 	/** Recalculates attribute base values from class stat growth + allocated node bonuses. */
 	void RecalculateStatBases();
@@ -168,10 +168,10 @@ private:
 	void RevokeNodeAbilities(FGameplayTag NodeTag);
 
 	/** Finds the node definition across the active class and ascendancy skill trees. */
-	UOutlawSkillTreeNodeDefinition* FindNodeDefinition(FGameplayTag NodeTag) const;
+	UAtomSkillTreeNodeDefinition* FindNodeDefinition(FGameplayTag NodeTag) const;
 
 	/** Returns mutable reference to the allocated node entry, creating one if needed. */
-	FOutlawAllocatedSkillNode& FindOrAddAllocatedNode(FGameplayTag NodeTag);
+	FAtomAllocatedSkillNode& FindOrAddAllocatedNode(FGameplayTag NodeTag);
 
 	/** Checks if any other allocated node depends on the given node at its current rank. */
 	bool IsNodeRequiredByOthers(FGameplayTag NodeTag, int32 AtRank) const;
@@ -194,16 +194,16 @@ private:
 	FGameplayTag SelectedAscendancyTag;
 
 	UPROPERTY(Replicated)
-	TArray<FOutlawAllocatedSkillNode> AllocatedNodes;
+	TArray<FAtomAllocatedSkillNode> AllocatedNodes;
 
 	// ── Server-Only Handles ─────────────────────────────────────
 
 	/** Handles for the base class ability set. */
-	FOutlawAbilitySetGrantedHandles ClassAbilityHandles;
+	FAtomAbilitySetGrantedHandles ClassAbilityHandles;
 
 	/** Handles for the ascendancy ability set. */
-	FOutlawAbilitySetGrantedHandles AscendancyAbilityHandles;
+	FAtomAbilitySetGrantedHandles AscendancyAbilityHandles;
 
 	/** Per-node granted ability handles. */
-	TMap<FGameplayTag, FOutlawAbilitySetGrantedHandles> NodeAbilityHandles;
+	TMap<FGameplayTag, FAtomAbilitySetGrantedHandles> NodeAbilityHandles;
 };

@@ -4,24 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawProgressionTypes.h"
-#include "OutlawLevelingConfig.generated.h"
+#include "AtomProgressionTypes.h"
+#include "AtomLevelingConfig.generated.h"
 
 /**
  * Data-driven XP table. Each entry maps to a level (index 0 = level 1).
  * Defines XP thresholds and skill point awards per level.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawLevelingConfig : public UPrimaryDataAsset
+class OUTLAW_API UAtomLevelingConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawLevelingConfig(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomLevelingConfig(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** XP table — index 0 = level 1. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Leveling")
-	TArray<FOutlawXPLevelEntry> LevelTable;
+	TArray<FAtomXPLevelEntry> LevelTable;
 
 	/** Fallback skill points per level if the entry's SkillPointsAwarded is 0. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Leveling", meta = (ClampMin = "0"))

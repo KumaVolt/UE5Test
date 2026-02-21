@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawLootTable.h"
-#include "Inventory/OutlawItemDefinition.h"
+#include "AtomLootTable.h"
+#include "Inventory/AtomItemDefinition.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawLootTable, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomLootTable, Log, All);
 
-UOutlawLootTable::UOutlawLootTable(const FObjectInitializer& ObjectInitializer)
+UAtomLootTable::UAtomLootTable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-TArray<FOutlawLootDrop> UOutlawLootTable::RollLoot(int32 EnemyLevel, int32 NumDrops, float RarityBonus) const
+TArray<FAtomLootDrop> UAtomLootTable::RollLoot(int32 EnemyLevel, int32 NumDrops, float RarityBonus) const
 {
-	TArray<FOutlawLootDrop> Result;
+	TArray<FAtomLootDrop> Result;
 
 	if (Entries.Num() == 0 || NumDrops <= 0)
 	{
@@ -21,11 +21,11 @@ TArray<FOutlawLootDrop> UOutlawLootTable::RollLoot(int32 EnemyLevel, int32 NumDr
 
 	for (int32 DropIndex = 0; DropIndex < NumDrops; ++DropIndex)
 	{
-		TArray<const FOutlawLootTableEntry*> EligibleEntries;
+		TArray<const FAtomLootTableEntry*> EligibleEntries;
 		TArray<float> Weights;
 		float TotalWeight = 0.0f;
 
-		for (const FOutlawLootTableEntry& Entry : Entries)
+		for (const FAtomLootTableEntry& Entry : Entries)
 		{
 			if (EnemyLevel < Entry.MinItemLevel || EnemyLevel > Entry.MaxItemLevel)
 			{
@@ -47,7 +47,7 @@ TArray<FOutlawLootDrop> UOutlawLootTable::RollLoot(int32 EnemyLevel, int32 NumDr
 
 		float RandomRoll = FMath::FRandRange(0.0f, TotalWeight);
 		float CurrentWeight = 0.0f;
-		const FOutlawLootTableEntry* SelectedEntry = nullptr;
+		const FAtomLootTableEntry* SelectedEntry = nullptr;
 
 		for (int32 i = 0; i < EligibleEntries.Num(); ++i)
 		{
@@ -64,13 +64,13 @@ TArray<FOutlawLootDrop> UOutlawLootTable::RollLoot(int32 EnemyLevel, int32 NumDr
 			SelectedEntry = EligibleEntries.Last();
 		}
 
-		const UOutlawItemDefinition* ItemDef = SelectedEntry->ItemDefinition.LoadSynchronous();
+		const UAtomItemDefinition* ItemDef = SelectedEntry->ItemDefinition.LoadSynchronous();
 		if (!ItemDef)
 		{
 			continue;
 		}
 
-		FOutlawLootDrop Drop;
+		FAtomLootDrop Drop;
 		Drop.ItemDefinition = ItemDef;
 		Drop.Quantity = FMath::RandRange(SelectedEntry->MinQuantity, SelectedEntry->MaxQuantity);
 		Drop.ItemLevel = FMath::RandRange(SelectedEntry->MinItemLevel, SelectedEntry->MaxItemLevel);

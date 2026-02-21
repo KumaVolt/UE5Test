@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "OutlawWeaponTypes.h"
-#include "OutlawAffixDefinition.generated.h"
+#include "AtomWeaponTypes.h"
+#include "AtomAffixDefinition.generated.h"
 
 class UGameplayEffect;
 
@@ -15,12 +15,12 @@ class UGameplayEffect;
  * Each affix applies a GameplayEffect with SetByCaller magnitude.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawAffixDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomAffixDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawAffixDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomAffixDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Display name shown in item tooltip (e.g. "of Fury", "Blazing"). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affix")
@@ -28,7 +28,7 @@ public:
 
 	/** Whether this is a prefix or suffix. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affix")
-	EOutlawAffixSlot AffixSlot = EOutlawAffixSlot::Prefix;
+	EAtomAffixSlot AffixSlot = EAtomAffixSlot::Prefix;
 
 	/** Minimum item level required to roll this affix. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affix", meta = (ClampMin = "1"))

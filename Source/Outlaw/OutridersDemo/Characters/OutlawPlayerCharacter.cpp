@@ -1,26 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "OutlawPlayerCharacter.h"
-#include "AbilitySystem/OutlawAbilitySystemComponent.h"
+#include "AbilitySystem/AtomAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Player/OutlawPlayerState.h"
+#include "Player/AtomPlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Camera/OutlawCameraComponent.h"
-#include "Camera/OutlawLockOnComponent.h"
+#include "Camera/AtomCameraComponent.h"
+#include "Camera/AtomLockOnComponent.h"
 #include "AbilitySystemComponent.h"
-#include "Combat/OutlawDeathComponent.h"
-#include "Combat/OutlawPlayerDeathHandler.h"
-#include "Combat/OutlawCombatLogComponent.h"
-#include "Combat/OutlawDamageNumberComponent.h"
-#include "Animation/OutlawHitReactionComponent.h"
-#include "Combat/OutlawStatusEffectComponent.h"
-#include "Weapon/OutlawWeaponManagerComponent.h"
-#include "Weapon/OutlawShooterWeaponData.h"
-#include "Inventory/OutlawInventoryComponent.h"
-#include "Inventory/OutlawItemInstance.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Progression/OutlawProgressionComponent.h"
+#include "Combat/AtomDeathComponent.h"
+#include "Combat/AtomPlayerDeathHandler.h"
+#include "Combat/AtomCombatLogComponent.h"
+#include "Combat/AtomDamageNumberComponent.h"
+#include "Animation/AtomHitReactionComponent.h"
+#include "Combat/AtomStatusEffectComponent.h"
+#include "Weapon/AtomWeaponManagerComponent.h"
+#include "Weapon/AtomShooterWeaponData.h"
+#include "Inventory/AtomInventoryComponent.h"
+#include "Inventory/AtomItemInstance.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Progression/AtomProgressionComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -28,7 +28,7 @@
 #include "Game/OutlawDemoAbilitySets.h"
 #include "Game/OutlawDemoDataSubsystem.h"
 #include "Player/OutlawPlayerController.h"
-#include "Progression/OutlawClassDefinition.h"
+#include "Progression/AtomClassDefinition.h"
 #include "UI/OutlawDemoDeathScreen.h"
 #include "UI/OutlawDemoDamageNumber.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -47,50 +47,50 @@ AOutlawPlayerCharacter::AOutlawPlayerCharacter()
 	SpringArm->bUsePawnControlRotation = true;
 
 	// Camera
-	CameraComponent = CreateDefaultSubobject<UOutlawCameraComponent>(TEXT("Camera"));
+	CameraComponent = CreateDefaultSubobject<UAtomCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArm);
 
 	// Lock-On
-	LockOnComponent = CreateDefaultSubobject<UOutlawLockOnComponent>(TEXT("LockOn"));
+	LockOnComponent = CreateDefaultSubobject<UAtomLockOnComponent>(TEXT("LockOn"));
 
 	// Combat
-	DeathComponent = CreateDefaultSubobject<UOutlawDeathComponent>(TEXT("Death"));
-	PlayerDeathHandler = CreateDefaultSubobject<UOutlawPlayerDeathHandler>(TEXT("PlayerDeathHandler"));
+	DeathComponent = CreateDefaultSubobject<UAtomDeathComponent>(TEXT("Death"));
+	PlayerDeathHandler = CreateDefaultSubobject<UAtomPlayerDeathHandler>(TEXT("PlayerDeathHandler"));
 	PlayerDeathHandler->RespawnDelay = 3.f;
 	PlayerDeathHandler->DeathScreenWidgetClass = UOutlawDemoDeathScreen::StaticClass();
 
-	CombatLogComponent = CreateDefaultSubobject<UOutlawCombatLogComponent>(TEXT("CombatLog"));
-	DamageNumberComponent = CreateDefaultSubobject<UOutlawDamageNumberComponent>(TEXT("DamageNumber"));
+	CombatLogComponent = CreateDefaultSubobject<UAtomCombatLogComponent>(TEXT("CombatLog"));
+	DamageNumberComponent = CreateDefaultSubobject<UAtomDamageNumberComponent>(TEXT("DamageNumber"));
 	DamageNumberComponent->DamageNumberWidgetClass = UOutlawDemoDamageNumber::StaticClass();
 
-	HitReactionComponent = CreateDefaultSubobject<UOutlawHitReactionComponent>(TEXT("HitReaction"));
-	StatusEffectComponent = CreateDefaultSubobject<UOutlawStatusEffectComponent>(TEXT("StatusEffects"));
+	HitReactionComponent = CreateDefaultSubobject<UAtomHitReactionComponent>(TEXT("HitReaction"));
+	StatusEffectComponent = CreateDefaultSubobject<UAtomStatusEffectComponent>(TEXT("StatusEffects"));
 
 	// Weapon
-	WeaponManagerComponent = CreateDefaultSubobject<UOutlawWeaponManagerComponent>(TEXT("WeaponManager"));
+	WeaponManagerComponent = CreateDefaultSubobject<UAtomWeaponManagerComponent>(TEXT("WeaponManager"));
 	WeaponManagerComponent->ShooterWeaponSlotOrder.Add(FGameplayTag::RequestGameplayTag(TEXT("Weapon.Slot.Primary1")));
 	WeaponManagerComponent->ShooterWeaponSlotOrder.Add(FGameplayTag::RequestGameplayTag(TEXT("Weapon.Slot.Primary2")));
 	WeaponManagerComponent->ShooterWeaponSlotOrder.Add(FGameplayTag::RequestGameplayTag(TEXT("Weapon.Slot.Sidearm")));
 
 	// Inventory
-	InventoryComponent = CreateDefaultSubobject<UOutlawInventoryComponent>(TEXT("Inventory"));
+	InventoryComponent = CreateDefaultSubobject<UAtomInventoryComponent>(TEXT("Inventory"));
 	InventoryComponent->MaxSlots = 20;
 
 	// Add equipment slots
-	FOutlawEquipmentSlotInfo Primary1Slot;
+	FAtomEquipmentSlotInfo Primary1Slot;
 	Primary1Slot.SlotTag = FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Primary1"));
 	InventoryComponent->EquipmentSlots.Add(Primary1Slot);
 
-	FOutlawEquipmentSlotInfo Primary2Slot;
+	FAtomEquipmentSlotInfo Primary2Slot;
 	Primary2Slot.SlotTag = FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Primary2"));
 	InventoryComponent->EquipmentSlots.Add(Primary2Slot);
 
-	FOutlawEquipmentSlotInfo SidearmSlot;
+	FAtomEquipmentSlotInfo SidearmSlot;
 	SidearmSlot.SlotTag = FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Sidearm"));
 	InventoryComponent->EquipmentSlots.Add(SidearmSlot);
 
 	// Progression
-	ProgressionComponent = CreateDefaultSubobject<UOutlawProgressionComponent>(TEXT("Progression"));
+	ProgressionComponent = CreateDefaultSubobject<UAtomProgressionComponent>(TEXT("Progression"));
 
 	// Character Movement defaults for OTS shooter
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
@@ -140,11 +140,11 @@ AOutlawPlayerCharacter::AOutlawPlayerCharacter()
 
 void AOutlawPlayerCharacter::InitAbilitySystemComponent()
 {
-	AOutlawPlayerState* OutlawPlayerState = GetPlayerState<AOutlawPlayerState>();
-	check(OutlawPlayerState);
-	AbilitySystemComponent = CastChecked<UOutlawAbilitySystemComponent>(
-		OutlawPlayerState->GetAbilitySystemComponent());
-	AbilitySystemComponent->InitAbilityActorInfo(OutlawPlayerState, this);
+	AAtomPlayerState* AtomPlayerState = GetPlayerState<AAtomPlayerState>();
+	check(AtomPlayerState);
+	AbilitySystemComponent = CastChecked<UAtomAbilitySystemComponent>(
+		AtomPlayerState->GetAbilitySystemComponent());
+	AbilitySystemComponent->InitAbilityActorInfo(AtomPlayerState, this);
 }
 
 void AOutlawPlayerCharacter::PossessedBy(AController* NewController)
@@ -234,7 +234,7 @@ void AOutlawPlayerCharacter::SetupDemoDefaults()
 		int32 Added = InventoryComponent->AddItem(DataSub->GetAssaultRifleItemDef(), 1);
 		if (Added > 0)
 		{
-			TArray<FOutlawInventoryEntry> Weapons = InventoryComponent->FindItemsForSlot(
+			TArray<FAtomInventoryEntry> Weapons = InventoryComponent->FindItemsForSlot(
 				FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Primary1")));
 			if (Weapons.Num() > 0)
 			{
@@ -246,7 +246,7 @@ void AOutlawPlayerCharacter::SetupDemoDefaults()
 		Added = InventoryComponent->AddItem(DataSub->GetHandCannonItemDef(), 1);
 		if (Added > 0)
 		{
-			TArray<FOutlawInventoryEntry> Weapons = InventoryComponent->FindItemsForSlot(
+			TArray<FAtomInventoryEntry> Weapons = InventoryComponent->FindItemsForSlot(
 				FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Primary2")));
 			if (Weapons.Num() > 0)
 			{
@@ -407,7 +407,7 @@ void AOutlawPlayerCharacter::OnReloadStarted()
 	// For the demo, simply reload the active weapon
 	if (WeaponManagerComponent)
 	{
-		if (UOutlawItemInstance* Weapon = WeaponManagerComponent->GetActiveWeapon())
+		if (UAtomItemInstance* Weapon = WeaponManagerComponent->GetActiveWeapon())
 		{
 			if (Weapon->ItemDef && Weapon->ItemDef->ShooterWeaponData)
 			{

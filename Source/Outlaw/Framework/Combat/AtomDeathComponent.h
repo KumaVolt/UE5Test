@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "AbilitySystemComponent.h"
-#include "OutlawDeathTypes.h"
-#include "OutlawDeathComponent.generated.h"
+#include "AtomDeathTypes.h"
+#include "AtomDeathComponent.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawDeathComponent : public UActorComponent
+class OUTLAW_API UAtomDeathComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawDeathComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomDeathComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
+#include "AbilitySystem/AtomAbilitySet.h"
 #include "OutlawDemoAbilitySets.generated.h"
 
 /** Ability set for the player: fire weapon ability + player default attributes + attribute sets. */
 UCLASS()
-class OUTLAW_API UOutlawAbilitySet_PlayerDefault : public UOutlawAbilitySet
+class OUTLAW_API UOutlawAbilitySet_PlayerDefault : public UAtomAbilitySet
 {
 	GENERATED_BODY()
 
@@ -16,7 +16,7 @@ public:
 
 /** Ability set for enemies: melee attack ability + enemy default attributes + attribute set. */
 UCLASS()
-class OUTLAW_API UOutlawAbilitySet_EnemyDefault : public UOutlawAbilitySet
+class OUTLAW_API UOutlawAbilitySet_EnemyDefault : public UAtomAbilitySet
 {
 	GENERATED_BODY()
 

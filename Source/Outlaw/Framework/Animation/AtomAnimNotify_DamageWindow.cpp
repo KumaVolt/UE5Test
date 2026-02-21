@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Animation/OutlawAnimNotify_DamageWindow.h"
+#include "Animation/AtomAnimNotify_DamageWindow.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "Animation/OutlawAnimationTypes.h"
+#include "Animation/AtomAnimationTypes.h"
 #include "Components/SkeletalMeshComponent.h"
 
-void UOutlawAnimNotify_DamageWindow::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
+void UAtomAnimNotify_DamageWindow::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
@@ -25,12 +25,12 @@ void UOutlawAnimNotify_DamageWindow::NotifyBegin(USkeletalMeshComponent* MeshCom
 	{
 		if (UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent())
 		{
-			ASC->AddLooseGameplayTag(OutlawAnimTags::DamageWindowActive);
+			ASC->AddLooseGameplayTag(AtomAnimTags::DamageWindowActive);
 		}
 	}
 }
 
-void UOutlawAnimNotify_DamageWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAtomAnimNotify_DamageWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
@@ -49,7 +49,7 @@ void UOutlawAnimNotify_DamageWindow::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	{
 		if (UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent())
 		{
-			ASC->RemoveLooseGameplayTag(OutlawAnimTags::DamageWindowActive);
+			ASC->RemoveLooseGameplayTag(AtomAnimTags::DamageWindowActive);
 		}
 	}
 }

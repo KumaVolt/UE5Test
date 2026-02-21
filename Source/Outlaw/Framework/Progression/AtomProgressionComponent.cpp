@@ -1,53 +1,53 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawProgressionComponent.h"
-#include "OutlawLevelingConfig.h"
-#include "OutlawClassDefinition.h"
-#include "OutlawSkillTreeNodeDefinition.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
+#include "AtomProgressionComponent.h"
+#include "AtomLevelingConfig.h"
+#include "AtomClassDefinition.h"
+#include "AtomSkillTreeNodeDefinition.h"
+#include "AbilitySystem/AtomAbilitySet.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawProgression, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomProgression, Log, All);
 
-UOutlawProgressionComponent::UOutlawProgressionComponent(const FObjectInitializer& ObjectInitializer)
+UAtomProgressionComponent::UAtomProgressionComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 }
 
-void UOutlawProgressionComponent::BeginPlay()
+void UAtomProgressionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void UOutlawProgressionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UAtomProgressionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UOutlawProgressionComponent, CurrentLevel);
-	DOREPLIFETIME(UOutlawProgressionComponent, CurrentXP);
-	DOREPLIFETIME(UOutlawProgressionComponent, AvailableSkillPoints);
-	DOREPLIFETIME(UOutlawProgressionComponent, SelectedClassTag);
-	DOREPLIFETIME(UOutlawProgressionComponent, SelectedAscendancyTag);
-	DOREPLIFETIME(UOutlawProgressionComponent, AllocatedNodes);
+	DOREPLIFETIME(UAtomProgressionComponent, CurrentLevel);
+	DOREPLIFETIME(UAtomProgressionComponent, CurrentXP);
+	DOREPLIFETIME(UAtomProgressionComponent, AvailableSkillPoints);
+	DOREPLIFETIME(UAtomProgressionComponent, SelectedClassTag);
+	DOREPLIFETIME(UAtomProgressionComponent, SelectedAscendancyTag);
+	DOREPLIFETIME(UAtomProgressionComponent, AllocatedNodes);
 }
 
 // ── Leveling API ────────────────────────────────────────────────
 
-void UOutlawProgressionComponent::AwardXP(int32 Amount)
+void UAtomProgressionComponent::AwardXP(int32 Amount)
 {
 	if (!GetOwner()->HasAuthority() || Amount <= 0)
 	{
 		return;
 	}
 
-	const UOutlawLevelingConfig* Config = GetEffectiveLevelingConfig();
+	const UAtomLevelingConfig* Config = GetEffectiveLevelingConfig();
 	if (!Config)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("AwardXP: No leveling config available."));
+		UE_LOG(LogAtomProgression, Warning, TEXT("AwardXP: No leveling config available."));
 		return;
 	}
 
@@ -78,9 +78,9 @@ void UOutlawProgressionComponent::AwardXP(int32 Amount)
 	RecalculateStatBases();
 }
 
-int32 UOutlawProgressionComponent::GetXPToNextLevel() const
+int32 UAtomProgressionComponent::GetXPToNextLevel() const
 {
-	const UOutlawLevelingConfig* Config = GetEffectiveLevelingConfig();
+	const UAtomLevelingConfig* Config = GetEffectiveLevelingConfig();
 	if (!Config)
 	{
 		return 0;
@@ -96,9 +96,9 @@ int32 UOutlawProgressionComponent::GetXPToNextLevel() const
 	return FMath::Max(0, XPForNext - CurrentXP);
 }
 
-float UOutlawProgressionComponent::GetXPProgress() const
+float UAtomProgressionComponent::GetXPProgress() const
 {
-	const UOutlawLevelingConfig* Config = GetEffectiveLevelingConfig();
+	const UAtomLevelingConfig* Config = GetEffectiveLevelingConfig();
 	if (!Config)
 	{
 		return 0.0f;
@@ -124,7 +124,7 @@ float UOutlawProgressionComponent::GetXPProgress() const
 
 // ── Class API ───────────────────────────────────────────────────
 
-void UOutlawProgressionComponent::SelectClass(FGameplayTag ClassTag)
+void UAtomProgressionComponent::SelectClass(FGameplayTag ClassTag)
 {
 	if (!GetOwner()->HasAuthority() || !ClassTag.IsValid())
 	{
@@ -132,8 +132,8 @@ void UOutlawProgressionComponent::SelectClass(FGameplayTag ClassTag)
 	}
 
 	// Find the class definition
-	UOutlawClassDefinition* NewClass = nullptr;
-	for (const TObjectPtr<UOutlawClassDefinition>& ClassDef : AvailableClasses)
+	UAtomClassDefinition* NewClass = nullptr;
+	for (const TObjectPtr<UAtomClassDefinition>& ClassDef : AvailableClasses)
 	{
 		if (ClassDef && ClassDef->ClassTag == ClassTag)
 		{
@@ -144,14 +144,14 @@ void UOutlawProgressionComponent::SelectClass(FGameplayTag ClassTag)
 
 	if (!NewClass)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("SelectClass: Class tag '%s' not found in AvailableClasses."), *ClassTag.ToString());
+		UE_LOG(LogAtomProgression, Warning, TEXT("SelectClass: Class tag '%s' not found in AvailableClasses."), *ClassTag.ToString());
 		return;
 	}
 
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("SelectClass: No ASC available."));
+		UE_LOG(LogAtomProgression, Warning, TEXT("SelectClass: No ASC available."));
 		return;
 	}
 
@@ -188,7 +188,7 @@ void UOutlawProgressionComponent::SelectClass(FGameplayTag ClassTag)
 	OnClassChanged.Broadcast(ClassTag);
 }
 
-void UOutlawProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
+void UAtomProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
 {
 	if (!GetOwner()->HasAuthority() || !AscendancyTag.IsValid())
 	{
@@ -196,23 +196,23 @@ void UOutlawProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
 	}
 
 	// Must have a base class selected first
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (!BaseClass)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("SelectAscendancy: No base class selected."));
+		UE_LOG(LogAtomProgression, Warning, TEXT("SelectAscendancy: No base class selected."));
 		return;
 	}
 
 	// Check level requirement
 	if (CurrentLevel < BaseClass->AscendancyRequiredLevel)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("SelectAscendancy: Level %d < required %d."), CurrentLevel, BaseClass->AscendancyRequiredLevel);
+		UE_LOG(LogAtomProgression, Warning, TEXT("SelectAscendancy: Level %d < required %d."), CurrentLevel, BaseClass->AscendancyRequiredLevel);
 		return;
 	}
 
 	// Find the ascendancy in the base class's available ascendancies
-	UOutlawClassDefinition* NewAscendancy = nullptr;
-	for (const TObjectPtr<UOutlawClassDefinition>& AscDef : BaseClass->AvailableAscendancies)
+	UAtomClassDefinition* NewAscendancy = nullptr;
+	for (const TObjectPtr<UAtomClassDefinition>& AscDef : BaseClass->AvailableAscendancies)
 	{
 		if (AscDef && AscDef->ClassTag == AscendancyTag)
 		{
@@ -223,7 +223,7 @@ void UOutlawProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
 
 	if (!NewAscendancy)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("SelectAscendancy: Ascendancy '%s' not found in base class '%s'."),
+		UE_LOG(LogAtomProgression, Warning, TEXT("SelectAscendancy: Ascendancy '%s' not found in base class '%s'."),
 			*AscendancyTag.ToString(), *BaseClass->ClassTag.ToString());
 		return;
 	}
@@ -240,10 +240,10 @@ void UOutlawProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
 		AscendancyAbilityHandles.RevokeFromASC(ASC);
 
 		// Respec ascendancy nodes (nodes from old ascendancy tree)
-		UOutlawClassDefinition* OldAscendancy = GetSelectedAscendancy();
+		UAtomClassDefinition* OldAscendancy = GetSelectedAscendancy();
 		if (OldAscendancy)
 		{
-			for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : OldAscendancy->SkillTreeNodes)
+			for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : OldAscendancy->SkillTreeNodes)
 			{
 				if (Node && GetAllocatedRank(Node->NodeTag) > 0)
 				{
@@ -279,14 +279,14 @@ void UOutlawProgressionComponent::SelectAscendancy(FGameplayTag AscendancyTag)
 	OnAscendancySelected.Broadcast(AscendancyTag);
 }
 
-UOutlawClassDefinition* UOutlawProgressionComponent::GetSelectedClass() const
+UAtomClassDefinition* UAtomProgressionComponent::GetSelectedClass() const
 {
 	if (!SelectedClassTag.IsValid())
 	{
 		return nullptr;
 	}
 
-	for (const TObjectPtr<UOutlawClassDefinition>& ClassDef : AvailableClasses)
+	for (const TObjectPtr<UAtomClassDefinition>& ClassDef : AvailableClasses)
 	{
 		if (ClassDef && ClassDef->ClassTag == SelectedClassTag)
 		{
@@ -296,20 +296,20 @@ UOutlawClassDefinition* UOutlawProgressionComponent::GetSelectedClass() const
 	return nullptr;
 }
 
-UOutlawClassDefinition* UOutlawProgressionComponent::GetSelectedAscendancy() const
+UAtomClassDefinition* UAtomProgressionComponent::GetSelectedAscendancy() const
 {
 	if (!SelectedAscendancyTag.IsValid())
 	{
 		return nullptr;
 	}
 
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (!BaseClass)
 	{
 		return nullptr;
 	}
 
-	for (const TObjectPtr<UOutlawClassDefinition>& AscDef : BaseClass->AvailableAscendancies)
+	for (const TObjectPtr<UAtomClassDefinition>& AscDef : BaseClass->AvailableAscendancies)
 	{
 		if (AscDef && AscDef->ClassTag == SelectedAscendancyTag)
 		{
@@ -319,15 +319,15 @@ UOutlawClassDefinition* UOutlawProgressionComponent::GetSelectedAscendancy() con
 	return nullptr;
 }
 
-UOutlawClassDefinition* UOutlawProgressionComponent::GetActiveClassDefinition() const
+UAtomClassDefinition* UAtomProgressionComponent::GetActiveClassDefinition() const
 {
-	UOutlawClassDefinition* Ascendancy = GetSelectedAscendancy();
+	UAtomClassDefinition* Ascendancy = GetSelectedAscendancy();
 	return Ascendancy ? Ascendancy : GetSelectedClass();
 }
 
 // ── Skill Tree API ──────────────────────────────────────────────
 
-void UOutlawProgressionComponent::AllocateSkillNode(FGameplayTag NodeTag)
+void UAtomProgressionComponent::AllocateSkillNode(FGameplayTag NodeTag)
 {
 	if (!GetOwner()->HasAuthority() || !NodeTag.IsValid())
 	{
@@ -336,21 +336,21 @@ void UOutlawProgressionComponent::AllocateSkillNode(FGameplayTag NodeTag)
 
 	if (!CanAllocateNode(NodeTag))
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("AllocateSkillNode: Cannot allocate '%s'."), *NodeTag.ToString());
+		UE_LOG(LogAtomProgression, Warning, TEXT("AllocateSkillNode: Cannot allocate '%s'."), *NodeTag.ToString());
 		return;
 	}
 
-	UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
+	UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
 	if (!NodeDef)
 	{
 		return;
 	}
 
-	FOutlawAllocatedSkillNode& Entry = FindOrAddAllocatedNode(NodeTag);
+	FAtomAllocatedSkillNode& Entry = FindOrAddAllocatedNode(NodeTag);
 	Entry.AllocatedRank++;
 
 	// Deduct skill points (auto-unlock nodes are free)
-	if (NodeDef->UnlockType == EOutlawSkillNodeUnlockType::Manual)
+	if (NodeDef->UnlockType == EAtomSkillNodeUnlockType::Manual)
 	{
 		AvailableSkillPoints -= NodeDef->PointCostPerRank;
 	}
@@ -364,7 +364,7 @@ void UOutlawProgressionComponent::AllocateSkillNode(FGameplayTag NodeTag)
 	OnSkillNodeAllocated.Broadcast(NodeTag, Entry.AllocatedRank);
 }
 
-void UOutlawProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
+void UAtomProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
 {
 	if (!GetOwner()->HasAuthority() || !NodeTag.IsValid())
 	{
@@ -374,27 +374,27 @@ void UOutlawProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
 	const int32 CurrentRank = GetAllocatedRank(NodeTag);
 	if (CurrentRank <= 0)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("DeallocateSkillNode: '%s' is not allocated."), *NodeTag.ToString());
+		UE_LOG(LogAtomProgression, Warning, TEXT("DeallocateSkillNode: '%s' is not allocated."), *NodeTag.ToString());
 		return;
 	}
 
-	UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
+	UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
 	if (!NodeDef)
 	{
 		return;
 	}
 
 	// Cannot deallocate auto-unlock nodes
-	if (NodeDef->UnlockType == EOutlawSkillNodeUnlockType::AutoOnLevel)
+	if (NodeDef->UnlockType == EAtomSkillNodeUnlockType::AutoOnLevel)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("DeallocateSkillNode: Cannot deallocate auto-unlock node '%s'."), *NodeTag.ToString());
+		UE_LOG(LogAtomProgression, Warning, TEXT("DeallocateSkillNode: Cannot deallocate auto-unlock node '%s'."), *NodeTag.ToString());
 		return;
 	}
 
 	// Check if any other node depends on this rank
 	if (IsNodeRequiredByOthers(NodeTag, CurrentRank))
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("DeallocateSkillNode: '%s' at rank %d is required by other nodes."), *NodeTag.ToString(), CurrentRank);
+		UE_LOG(LogAtomProgression, Warning, TEXT("DeallocateSkillNode: '%s' at rank %d is required by other nodes."), *NodeTag.ToString(), CurrentRank);
 		return;
 	}
 
@@ -402,7 +402,7 @@ void UOutlawProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
 	RevokeNodeAbilities(NodeTag);
 
 	// Decrement rank
-	for (FOutlawAllocatedSkillNode& Entry : AllocatedNodes)
+	for (FAtomAllocatedSkillNode& Entry : AllocatedNodes)
 	{
 		if (Entry.NodeTag == NodeTag)
 		{
@@ -421,7 +421,7 @@ void UOutlawProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
 			else
 			{
 				// Remove the entry entirely if rank dropped to 0
-				AllocatedNodes.RemoveAll([&NodeTag](const FOutlawAllocatedSkillNode& N) { return N.NodeTag == NodeTag; });
+				AllocatedNodes.RemoveAll([&NodeTag](const FAtomAllocatedSkillNode& N) { return N.NodeTag == NodeTag; });
 			}
 
 			RecalculateStatBases();
@@ -431,7 +431,7 @@ void UOutlawProgressionComponent::DeallocateSkillNode(FGameplayTag NodeTag)
 	}
 }
 
-void UOutlawProgressionComponent::RespecAllNodes()
+void UAtomProgressionComponent::RespecAllNodes()
 {
 	if (!GetOwner()->HasAuthority())
 	{
@@ -440,14 +440,14 @@ void UOutlawProgressionComponent::RespecAllNodes()
 
 	UAbilitySystemComponent* ASC = GetASC();
 
-	for (const FOutlawAllocatedSkillNode& Entry : AllocatedNodes)
+	for (const FAtomAllocatedSkillNode& Entry : AllocatedNodes)
 	{
-		UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(Entry.NodeTag);
+		UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(Entry.NodeTag);
 
 		// Revoke abilities
 		if (ASC)
 		{
-			FOutlawAbilitySetGrantedHandles* Handles = NodeAbilityHandles.Find(Entry.NodeTag);
+			FAtomAbilitySetGrantedHandles* Handles = NodeAbilityHandles.Find(Entry.NodeTag);
 			if (Handles)
 			{
 				Handles->RevokeFromASC(ASC);
@@ -455,7 +455,7 @@ void UOutlawProgressionComponent::RespecAllNodes()
 		}
 
 		// Refund points (only manual nodes cost points)
-		if (NodeDef && NodeDef->UnlockType == EOutlawSkillNodeUnlockType::Manual)
+		if (NodeDef && NodeDef->UnlockType == EAtomSkillNodeUnlockType::Manual)
 		{
 			AvailableSkillPoints += NodeDef->PointCostPerRank * Entry.AllocatedRank;
 		}
@@ -470,9 +470,9 @@ void UOutlawProgressionComponent::RespecAllNodes()
 	RecalculateStatBases();
 }
 
-int32 UOutlawProgressionComponent::GetAllocatedRank(FGameplayTag NodeTag) const
+int32 UAtomProgressionComponent::GetAllocatedRank(FGameplayTag NodeTag) const
 {
-	for (const FOutlawAllocatedSkillNode& Entry : AllocatedNodes)
+	for (const FAtomAllocatedSkillNode& Entry : AllocatedNodes)
 	{
 		if (Entry.NodeTag == NodeTag)
 		{
@@ -482,14 +482,14 @@ int32 UOutlawProgressionComponent::GetAllocatedRank(FGameplayTag NodeTag) const
 	return 0;
 }
 
-bool UOutlawProgressionComponent::CanAllocateNode(FGameplayTag NodeTag) const
+bool UAtomProgressionComponent::CanAllocateNode(FGameplayTag NodeTag) const
 {
 	if (!NodeTag.IsValid())
 	{
 		return false;
 	}
 
-	UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
+	UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
 	if (!NodeDef)
 	{
 		return false;
@@ -510,13 +510,13 @@ bool UOutlawProgressionComponent::CanAllocateNode(FGameplayTag NodeTag) const
 	}
 
 	// Skill points (manual nodes only)
-	if (NodeDef->UnlockType == EOutlawSkillNodeUnlockType::Manual && AvailableSkillPoints < NodeDef->PointCostPerRank)
+	if (NodeDef->UnlockType == EAtomSkillNodeUnlockType::Manual && AvailableSkillPoints < NodeDef->PointCostPerRank)
 	{
 		return false;
 	}
 
 	// Prerequisites
-	for (const FOutlawSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
+	for (const FAtomSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
 	{
 		if (GetAllocatedRank(Prereq.RequiredNodeTag) < Prereq.RequiredRank)
 		{
@@ -527,17 +527,17 @@ bool UOutlawProgressionComponent::CanAllocateNode(FGameplayTag NodeTag) const
 	return true;
 }
 
-TArray<FGameplayTag> UOutlawProgressionComponent::GetAllocableNodes() const
+TArray<FGameplayTag> UAtomProgressionComponent::GetAllocableNodes() const
 {
 	TArray<FGameplayTag> Result;
 
 	// Gather nodes from both base class and ascendancy
-	TArray<UOutlawSkillTreeNodeDefinition*> AllNodes;
+	TArray<UAtomSkillTreeNodeDefinition*> AllNodes;
 
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (BaseClass)
 	{
-		for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : BaseClass->SkillTreeNodes)
+		for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : BaseClass->SkillTreeNodes)
 		{
 			if (Node)
 			{
@@ -546,10 +546,10 @@ TArray<FGameplayTag> UOutlawProgressionComponent::GetAllocableNodes() const
 		}
 	}
 
-	UOutlawClassDefinition* Ascendancy = GetSelectedAscendancy();
+	UAtomClassDefinition* Ascendancy = GetSelectedAscendancy();
 	if (Ascendancy)
 	{
-		for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : Ascendancy->SkillTreeNodes)
+		for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : Ascendancy->SkillTreeNodes)
 		{
 			if (Node)
 			{
@@ -558,7 +558,7 @@ TArray<FGameplayTag> UOutlawProgressionComponent::GetAllocableNodes() const
 		}
 	}
 
-	for (const UOutlawSkillTreeNodeDefinition* Node : AllNodes)
+	for (const UAtomSkillTreeNodeDefinition* Node : AllNodes)
 	{
 		if (CanAllocateNode(Node->NodeTag))
 		{
@@ -571,9 +571,9 @@ TArray<FGameplayTag> UOutlawProgressionComponent::GetAllocableNodes() const
 
 // ── Save/Load API ───────────────────────────────────────────────
 
-FOutlawProgressionSaveData UOutlawProgressionComponent::SaveProgression() const
+FAtomProgressionSaveData UAtomProgressionComponent::SaveProgression() const
 {
-	FOutlawProgressionSaveData Data;
+	FAtomProgressionSaveData Data;
 	Data.CurrentLevel = CurrentLevel;
 	Data.CurrentXP = CurrentXP;
 	Data.AvailableSkillPoints = AvailableSkillPoints;
@@ -583,7 +583,7 @@ FOutlawProgressionSaveData UOutlawProgressionComponent::SaveProgression() const
 	return Data;
 }
 
-void UOutlawProgressionComponent::LoadProgression(const FOutlawProgressionSaveData& Data)
+void UAtomProgressionComponent::LoadProgression(const FAtomProgressionSaveData& Data)
 {
 	if (!GetOwner()->HasAuthority())
 	{
@@ -593,7 +593,7 @@ void UOutlawProgressionComponent::LoadProgression(const FOutlawProgressionSaveDa
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
 	{
-		UE_LOG(LogOutlawProgression, Warning, TEXT("LoadProgression: No ASC available."));
+		UE_LOG(LogAtomProgression, Warning, TEXT("LoadProgression: No ASC available."));
 		return;
 	}
 
@@ -645,15 +645,15 @@ void UOutlawProgressionComponent::LoadProgression(const FOutlawProgressionSaveDa
 	NodeAbilityHandles.Empty();
 
 	// Re-allocate saved nodes in order
-	for (const FOutlawAllocatedSkillNode& SavedNode : Data.AllocatedNodes)
+	for (const FAtomAllocatedSkillNode& SavedNode : Data.AllocatedNodes)
 	{
-		UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(SavedNode.NodeTag);
+		UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(SavedNode.NodeTag);
 		if (!NodeDef)
 		{
 			continue;
 		}
 
-		FOutlawAllocatedSkillNode& Entry = FindOrAddAllocatedNode(SavedNode.NodeTag);
+		FAtomAllocatedSkillNode& Entry = FindOrAddAllocatedNode(SavedNode.NodeTag);
 		for (int32 Rank = 1; Rank <= SavedNode.AllocatedRank; ++Rank)
 		{
 			Entry.AllocatedRank = Rank;
@@ -667,7 +667,7 @@ void UOutlawProgressionComponent::LoadProgression(const FOutlawProgressionSaveDa
 
 // ── Private Helpers ─────────────────────────────────────────────
 
-UAbilitySystemComponent* UOutlawProgressionComponent::GetASC() const
+UAbilitySystemComponent* UAtomProgressionComponent::GetASC() const
 {
 	AActor* Owner = GetOwner();
 	if (!Owner)
@@ -694,9 +694,9 @@ UAbilitySystemComponent* UOutlawProgressionComponent::GetASC() const
 	return nullptr;
 }
 
-UOutlawLevelingConfig* UOutlawProgressionComponent::GetEffectiveLevelingConfig() const
+UAtomLevelingConfig* UAtomProgressionComponent::GetEffectiveLevelingConfig() const
 {
-	UOutlawClassDefinition* ActiveClass = GetSelectedClass();
+	UAtomClassDefinition* ActiveClass = GetSelectedClass();
 	if (ActiveClass && ActiveClass->LevelingConfig)
 	{
 		return ActiveClass->LevelingConfig;
@@ -704,7 +704,7 @@ UOutlawLevelingConfig* UOutlawProgressionComponent::GetEffectiveLevelingConfig()
 	return DefaultLevelingConfig;
 }
 
-void UOutlawProgressionComponent::RecalculateStatBases()
+void UAtomProgressionComponent::RecalculateStatBases()
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -716,10 +716,10 @@ void UOutlawProgressionComponent::RecalculateStatBases()
 	TMap<FGameplayAttribute, float> AttributeTotals;
 
 	// Class stat growth (base class)
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (BaseClass)
 	{
-		for (const FOutlawStatGrowthEntry& Entry : BaseClass->StatGrowthTable)
+		for (const FAtomStatGrowthEntry& Entry : BaseClass->StatGrowthTable)
 		{
 			if (Entry.Attribute.IsValid())
 			{
@@ -729,10 +729,10 @@ void UOutlawProgressionComponent::RecalculateStatBases()
 	}
 
 	// Ascendancy stat growth
-	UOutlawClassDefinition* Ascendancy = GetSelectedAscendancy();
+	UAtomClassDefinition* Ascendancy = GetSelectedAscendancy();
 	if (Ascendancy)
 	{
-		for (const FOutlawStatGrowthEntry& Entry : Ascendancy->StatGrowthTable)
+		for (const FAtomStatGrowthEntry& Entry : Ascendancy->StatGrowthTable)
 		{
 			if (Entry.Attribute.IsValid())
 			{
@@ -742,15 +742,15 @@ void UOutlawProgressionComponent::RecalculateStatBases()
 	}
 
 	// Node stat bonuses
-	for (const FOutlawAllocatedSkillNode& AllocNode : AllocatedNodes)
+	for (const FAtomAllocatedSkillNode& AllocNode : AllocatedNodes)
 	{
-		UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(AllocNode.NodeTag);
+		UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(AllocNode.NodeTag);
 		if (!NodeDef)
 		{
 			continue;
 		}
 
-		for (const FOutlawStatGrowthEntry& Bonus : NodeDef->StatBonusesPerRank)
+		for (const FAtomStatGrowthEntry& Bonus : NodeDef->StatBonusesPerRank)
 		{
 			if (Bonus.Attribute.IsValid())
 			{
@@ -766,15 +766,15 @@ void UOutlawProgressionComponent::RecalculateStatBases()
 	}
 }
 
-void UOutlawProgressionComponent::ProcessAutoUnlockNodes()
+void UAtomProgressionComponent::ProcessAutoUnlockNodes()
 {
 	// Gather all nodes from both base class and ascendancy
-	TArray<UOutlawSkillTreeNodeDefinition*> AllNodes;
+	TArray<UAtomSkillTreeNodeDefinition*> AllNodes;
 
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (BaseClass)
 	{
-		for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : BaseClass->SkillTreeNodes)
+		for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : BaseClass->SkillTreeNodes)
 		{
 			if (Node)
 			{
@@ -783,10 +783,10 @@ void UOutlawProgressionComponent::ProcessAutoUnlockNodes()
 		}
 	}
 
-	UOutlawClassDefinition* Ascendancy = GetSelectedAscendancy();
+	UAtomClassDefinition* Ascendancy = GetSelectedAscendancy();
 	if (Ascendancy)
 	{
-		for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : Ascendancy->SkillTreeNodes)
+		for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : Ascendancy->SkillTreeNodes)
 		{
 			if (Node)
 			{
@@ -795,9 +795,9 @@ void UOutlawProgressionComponent::ProcessAutoUnlockNodes()
 		}
 	}
 
-	for (UOutlawSkillTreeNodeDefinition* Node : AllNodes)
+	for (UAtomSkillTreeNodeDefinition* Node : AllNodes)
 	{
-		if (Node->UnlockType != EOutlawSkillNodeUnlockType::AutoOnLevel)
+		if (Node->UnlockType != EAtomSkillNodeUnlockType::AutoOnLevel)
 		{
 			continue;
 		}
@@ -817,7 +817,7 @@ void UOutlawProgressionComponent::ProcessAutoUnlockNodes()
 		// Auto-allocate to max rank
 		for (int32 Rank = CurrentRank + 1; Rank <= Node->MaxRank; ++Rank)
 		{
-			FOutlawAllocatedSkillNode& Entry = FindOrAddAllocatedNode(Node->NodeTag);
+			FAtomAllocatedSkillNode& Entry = FindOrAddAllocatedNode(Node->NodeTag);
 			Entry.AllocatedRank = Rank;
 			GrantNodeAbilities(Node->NodeTag, Rank);
 			OnSkillNodeAllocated.Broadcast(Node->NodeTag, Rank);
@@ -825,7 +825,7 @@ void UOutlawProgressionComponent::ProcessAutoUnlockNodes()
 	}
 }
 
-void UOutlawProgressionComponent::GrantNodeAbilities(FGameplayTag NodeTag, int32 Rank)
+void UAtomProgressionComponent::GrantNodeAbilities(FGameplayTag NodeTag, int32 Rank)
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -833,29 +833,29 @@ void UOutlawProgressionComponent::GrantNodeAbilities(FGameplayTag NodeTag, int32
 		return;
 	}
 
-	UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
+	UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(NodeTag);
 	if (!NodeDef)
 	{
 		return;
 	}
 
 	// Revoke previous rank's abilities (we'll re-grant the correct set for the new rank)
-	FOutlawAbilitySetGrantedHandles* ExistingHandles = NodeAbilityHandles.Find(NodeTag);
+	FAtomAbilitySetGrantedHandles* ExistingHandles = NodeAbilityHandles.Find(NodeTag);
 	if (ExistingHandles)
 	{
 		ExistingHandles->RevokeFromASC(ASC);
 		NodeAbilityHandles.Remove(NodeTag);
 	}
 
-	UOutlawAbilitySet* AbilitySet = NodeDef->GetAbilitySetForRank(Rank);
+	UAtomAbilitySet* AbilitySet = NodeDef->GetAbilitySetForRank(Rank);
 	if (AbilitySet)
 	{
-		FOutlawAbilitySetGrantedHandles& NewHandles = NodeAbilityHandles.Add(NodeTag);
+		FAtomAbilitySetGrantedHandles& NewHandles = NodeAbilityHandles.Add(NodeTag);
 		AbilitySet->GiveToAbilitySystem(ASC, GetOwner(), NewHandles);
 	}
 }
 
-void UOutlawProgressionComponent::RevokeNodeAbilities(FGameplayTag NodeTag)
+void UAtomProgressionComponent::RevokeNodeAbilities(FGameplayTag NodeTag)
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -863,7 +863,7 @@ void UOutlawProgressionComponent::RevokeNodeAbilities(FGameplayTag NodeTag)
 		return;
 	}
 
-	FOutlawAbilitySetGrantedHandles* Handles = NodeAbilityHandles.Find(NodeTag);
+	FAtomAbilitySetGrantedHandles* Handles = NodeAbilityHandles.Find(NodeTag);
 	if (Handles)
 	{
 		Handles->RevokeFromASC(ASC);
@@ -871,13 +871,13 @@ void UOutlawProgressionComponent::RevokeNodeAbilities(FGameplayTag NodeTag)
 	}
 }
 
-UOutlawSkillTreeNodeDefinition* UOutlawProgressionComponent::FindNodeDefinition(FGameplayTag NodeTag) const
+UAtomSkillTreeNodeDefinition* UAtomProgressionComponent::FindNodeDefinition(FGameplayTag NodeTag) const
 {
 	// Search base class tree
-	UOutlawClassDefinition* BaseClass = GetSelectedClass();
+	UAtomClassDefinition* BaseClass = GetSelectedClass();
 	if (BaseClass)
 	{
-		UOutlawSkillTreeNodeDefinition* Node = BaseClass->FindSkillNode(NodeTag);
+		UAtomSkillTreeNodeDefinition* Node = BaseClass->FindSkillNode(NodeTag);
 		if (Node)
 		{
 			return Node;
@@ -885,10 +885,10 @@ UOutlawSkillTreeNodeDefinition* UOutlawProgressionComponent::FindNodeDefinition(
 	}
 
 	// Search ascendancy tree
-	UOutlawClassDefinition* Ascendancy = GetSelectedAscendancy();
+	UAtomClassDefinition* Ascendancy = GetSelectedAscendancy();
 	if (Ascendancy)
 	{
-		UOutlawSkillTreeNodeDefinition* Node = Ascendancy->FindSkillNode(NodeTag);
+		UAtomSkillTreeNodeDefinition* Node = Ascendancy->FindSkillNode(NodeTag);
 		if (Node)
 		{
 			return Node;
@@ -898,9 +898,9 @@ UOutlawSkillTreeNodeDefinition* UOutlawProgressionComponent::FindNodeDefinition(
 	return nullptr;
 }
 
-FOutlawAllocatedSkillNode& UOutlawProgressionComponent::FindOrAddAllocatedNode(FGameplayTag NodeTag)
+FAtomAllocatedSkillNode& UAtomProgressionComponent::FindOrAddAllocatedNode(FGameplayTag NodeTag)
 {
-	for (FOutlawAllocatedSkillNode& Entry : AllocatedNodes)
+	for (FAtomAllocatedSkillNode& Entry : AllocatedNodes)
 	{
 		if (Entry.NodeTag == NodeTag)
 		{
@@ -908,30 +908,30 @@ FOutlawAllocatedSkillNode& UOutlawProgressionComponent::FindOrAddAllocatedNode(F
 		}
 	}
 
-	FOutlawAllocatedSkillNode NewEntry;
+	FAtomAllocatedSkillNode NewEntry;
 	NewEntry.NodeTag = NodeTag;
 	NewEntry.AllocatedRank = 0;
 	AllocatedNodes.Add(NewEntry);
 	return AllocatedNodes.Last();
 }
 
-bool UOutlawProgressionComponent::IsNodeRequiredByOthers(FGameplayTag NodeTag, int32 AtRank) const
+bool UAtomProgressionComponent::IsNodeRequiredByOthers(FGameplayTag NodeTag, int32 AtRank) const
 {
 	// Check all allocated nodes to see if any has a prerequisite on this node at this rank
-	for (const FOutlawAllocatedSkillNode& AllocNode : AllocatedNodes)
+	for (const FAtomAllocatedSkillNode& AllocNode : AllocatedNodes)
 	{
 		if (AllocNode.NodeTag == NodeTag || AllocNode.AllocatedRank <= 0)
 		{
 			continue;
 		}
 
-		UOutlawSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(AllocNode.NodeTag);
+		UAtomSkillTreeNodeDefinition* NodeDef = FindNodeDefinition(AllocNode.NodeTag);
 		if (!NodeDef)
 		{
 			continue;
 		}
 
-		for (const FOutlawSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
+		for (const FAtomSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
 		{
 			if (Prereq.RequiredNodeTag == NodeTag && Prereq.RequiredRank >= AtRank)
 			{

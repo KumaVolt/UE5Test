@@ -4,26 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawWeaponTypes.h"
-#include "OutlawAffixPoolDefinition.generated.h"
+#include "AtomWeaponTypes.h"
+#include "AtomAffixPoolDefinition.generated.h"
 
-class UOutlawAffixDefinition;
+class UAtomAffixDefinition;
 
 /**
  * Data asset defining a pool of possible affixes for ARPG weapons.
- * Used by UOutlawItemInstance::RollAffixes() to randomly select affixes.
+ * Used by UAtomItemInstance::RollAffixes() to randomly select affixes.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawAffixPoolDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomAffixPoolDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawAffixPoolDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomAffixPoolDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** All possible affixes that can roll from this pool. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affix Pool")
-	TArray<TObjectPtr<UOutlawAffixDefinition>> PossibleAffixes;
+	TArray<TObjectPtr<UAtomAffixDefinition>> PossibleAffixes;
 
 	/** Maximum number of prefix affixes that can roll. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affix Pool", meta = (ClampMin = "0", ClampMax = "6"))
@@ -41,5 +41,5 @@ public:
 	 * @param NumSuffixes    Number of suffix affixes to roll.
 	 * @return Array of rolled affixes.
 	 */
-	TArray<FOutlawItemAffix> RollAffixes(int32 ItemLevel, int32 NumPrefixes, int32 NumSuffixes) const;
+	TArray<FAtomItemAffix> RollAffixes(int32 ItemLevel, int32 NumPrefixes, int32 NumSuffixes) const;
 };

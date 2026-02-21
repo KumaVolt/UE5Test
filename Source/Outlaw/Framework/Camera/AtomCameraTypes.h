@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawCameraTypes.generated.h"
+#include "AtomCameraTypes.generated.h"
 
 /**
  * Camera mode enum — switches between OTS and Isometric at runtime.
  */
 UENUM(BlueprintType)
-enum class EOutlawCameraMode : uint8
+enum class EAtomCameraMode : uint8
 {
 	OTS UMETA(DisplayName = "Over-The-Shoulder"),
 	Isometric UMETA(DisplayName = "Isometric")
@@ -20,7 +20,7 @@ enum class EOutlawCameraMode : uint8
  * Camera configuration struct — defines settings for each camera mode.
  */
 USTRUCT(BlueprintType)
-struct FOutlawCameraConfig
+struct FAtomCameraConfig
 {
 	GENERATED_BODY()
 
@@ -51,7 +51,7 @@ struct FOutlawCameraConfig
  * Expected tags:
  * - Combat.Targetable — tag for actors that can be targeted by lock-on
  */
-namespace OutlawCameraTags
+namespace AtomCameraTags
 {
 	// Combat.Targetable tag is defined in the project's gameplay tags data table
 }

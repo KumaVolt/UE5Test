@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/OutlawPlayerState.h"
-#include "AbilitySystem/OutlawAbilitySystemComponent.h"
+#include "Player/AtomPlayerState.h"
+#include "AbilitySystem/AtomAbilitySystemComponent.h"
 
-AOutlawPlayerState::AOutlawPlayerState()
+AAtomPlayerState::AAtomPlayerState()
 {
 	SetNetUpdateFrequency(100.f);
-	AbilitySystemComponent = CreateDefaultSubobject<UOutlawAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UAtomAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
-UAbilitySystemComponent* AOutlawPlayerState::GetAbilitySystemComponent() const
+UAbilitySystemComponent* AAtomPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }

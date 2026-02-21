@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "OutlawItemDefinition.generated.h"
+#include "AtomItemDefinition.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 class UGameplayAbility;
 class UTexture2D;
-class UOutlawShooterWeaponData;
-class UOutlawARPGWeaponData;
+class UAtomShooterWeaponData;
+class UAtomARPGWeaponData;
 
 /** Rarity tier for inventory items. Determines sort order and UI presentation. */
 UENUM(BlueprintType)
-enum class EOutlawItemRarity : uint8
+enum class EAtomItemRarity : uint8
 {
 	Common = 0,
 	Uncommon,
@@ -26,7 +26,7 @@ enum class EOutlawItemRarity : uint8
 
 /** Broad category of an item. Used for filtering and sorting. */
 UENUM(BlueprintType)
-enum class EOutlawItemType : uint8
+enum class EAtomItemType : uint8
 {
 	Miscellaneous = 0,
 	Weapon,
@@ -47,12 +47,12 @@ enum class EOutlawItemType : uint8
  * Create instances in the Content Browser to define swords, potions, armor, etc.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawItemDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomItemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Display name shown in UI. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
@@ -60,11 +60,11 @@ public:
 
 	/** Rarity tier (affects sort order and UI color). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-	EOutlawItemRarity Rarity = EOutlawItemRarity::Common;
+	EAtomItemRarity Rarity = EAtomItemRarity::Common;
 
 	/** Broad item category (Weapon, Boots, Consumable, etc.). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-	EOutlawItemType ItemType = EOutlawItemType::Miscellaneous;
+	EAtomItemType ItemType = EAtomItemType::Miscellaneous;
 
 	/** Item description shown in tooltips. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
@@ -96,7 +96,7 @@ public:
 
 	/** Ability set granted when this item is equipped. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment")
-	TObjectPtr<UOutlawAbilitySet> GrantedAbilitySet;
+	TObjectPtr<UAtomAbilitySet> GrantedAbilitySet;
 
 	/** Ability activated when the item is used (e.g. drink potion). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Use")
@@ -114,11 +114,11 @@ public:
 
 	/** Shooter weapon data (Outriders-style). Set for shooter weapons, null for non-weapons. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UOutlawShooterWeaponData> ShooterWeaponData;
+	TObjectPtr<UAtomShooterWeaponData> ShooterWeaponData;
 
 	/** ARPG weapon data (Path of Exile 2-style). Set for ARPG weapons, null for non-weapons. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UOutlawARPGWeaponData> ARPGWeaponData;
+	TObjectPtr<UAtomARPGWeaponData> ARPGWeaponData;
 
 	/** Whether this item definition has weapon data attached. */
 	bool IsWeapon() const { return ShooterWeaponData != nullptr || ARPGWeaponData != nullptr; }

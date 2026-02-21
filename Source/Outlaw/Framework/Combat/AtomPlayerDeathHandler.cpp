@@ -1,22 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawPlayerDeathHandler.h"
-#include "OutlawDeathComponent.h"
+#include "AtomPlayerDeathHandler.h"
+#include "AtomDeathComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "Animation/OutlawAnimationTypes.h"
+#include "Animation/AtomAnimationTypes.h"
 
-UOutlawPlayerDeathHandler::UOutlawPlayerDeathHandler(const FObjectInitializer& ObjectInitializer)
+UAtomPlayerDeathHandler::UAtomPlayerDeathHandler(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawPlayerDeathHandler::BeginPlay()
+void UAtomPlayerDeathHandler::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -26,19 +26,19 @@ void UOutlawPlayerDeathHandler::BeginPlay()
 		return;
 	}
 
-	if (UOutlawDeathComponent* DeathComp = Owner->FindComponentByClass<UOutlawDeathComponent>())
+	if (UAtomDeathComponent* DeathComp = Owner->FindComponentByClass<UAtomDeathComponent>())
 	{
-		DeathComp->OnDeathStarted.AddDynamic(this, &UOutlawPlayerDeathHandler::OnDeathStarted);
+		DeathComp->OnDeathStarted.AddDynamic(this, &UAtomPlayerDeathHandler::OnDeathStarted);
 	}
 }
 
-void UOutlawPlayerDeathHandler::SetCheckpoint(FVector Location, FRotator Rotation)
+void UAtomPlayerDeathHandler::SetCheckpoint(FVector Location, FRotator Rotation)
 {
 	CheckpointLocation = Location;
 	CheckpointRotation = Rotation;
 }
 
-void UOutlawPlayerDeathHandler::OnDeathStarted(AActor* Killer)
+void UAtomPlayerDeathHandler::OnDeathStarted(AActor* Killer)
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || !Owner->HasAuthority())
@@ -61,13 +61,13 @@ void UOutlawPlayerDeathHandler::OnDeathStarted(AActor* Killer)
 	GetWorld()->GetTimerManager().SetTimer(
 		RespawnTimerHandle,
 		this,
-		&UOutlawPlayerDeathHandler::RespawnAtCheckpoint,
+		&UAtomPlayerDeathHandler::RespawnAtCheckpoint,
 		RespawnDelay,
 		false
 	);
 }
 
-void UOutlawPlayerDeathHandler::RespawnAtCheckpoint()
+void UAtomPlayerDeathHandler::RespawnAtCheckpoint()
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || !Owner->HasAuthority())
@@ -85,12 +85,12 @@ void UOutlawPlayerDeathHandler::RespawnAtCheckpoint()
 
 	if (ASC)
 	{
-		ASC->RemoveLooseGameplayTag(OutlawAnimTags::Dead);
+		ASC->RemoveLooseGameplayTag(AtomAnimTags::Dead);
 
-		if (const UOutlawAttributeSet* AttributeSet = ASC->GetSet<UOutlawAttributeSet>())
+		if (const UAtomAttributeSet* AttributeSet = ASC->GetSet<UAtomAttributeSet>())
 		{
 			ASC->SetNumericAttributeBase(
-				UOutlawAttributeSet::GetHealthAttribute(),
+				UAtomAttributeSet::GetHealthAttribute(),
 				AttributeSet->GetMaxHealth()
 			);
 		}

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OutlawProjectileBase.h"
-#include "OutlawBulletProjectile.generated.h"
+#include "AtomProjectileBase.h"
+#include "AtomBulletProjectile.generated.h"
 
 UCLASS()
-class OUTLAW_API AOutlawBulletProjectile : public AOutlawProjectileBase
+class OUTLAW_API AAtomBulletProjectile : public AAtomProjectileBase
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawBulletProjectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AAtomBulletProjectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

@@ -1,7 +1,7 @@
 #include "UI/OutlawDemoSkillTree.h"
-#include "Progression/OutlawProgressionComponent.h"
-#include "Progression/OutlawClassDefinition.h"
-#include "Progression/OutlawSkillTreeNodeDefinition.h"
+#include "Progression/AtomProgressionComponent.h"
+#include "Progression/AtomClassDefinition.h"
+#include "Progression/AtomSkillTreeNodeDefinition.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/SLeafWidget.h"
 #include "Widgets/SBoxPanel.h"
@@ -46,7 +46,7 @@ public:
 		Nodes = InNodes;
 	}
 
-	void SetProgressionComponent(UOutlawProgressionComponent* InComp)
+	void SetProgressionComponent(UAtomProgressionComponent* InComp)
 	{
 		ProgComp = InComp;
 	}
@@ -312,7 +312,7 @@ private:
 	}
 
 	TArray<FSkillNodeVisual> Nodes;
-	TWeakObjectPtr<UOutlawProgressionComponent> ProgComp;
+	TWeakObjectPtr<UAtomProgressionComponent> ProgComp;
 	FVector2D PanOffset;
 	FVector2D PanStart;
 	FVector2D DragStart;
@@ -382,7 +382,7 @@ public:
 		];
 	}
 
-	void Update(UOutlawProgressionComponent* ProgComp)
+	void Update(UAtomProgressionComponent* ProgComp)
 	{
 		if (!ProgComp || !Canvas.IsValid())
 		{
@@ -391,7 +391,7 @@ public:
 
 		Canvas->SetProgressionComponent(ProgComp);
 
-		UOutlawClassDefinition* ActiveClass = ProgComp->GetActiveClassDefinition();
+		UAtomClassDefinition* ActiveClass = ProgComp->GetActiveClassDefinition();
 		if (!ActiveClass)
 		{
 			return;
@@ -399,7 +399,7 @@ public:
 
 		// Build visual nodes
 		TArray<FSkillNodeVisual> VisualNodes;
-		for (UOutlawSkillTreeNodeDefinition* NodeDef : ActiveClass->SkillTreeNodes)
+		for (UAtomSkillTreeNodeDefinition* NodeDef : ActiveClass->SkillTreeNodes)
 		{
 			if (!NodeDef)
 			{
@@ -415,7 +415,7 @@ public:
 			V.AllocatedRank = ProgComp->GetAllocatedRank(NodeDef->NodeTag);
 			V.bCanAllocate = ProgComp->CanAllocateNode(NodeDef->NodeTag);
 
-			for (const FOutlawSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
+			for (const FAtomSkillNodePrerequisite& Prereq : NodeDef->Prerequisites)
 			{
 				V.PrerequisiteTags.Add(Prereq.RequiredNodeTag);
 			}
@@ -470,6 +470,6 @@ void UOutlawDemoSkillTree::NativeTick(const FGeometry& MyGeometry, float InDelta
 		return;
 	}
 
-	UOutlawProgressionComponent* ProgComp = Pawn->FindComponentByClass<UOutlawProgressionComponent>();
+	UAtomProgressionComponent* ProgComp = Pawn->FindComponentByClass<UAtomProgressionComponent>();
 	SlateWidget->Update(ProgComp);
 }

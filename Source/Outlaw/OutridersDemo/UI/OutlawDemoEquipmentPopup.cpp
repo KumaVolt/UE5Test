@@ -1,7 +1,7 @@
 #include "UI/OutlawDemoEquipmentPopup.h"
-#include "Inventory/OutlawInventoryComponent.h"
-#include "Inventory/OutlawInventoryTypes.h"
-#include "Inventory/OutlawItemDefinition.h"
+#include "Inventory/AtomInventoryComponent.h"
+#include "Inventory/AtomInventoryTypes.h"
+#include "Inventory/AtomItemDefinition.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SScrollBox.h"
@@ -16,15 +16,15 @@
 
 namespace EquipPopupColors
 {
-	static FLinearColor GetRarityColor(EOutlawItemRarity Rarity)
+	static FLinearColor GetRarityColor(EAtomItemRarity Rarity)
 	{
 		switch (Rarity)
 		{
-		case EOutlawItemRarity::Common:    return FLinearColor(0.8f, 0.8f, 0.8f);
-		case EOutlawItemRarity::Uncommon:  return FLinearColor(0.2f, 0.9f, 0.2f);
-		case EOutlawItemRarity::Rare:      return FLinearColor(0.3f, 0.5f, 1.0f);
-		case EOutlawItemRarity::Epic:      return FLinearColor(0.7f, 0.3f, 0.9f);
-		case EOutlawItemRarity::Legendary: return FLinearColor(1.0f, 0.65f, 0.0f);
+		case EAtomItemRarity::Common:    return FLinearColor(0.8f, 0.8f, 0.8f);
+		case EAtomItemRarity::Uncommon:  return FLinearColor(0.2f, 0.9f, 0.2f);
+		case EAtomItemRarity::Rare:      return FLinearColor(0.3f, 0.5f, 1.0f);
+		case EAtomItemRarity::Epic:      return FLinearColor(0.7f, 0.3f, 0.9f);
+		case EAtomItemRarity::Legendary: return FLinearColor(1.0f, 0.65f, 0.0f);
 		default:                           return FLinearColor::White;
 		}
 	}
@@ -117,7 +117,7 @@ public:
 		];
 	}
 
-	void Update(UOutlawInventoryComponent* InvComp)
+	void Update(UAtomInventoryComponent* InvComp)
 	{
 		CachedInvComp = InvComp;
 		if (!InvComp)
@@ -125,13 +125,13 @@ public:
 			return;
 		}
 
-		const TArray<FOutlawInventoryEntry>& Entries = InvComp->GetEntries();
+		const TArray<FAtomInventoryEntry>& Entries = InvComp->GetEntries();
 		int32 CurrentCount = Entries.Num();
 
 		bool bNeedsRebuild = (CurrentCount != LastItemCount);
 		if (!bNeedsRebuild)
 		{
-			for (const FOutlawEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
+			for (const FAtomEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
 			{
 				if (!LastEquipped.Contains(Slot.SlotTag) || LastEquipped[Slot.SlotTag] != Slot.EquippedItemInstanceId)
 				{
@@ -148,7 +148,7 @@ public:
 
 		LastItemCount = CurrentCount;
 		LastEquipped.Empty();
-		for (const FOutlawEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
+		for (const FAtomEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
 		{
 			LastEquipped.Add(Slot.SlotTag, Slot.EquippedItemInstanceId);
 		}
@@ -158,7 +158,7 @@ public:
 	}
 
 private:
-	void RebuildEquipment(UOutlawInventoryComponent* InvComp)
+	void RebuildEquipment(UAtomInventoryComponent* InvComp)
 	{
 		if (!EquipmentBox.IsValid())
 		{
@@ -174,7 +174,7 @@ private:
 		for (const auto& SlotPair : SlotNames)
 		{
 			FGameplayTag SlotTag = SlotPair.Value;
-			UOutlawItemDefinition* Equipped = InvComp->GetEquippedItem(SlotTag);
+			UAtomItemDefinition* Equipped = InvComp->GetEquippedItem(SlotTag);
 
 			FString SlotLabel = SlotPair.Key;
 			FString ItemText;
@@ -232,7 +232,7 @@ private:
 		}
 	}
 
-	void RebuildBackpack(UOutlawInventoryComponent* InvComp)
+	void RebuildBackpack(UAtomInventoryComponent* InvComp)
 	{
 		if (!BackpackScrollBox.IsValid())
 		{
@@ -240,7 +240,7 @@ private:
 		}
 		BackpackScrollBox->ClearChildren();
 
-		const TArray<FOutlawInventoryEntry>& Entries = InvComp->GetEntries();
+		const TArray<FAtomInventoryEntry>& Entries = InvComp->GetEntries();
 
 		if (Entries.Num() == 0)
 		{
@@ -254,7 +254,7 @@ private:
 			return;
 		}
 
-		for (const FOutlawInventoryEntry& Entry : Entries)
+		for (const FAtomInventoryEntry& Entry : Entries)
 		{
 			if (!Entry.ItemDef)
 			{
@@ -311,7 +311,7 @@ private:
 		}
 	}
 
-	TWeakObjectPtr<UOutlawInventoryComponent> CachedInvComp;
+	TWeakObjectPtr<UAtomInventoryComponent> CachedInvComp;
 	TSharedPtr<SVerticalBox> EquipmentBox;
 	TSharedPtr<SScrollBox> BackpackScrollBox;
 	TMap<FGameplayTag, int32> LastEquipped;
@@ -351,6 +351,6 @@ void UOutlawDemoEquipmentPopup::NativeTick(const FGeometry& MyGeometry, float In
 		return;
 	}
 
-	UOutlawInventoryComponent* InvComp = Pawn->FindComponentByClass<UOutlawInventoryComponent>();
+	UAtomInventoryComponent* InvComp = Pawn->FindComponentByClass<UAtomInventoryComponent>();
 	SlateWidget->Update(InvComp);
 }

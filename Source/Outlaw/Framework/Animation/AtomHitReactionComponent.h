@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Animation/OutlawAnimationTypes.h"
-#include "OutlawHitReactionComponent.generated.h"
+#include "Animation/AtomAnimationTypes.h"
+#include "AtomHitReactionComponent.generated.h"
 
 class UAbilitySystemComponent;
 class UAnimMontage;
@@ -13,38 +13,38 @@ struct FGameplayTag;
 struct FOnAttributeChangeData;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawHitReactionComponent : public UActorComponent
+class OUTLAW_API UAtomHitReactionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawHitReactionComponent();
+	UAtomHitReactionComponent();
 
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Outlaw|HitReaction")
-	TArray<FOutlawHitReactionConfig> HitReactionMontages;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Atom|HitReaction")
+	TArray<FAtomHitReactionConfig> HitReactionMontages;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Outlaw|HitReaction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Atom|HitReaction")
 	float LightHitThresholdPercent = 10.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Outlaw|HitReaction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Atom|HitReaction")
 	float MediumHitThresholdPercent = 30.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Outlaw|HitReaction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Atom|HitReaction")
 	bool bCanBeStaggered = true;
 
-	UFUNCTION(BlueprintCallable, Category = "Outlaw|HitReaction")
+	UFUNCTION(BlueprintCallable, Category = "Atom|HitReaction")
 	void PlayHitReaction(float DamageAmount, AActor* DamageSource);
 
 protected:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
-	EOutlawHitReactionType DetermineReactionType(float DamageAmount, float MaxHealth) const;
-	EOutlawHitDirection DetermineHitDirection(AActor* DamageSource) const;
-	UAnimMontage* FindHitReactionMontage(EOutlawHitReactionType ReactionType, EOutlawHitDirection Direction) const;
+	EAtomHitReactionType DetermineReactionType(float DamageAmount, float MaxHealth) const;
+	EAtomHitDirection DetermineHitDirection(AActor* DamageSource) const;
+	UAnimMontage* FindHitReactionMontage(EAtomHitReactionType ReactionType, EAtomHitDirection Direction) const;
 
 private:
 	void OnIncomingDamageChanged(const FOnAttributeChangeData& Data);

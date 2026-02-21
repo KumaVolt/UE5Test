@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawCombatTypes.generated.h"
+#include "AtomCombatTypes.generated.h"
 
-class UOutlawAffixDefinition;
+class UAtomAffixDefinition;
 
 /**
  * Result data for damage application.
  * Contains final damage value, crit flag, and any applied tags.
  */
 USTRUCT(BlueprintType)
-struct FOutlawDamageResult
+struct FAtomDamageResult
 {
 	GENERATED_BODY()
 
@@ -29,9 +29,9 @@ struct FOutlawDamageResult
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	FGameplayTagContainer AppliedTags;
 
-	FOutlawDamageResult() = default;
+	FAtomDamageResult() = default;
 
-	FOutlawDamageResult(float Damage, bool bCrit, const FGameplayTagContainer& Tags = FGameplayTagContainer())
+	FAtomDamageResult(float Damage, bool bCrit, const FGameplayTagContainer& Tags = FGameplayTagContainer())
 		: FinalDamage(Damage), bWasCritical(bCrit), AppliedTags(Tags)
 	{
 	}
@@ -42,7 +42,7 @@ struct FOutlawDamageResult
  * Populated from ASC tag changes (Status.DoT, Status.CC.*, etc.).
  */
 USTRUCT(BlueprintType)
-struct FOutlawActiveStatusEffect
+struct FAtomActiveStatusEffect
 {
 	GENERATED_BODY()
 
@@ -58,9 +58,9 @@ struct FOutlawActiveStatusEffect
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	float TimeRemaining = -1.f;
 
-	FOutlawActiveStatusEffect() = default;
+	FAtomActiveStatusEffect() = default;
 
-	FOutlawActiveStatusEffect(const FGameplayTag& Tag, int32 Stacks, float Duration)
+	FAtomActiveStatusEffect(const FGameplayTag& Tag, int32 Stacks, float Duration)
 		: StatusTag(Tag), StackCount(Stacks), TimeRemaining(Duration)
 	{
 	}

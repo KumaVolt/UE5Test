@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "OutlawWeaponModDefinition.generated.h"
+#include "AtomWeaponModDefinition.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 class UTexture2D;
 
 /**
@@ -15,12 +15,12 @@ class UTexture2D;
  * Each mod occupies a tier slot (Tier 1 or Tier 2) and grants abilities while installed.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawWeaponModDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomWeaponModDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawWeaponModDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomWeaponModDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Display name shown in UI. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod")
@@ -40,7 +40,7 @@ public:
 
 	/** Abilities/effects granted while this mod is installed. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod")
-	TObjectPtr<UOutlawAbilitySet> GrantedAbilitySet;
+	TObjectPtr<UAtomAbilitySet> GrantedAbilitySet;
 
 	/** Cooldown tag for mod-specific cooldown tracking. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod", meta = (Categories = "Cooldown"))

@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawAIController.h"
+#include "AtomAIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Hearing.h"
@@ -8,7 +8,7 @@
 #include "Components/StateTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-AOutlawAIController::AOutlawAIController()
+AAtomAIController::AAtomAIController()
 {
 	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 	StateTreeComponent = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
@@ -16,7 +16,7 @@ AOutlawAIController::AOutlawAIController()
 	SetPerceptionComponent(*AIPerceptionComponent);
 }
 
-void AOutlawAIController::BeginPlay()
+void AAtomAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -33,7 +33,7 @@ void AOutlawAIController::BeginPlay()
 	}
 }
 
-void AOutlawAIController::OnPossess(APawn* InPawn)
+void AAtomAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
@@ -43,12 +43,12 @@ void AOutlawAIController::OnPossess(APawn* InPawn)
 	}
 }
 
-AActor* AOutlawAIController::GetTargetActor() const
+AActor* AAtomAIController::GetTargetActor() const
 {
 	return AIContext.TargetActor;
 }
 
-void AOutlawAIController::SetTargetActor(AActor* NewTarget)
+void AAtomAIController::SetTargetActor(AActor* NewTarget)
 {
 	AIContext.TargetActor = NewTarget;
 
@@ -58,7 +58,7 @@ void AOutlawAIController::SetTargetActor(AActor* NewTarget)
 	}
 }
 
-void AOutlawAIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+void AAtomAIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (!Actor)
 	{
@@ -82,7 +82,7 @@ void AOutlawAIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulu
 	}
 }
 
-void AOutlawAIController::ConfigurePerception()
+void AAtomAIController::ConfigurePerception()
 {
 	if (!AIPerceptionComponent)
 	{
@@ -113,5 +113,5 @@ void AOutlawAIController::ConfigurePerception()
 	AIPerceptionComponent->ConfigureSense(*DamageConfig);
 	AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
-	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AOutlawAIController::OnPerceptionUpdated);
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AAtomAIController::OnPerceptionUpdated);
 }

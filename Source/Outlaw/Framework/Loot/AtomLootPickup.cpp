@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawLootPickup.h"
-#include "OutlawLootBeamComponent.h"
-#include "Inventory/OutlawInventoryComponent.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Inventory/OutlawItemInstance.h"
+#include "AtomLootPickup.h"
+#include "AtomLootBeamComponent.h"
+#include "Inventory/AtomInventoryComponent.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Inventory/AtomItemInstance.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "NiagaraComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Pawn.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawLootPickup, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomLootPickup, Log, All);
 
-AOutlawLootPickup::AOutlawLootPickup(const FObjectInitializer& ObjectInitializer)
+AAtomLootPickup::AAtomLootPickup(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	bReplicates = true;
@@ -30,17 +30,17 @@ AOutlawLootPickup::AOutlawLootPickup(const FObjectInitializer& ObjectInitializer
 	MeshComponent->SetupAttachment(RootComponent);
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	LootBeamComponent = CreateDefaultSubobject<UOutlawLootBeamComponent>(TEXT("LootBeamComponent"));
+	LootBeamComponent = CreateDefaultSubobject<UAtomLootBeamComponent>(TEXT("LootBeamComponent"));
 	LootBeamComponent->SetupAttachment(RootComponent);
 }
 
-void AOutlawLootPickup::BeginPlay()
+void AAtomLootPickup::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (HasAuthority())
 	{
-		CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AOutlawLootPickup::OnOverlapBegin);
+		CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAtomLootPickup::OnOverlapBegin);
 	}
 
 	if (LootDrop.ItemDefinition)
@@ -49,13 +49,13 @@ void AOutlawLootPickup::BeginPlay()
 	}
 }
 
-void AOutlawLootPickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AAtomLootPickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AOutlawLootPickup, LootDrop);
+	DOREPLIFETIME(AAtomLootPickup, LootDrop);
 }
 
-void AOutlawLootPickup::InitializeLoot(const FOutlawLootDrop& Drop)
+void AAtomLootPickup::InitializeLoot(const FAtomLootDrop& Drop)
 {
 	LootDrop = Drop;
 
@@ -65,7 +65,7 @@ void AOutlawLootPickup::InitializeLoot(const FOutlawLootDrop& Drop)
 	}
 }
 
-void AOutlawLootPickup::OnRep_LootDrop()
+void AAtomLootPickup::OnRep_LootDrop()
 {
 	if (LootBeamComponent && LootDrop.ItemDefinition)
 	{
@@ -73,7 +73,7 @@ void AOutlawLootPickup::OnRep_LootDrop()
 	}
 }
 
-void AOutlawLootPickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void AAtomLootPickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!HasAuthority() || !LootDrop.ItemDefinition)
@@ -93,30 +93,30 @@ void AOutlawLootPickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	}
 }
 
-void AOutlawLootPickup::AttemptPickup(AActor* PickupActor)
+void AAtomLootPickup::AttemptPickup(AActor* PickupActor)
 {
 	if (!HasAuthority() || !LootDrop.ItemDefinition || !PickupActor)
 	{
 		return;
 	}
 
-	UOutlawInventoryComponent* InventoryComp = PickupActor->FindComponentByClass<UOutlawInventoryComponent>();
+	UAtomInventoryComponent* InventoryComp = PickupActor->FindComponentByClass<UAtomInventoryComponent>();
 	if (!InventoryComp)
 	{
 		return;
 	}
 
-	int32 AddedCount = InventoryComp->AddItem(const_cast<UOutlawItemDefinition*>(LootDrop.ItemDefinition.Get()), LootDrop.Quantity);
+	int32 AddedCount = InventoryComp->AddItem(const_cast<UAtomItemDefinition*>(LootDrop.ItemDefinition.Get()), LootDrop.Quantity);
 
 	if (AddedCount > 0)
 	{
 		// Auto-equip into empty equipment slot if applicable
-		const UOutlawItemDefinition* ItemDef = LootDrop.ItemDefinition.Get();
+		const UAtomItemDefinition* ItemDef = LootDrop.ItemDefinition.Get();
 		if (ItemDef && ItemDef->bCanBeEquipped && ItemDef->EquipmentSlotTag.IsValid())
 		{
 			if (!InventoryComp->IsSlotOccupied(ItemDef->EquipmentSlotTag))
 			{
-				TArray<FOutlawInventoryEntry> Matching = InventoryComp->FindItemsForSlot(ItemDef->EquipmentSlotTag);
+				TArray<FAtomInventoryEntry> Matching = InventoryComp->FindItemsForSlot(ItemDef->EquipmentSlotTag);
 				for (const auto& Entry : Matching)
 				{
 					if (Entry.ItemDef == ItemDef)
@@ -133,6 +133,6 @@ void AOutlawLootPickup::AttemptPickup(AActor* PickupActor)
 	}
 	else
 	{
-		UE_LOG(LogOutlawLootPickup, Warning, TEXT("AttemptPickup: Inventory full, cannot pick up %s"), *LootDrop.ItemDefinition->DisplayName.ToString());
+		UE_LOG(LogAtomLootPickup, Warning, TEXT("AttemptPickup: Inventory full, cannot pick up %s"), *LootDrop.ItemDefinition->DisplayName.ToString());
 	}
 }

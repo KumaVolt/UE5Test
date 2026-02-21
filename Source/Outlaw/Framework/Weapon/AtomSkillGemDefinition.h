@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "OutlawSkillGemDefinition.generated.h"
+#include "AtomSkillGemDefinition.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 class UTexture2D;
 
 /**
@@ -15,12 +15,12 @@ class UTexture2D;
  * Active gems grant abilities; support gems modify linked active gems.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawSkillGemDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomSkillGemDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawSkillGemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomSkillGemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Display name shown in UI. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gem")
@@ -40,7 +40,7 @@ public:
 
 	/** Abilities granted when this gem is socketed and the weapon is active. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gem")
-	TObjectPtr<UOutlawAbilitySet> GrantedAbilitySet;
+	TObjectPtr<UAtomAbilitySet> GrantedAbilitySet;
 
 	/** Tags describing this gem for support gem compatibility filtering. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gem")

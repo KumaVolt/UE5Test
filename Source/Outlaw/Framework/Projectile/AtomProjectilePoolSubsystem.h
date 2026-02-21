@@ -4,30 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "OutlawProjectilePoolSubsystem.generated.h"
+#include "AtomProjectilePoolSubsystem.generated.h"
 
-class AOutlawProjectileBase;
+class AAtomProjectileBase;
 
 UCLASS(config=Game)
-class OUTLAW_API UOutlawProjectilePoolSubsystem : public UWorldSubsystem
+class OUTLAW_API UAtomProjectilePoolSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	AOutlawProjectileBase* GetProjectile(TSubclassOf<AOutlawProjectileBase> ProjectileClass);
+	AAtomProjectileBase* GetProjectile(TSubclassOf<AAtomProjectileBase> ProjectileClass);
 
-	void ReturnProjectile(AOutlawProjectileBase* Projectile);
+	void ReturnProjectile(AAtomProjectileBase* Projectile);
 
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	void PreWarmPool(TSubclassOf<AOutlawProjectileBase> ProjectileClass, int32 Count);
+	void PreWarmPool(TSubclassOf<AAtomProjectileBase> ProjectileClass, int32 Count);
 
 	UPROPERTY(Config)
 	int32 MaxPoolSizePerClass = 50;
 
 private:
 	// Non-UPROPERTY TMap because UHT doesn't support nested TObjectPtr containers
-	TMap<TObjectPtr<UClass>, TArray<TObjectPtr<AOutlawProjectileBase>>> Pool;
+	TMap<TObjectPtr<UClass>, TArray<TObjectPtr<AAtomProjectileBase>>> Pool;
 
-	AOutlawProjectileBase* CreateNewProjectile(TSubclassOf<AOutlawProjectileBase> ProjectileClass);
+	AAtomProjectileBase* CreateNewProjectile(TSubclassOf<AAtomProjectileBase> ProjectileClass);
 };

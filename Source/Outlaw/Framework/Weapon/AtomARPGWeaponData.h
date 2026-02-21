@@ -4,28 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawWeaponTypes.h"
-#include "OutlawARPGWeaponData.generated.h"
+#include "AtomWeaponTypes.h"
+#include "AtomARPGWeaponData.generated.h"
 
-class UOutlawAbilitySet;
-class UOutlawAffixPoolDefinition;
+class UAtomAbilitySet;
+class UAtomAffixPoolDefinition;
 class USkeletalMesh;
 
 /**
  * Data asset defining an ARPG-style weapon's properties (Path of Exile 2-style).
- * Referenced from UOutlawItemDefinition via composition.
+ * Referenced from UAtomItemDefinition via composition.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawARPGWeaponData : public UPrimaryDataAsset
+class OUTLAW_API UAtomARPGWeaponData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawARPGWeaponData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomARPGWeaponData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Weapon archetype (Sword, Axe, Staff, etc.). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	EOutlawARPGWeaponType WeaponType = EOutlawARPGWeaponType::Sword;
+	EAtomARPGWeaponType WeaponType = EAtomARPGWeaponType::Sword;
 
 	// ── Core Stats ──────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ public:
 
 	/** Default socket layout (socket types and links). Copied to item instance on creation. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sockets")
-	TArray<FOutlawSocketSlot> DefaultSocketLayout;
+	TArray<FAtomSocketSlot> DefaultSocketLayout;
 
 	/** Whether this weapon requires both hands (prevents off-hand). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
@@ -63,13 +63,13 @@ public:
 
 	/** Affix pool used when rolling random affixes on this weapon. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Affixes")
-	TObjectPtr<UOutlawAffixPoolDefinition> AffixPool;
+	TObjectPtr<UAtomAffixPoolDefinition> AffixPool;
 
 	// ── Abilities ───────────────────────────────────────────────
 
 	/** Default attack ability set granted when this weapon is active. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UOutlawAbilitySet> DefaultAttackAbilitySet;
+	TObjectPtr<UAtomAbilitySet> DefaultAttackAbilitySet;
 
 	// ── Visual ──────────────────────────────────────────────────
 

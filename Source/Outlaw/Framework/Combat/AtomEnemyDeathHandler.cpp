@@ -1,22 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawEnemyDeathHandler.h"
-#include "OutlawDeathComponent.h"
+#include "AtomEnemyDeathHandler.h"
+#include "AtomDeathComponent.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Loot/OutlawLootSubsystem.h"
-#include "Loot/OutlawLootTable.h"
-#include "Progression/OutlawProgressionComponent.h"
+#include "Loot/AtomLootSubsystem.h"
+#include "Loot/AtomLootTable.h"
+#include "Progression/AtomProgressionComponent.h"
 
-UOutlawEnemyDeathHandler::UOutlawEnemyDeathHandler(const FObjectInitializer& ObjectInitializer)
+UAtomEnemyDeathHandler::UAtomEnemyDeathHandler(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawEnemyDeathHandler::BeginPlay()
+void UAtomEnemyDeathHandler::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -26,13 +26,13 @@ void UOutlawEnemyDeathHandler::BeginPlay()
 		return;
 	}
 
-	if (UOutlawDeathComponent* DeathComp = Owner->FindComponentByClass<UOutlawDeathComponent>())
+	if (UAtomDeathComponent* DeathComp = Owner->FindComponentByClass<UAtomDeathComponent>())
 	{
-		DeathComp->OnDeathStarted.AddDynamic(this, &UOutlawEnemyDeathHandler::OnDeathStarted);
+		DeathComp->OnDeathStarted.AddDynamic(this, &UAtomEnemyDeathHandler::OnDeathStarted);
 	}
 }
 
-void UOutlawEnemyDeathHandler::OnDeathStarted(AActor* Killer)
+void UAtomEnemyDeathHandler::OnDeathStarted(AActor* Killer)
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || !Owner->HasAuthority())
@@ -81,24 +81,24 @@ void UOutlawEnemyDeathHandler::OnDeathStarted(AActor* Killer)
 	GetWorld()->GetTimerManager().SetTimer(
 		RagdollTimerHandle,
 		this,
-		&UOutlawEnemyDeathHandler::StartDissolve,
+		&UAtomEnemyDeathHandler::StartDissolve,
 		RagdollDuration,
 		false
 	);
 }
 
-void UOutlawEnemyDeathHandler::StartDissolve()
+void UAtomEnemyDeathHandler::StartDissolve()
 {
 	GetWorld()->GetTimerManager().SetTimer(
 		DissolveTimerHandle,
 		this,
-		&UOutlawEnemyDeathHandler::SpawnLootAndDestroy,
+		&UAtomEnemyDeathHandler::SpawnLootAndDestroy,
 		DissolveDuration,
 		false
 	);
 }
 
-void UOutlawEnemyDeathHandler::SpawnLootAndDestroy()
+void UAtomEnemyDeathHandler::SpawnLootAndDestroy()
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || !Owner->HasAuthority())
@@ -114,7 +114,7 @@ void UOutlawEnemyDeathHandler::SpawnLootAndDestroy()
 
 	if (KillerActor.IsValid())
 	{
-		if (UOutlawProgressionComponent* ProgressionComp = KillerActor->FindComponentByClass<UOutlawProgressionComponent>())
+		if (UAtomProgressionComponent* ProgressionComp = KillerActor->FindComponentByClass<UAtomProgressionComponent>())
 		{
 			ProgressionComp->AwardXP(BaseXPReward);
 			OnXPAwarded.Broadcast(BaseXPReward);
@@ -123,7 +123,7 @@ void UOutlawEnemyDeathHandler::SpawnLootAndDestroy()
 
 	if (LootTable)
 	{
-		if (UOutlawLootSubsystem* LootSubsystem = World->GetSubsystem<UOutlawLootSubsystem>())
+		if (UAtomLootSubsystem* LootSubsystem = World->GetSubsystem<UAtomLootSubsystem>())
 		{
 			LootSubsystem->SpawnLoot(DeathLocation, LootTable, EnemyLevel, RarityBonus, NumLootDrops);
 			OnLootDropRequested.Broadcast(DeathLocation, EnemyLevel);

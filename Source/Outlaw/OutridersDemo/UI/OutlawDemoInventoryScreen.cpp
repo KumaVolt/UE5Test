@@ -1,8 +1,8 @@
 #include "UI/OutlawDemoInventoryScreen.h"
-#include "Inventory/OutlawInventoryComponent.h"
-#include "Inventory/OutlawInventoryTypes.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Progression/OutlawProgressionComponent.h"
+#include "Inventory/AtomInventoryComponent.h"
+#include "Inventory/AtomInventoryTypes.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Progression/AtomProgressionComponent.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SScrollBox.h"
@@ -15,15 +15,15 @@
 
 // ── Rarity Color Helper ──────────────────────────────────────────
 
-static FLinearColor GetRarityColor(EOutlawItemRarity Rarity)
+static FLinearColor GetRarityColor(EAtomItemRarity Rarity)
 {
 	switch (Rarity)
 	{
-	case EOutlawItemRarity::Common:    return FLinearColor(0.8f, 0.8f, 0.8f);
-	case EOutlawItemRarity::Uncommon:  return FLinearColor(0.2f, 0.9f, 0.2f);
-	case EOutlawItemRarity::Rare:      return FLinearColor(0.3f, 0.5f, 1.0f);
-	case EOutlawItemRarity::Epic:      return FLinearColor(0.7f, 0.3f, 0.9f);
-	case EOutlawItemRarity::Legendary: return FLinearColor(1.0f, 0.65f, 0.0f);
+	case EAtomItemRarity::Common:    return FLinearColor(0.8f, 0.8f, 0.8f);
+	case EAtomItemRarity::Uncommon:  return FLinearColor(0.2f, 0.9f, 0.2f);
+	case EAtomItemRarity::Rare:      return FLinearColor(0.3f, 0.5f, 1.0f);
+	case EAtomItemRarity::Epic:      return FLinearColor(0.7f, 0.3f, 0.9f);
+	case EAtomItemRarity::Legendary: return FLinearColor(1.0f, 0.65f, 0.0f);
 	default:                           return FLinearColor::White;
 	}
 }
@@ -144,7 +144,7 @@ public:
 		];
 	}
 
-	void Update(UOutlawInventoryComponent* InvComp, UOutlawProgressionComponent* ProgComp)
+	void Update(UAtomInventoryComponent* InvComp, UAtomProgressionComponent* ProgComp)
 	{
 		CachedInvComp = InvComp;
 		if (!InvComp)
@@ -152,14 +152,14 @@ public:
 			return;
 		}
 
-		const TArray<FOutlawInventoryEntry>& Entries = InvComp->GetEntries();
+		const TArray<FAtomInventoryEntry>& Entries = InvComp->GetEntries();
 		int32 CurrentCount = Entries.Num();
 		// Simple change detection
 		bool bNeedsRebuild = (CurrentCount != LastItemCount);
 		if (!bNeedsRebuild)
 		{
 			// Check if equipped items changed
-			for (const FOutlawEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
+			for (const FAtomEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
 			{
 				int32 Equipped = Slot.EquippedItemInstanceId;
 				if (!LastEquipped.Contains(Slot.SlotTag) || LastEquipped[Slot.SlotTag] != Equipped)
@@ -177,7 +177,7 @@ public:
 
 		LastItemCount = CurrentCount;
 		LastEquipped.Empty();
-		for (const FOutlawEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
+		for (const FAtomEquipmentSlotInfo& Slot : InvComp->EquipmentSlots)
 		{
 			LastEquipped.Add(Slot.SlotTag, Slot.EquippedItemInstanceId);
 		}
@@ -194,7 +194,7 @@ public:
 	}
 
 private:
-	void RebuildEquipmentPanel(UOutlawInventoryComponent* InvComp)
+	void RebuildEquipmentPanel(UAtomInventoryComponent* InvComp)
 	{
 		if (!EquipmentBox.IsValid())
 		{
@@ -210,7 +210,7 @@ private:
 		for (const auto& SlotPair : SlotNames)
 		{
 			FGameplayTag SlotTag = SlotPair.Value;
-			UOutlawItemDefinition* Equipped = InvComp->GetEquippedItem(SlotTag);
+			UAtomItemDefinition* Equipped = InvComp->GetEquippedItem(SlotTag);
 
 			FString ButtonText;
 			FLinearColor TextColor;
@@ -251,7 +251,7 @@ private:
 		}
 	}
 
-	void RebuildInventoryList(UOutlawInventoryComponent* InvComp)
+	void RebuildInventoryList(UAtomInventoryComponent* InvComp)
 	{
 		if (!InventoryScrollBox.IsValid())
 		{
@@ -259,7 +259,7 @@ private:
 		}
 		InventoryScrollBox->ClearChildren();
 
-		const TArray<FOutlawInventoryEntry>& Entries = InvComp->GetEntries();
+		const TArray<FAtomInventoryEntry>& Entries = InvComp->GetEntries();
 
 		if (Entries.Num() == 0)
 		{
@@ -273,7 +273,7 @@ private:
 			return;
 		}
 
-		for (const FOutlawInventoryEntry& Entry : Entries)
+		for (const FAtomInventoryEntry& Entry : Entries)
 		{
 			if (!Entry.ItemDef)
 			{
@@ -330,7 +330,7 @@ private:
 		}
 	}
 
-	TWeakObjectPtr<UOutlawInventoryComponent> CachedInvComp;
+	TWeakObjectPtr<UAtomInventoryComponent> CachedInvComp;
 	TSharedPtr<SVerticalBox> EquipmentBox;
 	TSharedPtr<SScrollBox> InventoryScrollBox;
 	TSharedPtr<STextBlock> InfoLabel;
@@ -371,7 +371,7 @@ void UOutlawDemoInventoryScreen::NativeTick(const FGeometry& MyGeometry, float I
 		return;
 	}
 
-	UOutlawInventoryComponent* InvComp = Pawn->FindComponentByClass<UOutlawInventoryComponent>();
-	UOutlawProgressionComponent* ProgComp = Pawn->FindComponentByClass<UOutlawProgressionComponent>();
+	UAtomInventoryComponent* InvComp = Pawn->FindComponentByClass<UAtomInventoryComponent>();
+	UAtomProgressionComponent* ProgComp = Pawn->FindComponentByClass<UAtomProgressionComponent>();
 	SlateWidget->Update(InvComp, ProgComp);
 }

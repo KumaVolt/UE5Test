@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlowSTCondition_InRange.h"
+#include "AtomSTCondition_InRange.h"
 #include "StateTreeExecutionContext.h"
 
-bool FOutlowSTCondition_InRange::TestCondition(FStateTreeExecutionContext& Context) const
+bool FAtomSTCondition_InRange::TestCondition(FStateTreeExecutionContext& Context) const
 {
 	const FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawProjectileTypes.generated.h"
+#include "AtomProjectileTypes.generated.h"
 
 class UAbilitySystemComponent;
 class UGameplayEffect;
@@ -14,7 +14,7 @@ class UGameplayEffect;
  * Contains all runtime parameters needed to configure the projectile.
  */
 USTRUCT(BlueprintType)
-struct FOutlawProjectileInitData
+struct FAtomProjectileInitData
 {
 	GENERATED_BODY()
 

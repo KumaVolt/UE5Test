@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Animation/OutlawAnimInstance.h"
-#include "Animation/OutlawAnimationTypes.h"
+#include "Animation/AtomAnimInstance.h"
+#include "Animation/AtomAnimationTypes.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -9,7 +9,7 @@
 #include "AbilitySystemComponent.h"
 #include "KismetAnimationLibrary.h"
 
-void UOutlawAnimInstance::NativeInitializeAnimation()
+void UAtomAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
@@ -30,7 +30,7 @@ void UOutlawAnimInstance::NativeInitializeAnimation()
 	}
 }
 
-void UOutlawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UAtomAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
@@ -52,12 +52,12 @@ void UOutlawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (AbilitySystemComponent)
 	{
-		bIsDead = AbilitySystemComponent->HasMatchingGameplayTag(OutlawAnimTags::Dead);
-		bIsStaggered = AbilitySystemComponent->HasMatchingGameplayTag(OutlawAnimTags::Staggered);
+		bIsDead = AbilitySystemComponent->HasMatchingGameplayTag(AtomAnimTags::Dead);
+		bIsStaggered = AbilitySystemComponent->HasMatchingGameplayTag(AtomAnimTags::Staggered);
 	}
 }
 
-void UOutlawAnimInstance::PlayAbilityMontage(UAnimMontage* Montage, float Rate, FName Section)
+void UAtomAnimInstance::PlayAbilityMontage(UAnimMontage* Montage, float Rate, FName Section)
 {
 	if (!Montage)
 	{

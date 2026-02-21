@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
-#include "OutlawInventoryTypes.h"
-#include "OutlawItemDefinition.h"
-#include "OutlawInventoryComponent.generated.h"
+#include "AtomInventoryTypes.h"
+#include "AtomItemDefinition.h"
+#include "AtomInventoryComponent.generated.h"
 
 class UAbilitySystemComponent;
-class UOutlawItemInstance;
-class UOutlawWeaponManagerComponent;
+class UAtomItemInstance;
+class UAtomWeaponManagerComponent;
 
 /** Criteria for sorting inventory entries. */
 UENUM(BlueprintType)
-enum class EOutlawInventorySortMode : uint8
+enum class EAtomInventorySortMode : uint8
 {
 	ByName,
 	ByRarity,
@@ -24,9 +24,9 @@ enum class EOutlawInventorySortMode : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquipped, const UOutlawItemDefinition*, ItemDef, FGameplayTag, SlotTag);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequipped, const UOutlawItemDefinition*, ItemDef, FGameplayTag, SlotTag);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, const UOutlawItemDefinition*, ItemDef);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquipped, const UAtomItemDefinition*, ItemDef, FGameplayTag, SlotTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequipped, const UAtomItemDefinition*, ItemDef, FGameplayTag, SlotTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, const UAtomItemDefinition*, ItemDef);
 
 /**
  * Inventory component that can be dropped onto any actor Blueprint.
@@ -34,12 +34,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUsed, const UOutlawItemDefini
  * Server-authoritative with FFastArraySerializer replication for inventory entries.
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawInventoryComponent : public UActorComponent
+class OUTLAW_API UAtomInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawInventoryComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomInventoryComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -53,7 +53,7 @@ public:
 	 * @return Number of items actually added (may be less if weight/slot limit reached).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 AddItem(UOutlawItemDefinition* ItemDef, int32 Count = 1);
+	int32 AddItem(UAtomItemDefinition* ItemDef, int32 Count = 1);
 
 	/**
 	 * Remove items from a specific inventory entry.
@@ -71,19 +71,19 @@ public:
 	 * @return Number of items actually removed.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 RemoveItemByDef(UOutlawItemDefinition* ItemDef, int32 Count);
+	int32 RemoveItemByDef(UAtomItemDefinition* ItemDef, int32 Count);
 
 	/** Find all inventory entries that have items matching a gameplay tag. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FOutlawInventoryEntry> FindItemsByTag(FGameplayTag Tag) const;
+	TArray<FAtomInventoryEntry> FindItemsByTag(FGameplayTag Tag) const;
 
 	/** Get total count of a specific item definition across all stacks. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetItemCount(const UOutlawItemDefinition* ItemDef) const;
+	int32 GetItemCount(const UAtomItemDefinition* ItemDef) const;
 
 	/** Check if the inventory contains at least Count of the given item. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool HasItem(const UOutlawItemDefinition* ItemDef, int32 Count = 1) const;
+	bool HasItem(const UAtomItemDefinition* ItemDef, int32 Count = 1) const;
 
 	/** Get total weight of all items in the inventory. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -95,15 +95,15 @@ public:
 
 	/** Get all inventory entries that can be equipped in the given slot. Useful for slot-based UI (Destiny/Outriders style). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FOutlawInventoryEntry> FindItemsForSlot(FGameplayTag SlotTag) const;
+	TArray<FAtomInventoryEntry> FindItemsForSlot(FGameplayTag SlotTag) const;
 
 	/** Get all inventory entries matching a specific item type (Boots, Helmet, Weapon, etc.). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FOutlawInventoryEntry> FindItemsByType(EOutlawItemType ItemType) const;
+	TArray<FAtomInventoryEntry> FindItemsByType(EAtomItemType ItemType) const;
 
 	/** Get all inventory entries matching a specific rarity. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FOutlawInventoryEntry> FindItemsByRarity(EOutlawItemRarity Rarity) const;
+	TArray<FAtomInventoryEntry> FindItemsByRarity(EAtomItemRarity Rarity) const;
 
 	// ── Sorting API ─────────────────────────────────────────────
 
@@ -113,7 +113,7 @@ public:
 	 * @param bDescending  If true, sort highest-first (e.g. Legendary before Common).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Sort")
-	void SortInventory(EOutlawInventorySortMode SortMode, bool bDescending = false);
+	void SortInventory(EAtomInventorySortMode SortMode, bool bDescending = false);
 
 	// ── Equipment API ───────────────────────────────────────────
 
@@ -137,7 +137,7 @@ public:
 
 	/** Get the item definition currently equipped in the given slot. Returns null if empty. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Equipment")
-	UOutlawItemDefinition* GetEquippedItem(FGameplayTag SlotTag) const;
+	UAtomItemDefinition* GetEquippedItem(FGameplayTag SlotTag) const;
 
 	/** Check if an equipment slot is occupied. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Equipment")
@@ -161,7 +161,7 @@ public:
 	 * @return The item instance, or nullptr if no weapon equipped or no instance.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Weapon")
-	UOutlawItemInstance* GetItemInstance(FGameplayTag SlotTag) const;
+	UAtomItemInstance* GetItemInstance(FGameplayTag SlotTag) const;
 
 	/**
 	 * Get the item instance by instance ID.
@@ -169,17 +169,17 @@ public:
 	 * @return The item instance, or nullptr if not found or not a weapon.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Weapon")
-	UOutlawItemInstance* GetItemInstanceById(int32 InstanceId) const;
+	UAtomItemInstance* GetItemInstanceById(int32 InstanceId) const;
 
 	// ── Save/Load ───────────────────────────────────────────────
 
 	/** Serialize the full inventory state for saving. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Save")
-	FOutlawInventorySaveData SaveInventory() const;
+	FAtomInventorySaveData SaveInventory() const;
 
 	/** Load inventory from previously saved data. Clears current inventory first. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Save")
-	void LoadInventory(const FOutlawInventorySaveData& Data);
+	void LoadInventory(const FAtomInventorySaveData& Data);
 
 	// ── Delegates ───────────────────────────────────────────────
 
@@ -206,20 +206,20 @@ public:
 	 * Only meaningful in grid mode (InventoryGridWidth > 0).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
-	bool CanPlaceItemAt(const UOutlawItemDefinition* ItemDef, int32 X, int32 Y) const;
+	bool CanPlaceItemAt(const UAtomItemDefinition* ItemDef, int32 X, int32 Y) const;
 
 	/**
 	 * Check if an item can be placed at a position, ignoring a specific entry (for move operations).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
-	bool CanPlaceItemAtIgnoring(const UOutlawItemDefinition* ItemDef, int32 X, int32 Y, int32 IgnoreInstanceId) const;
+	bool CanPlaceItemAtIgnoring(const UAtomItemDefinition* ItemDef, int32 X, int32 Y, int32 IgnoreInstanceId) const;
 
 	/**
 	 * Add an item at a specific grid position.
 	 * @return Number of items actually added (0 if position blocked or out of bounds).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
-	int32 AddItemAtPosition(UOutlawItemDefinition* ItemDef, int32 X, int32 Y, int32 Count = 1);
+	int32 AddItemAtPosition(UAtomItemDefinition* ItemDef, int32 X, int32 Y, int32 Count = 1);
 
 	/**
 	 * Move an existing inventory entry to a new grid position.
@@ -236,14 +236,14 @@ public:
 	 * @return True if a free position was found.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
-	bool FindFreeSpace(const UOutlawItemDefinition* ItemDef, int32& OutX, int32& OutY) const;
+	bool FindFreeSpace(const UAtomItemDefinition* ItemDef, int32& OutX, int32& OutY) const;
 
 	/** Get the item at a specific grid cell (returns the entry occupying that cell, if any). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
-	FOutlawInventoryEntry GetItemAtGridPosition(int32 X, int32 Y) const;
+	FAtomInventoryEntry GetItemAtGridPosition(int32 X, int32 Y) const;
 
 	/** Get all inventory entries (read-only). */
-	const TArray<FOutlawInventoryEntry>& GetEntries() const { return InventoryList.Entries; }
+	const TArray<FAtomInventoryEntry>& GetEntries() const { return InventoryList.Entries; }
 
 	/** Whether the component is operating in grid mode. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Grid")
@@ -272,21 +272,21 @@ public:
 
 	/** Available equipment slots. Configure in the Blueprint defaults. */
 	UPROPERTY(EditDefaultsOnly, Replicated, BlueprintReadOnly, Category = "Inventory|Equipment")
-	TArray<FOutlawEquipmentSlotInfo> EquipmentSlots;
+	TArray<FAtomEquipmentSlotInfo> EquipmentSlots;
 
 private:
 	/** Create an item instance for a weapon item definition. */
-	UOutlawItemInstance* CreateItemInstance(UOutlawItemDefinition* ItemDef, int32 InstanceId);
+	UAtomItemInstance* CreateItemInstance(UAtomItemDefinition* ItemDef, int32 InstanceId);
 
 	/** Notify the weapon manager when a weapon is equipped/unequipped. */
-	UOutlawWeaponManagerComponent* GetWeaponManager() const;
+	UAtomWeaponManagerComponent* GetWeaponManager() const;
 
 	/** Resolve the ASC from the owning actor via IAbilitySystemInterface. */
 	UAbilitySystemComponent* GetASC() const;
 
 	/** Find a mutable equipment slot by tag. */
-	FOutlawEquipmentSlotInfo* FindEquipmentSlot(FGameplayTag SlotTag);
-	const FOutlawEquipmentSlotInfo* FindEquipmentSlot(FGameplayTag SlotTag) const;
+	FAtomEquipmentSlotInfo* FindEquipmentSlot(FGameplayTag SlotTag);
+	const FAtomEquipmentSlotInfo* FindEquipmentSlot(FGameplayTag SlotTag) const;
 
 	/** Broadcast inventory changed on both server and clients. */
 	void BroadcastInventoryChanged();
@@ -318,12 +318,12 @@ private:
 
 	/** The replicated inventory list. */
 	UPROPERTY(Replicated)
-	FOutlawInventoryList InventoryList;
+	FAtomInventoryList InventoryList;
 
 	/** Server-side counter for generating unique instance IDs. */
 	int32 NextInstanceId = 0;
 
-	// FOutlawInventoryList needs access to BroadcastInventoryChanged
-	friend struct FOutlawInventoryEntry;
-	friend struct FOutlawInventoryList;
+	// FAtomInventoryList needs access to BroadcastInventoryChanged
+	friend struct FAtomInventoryEntry;
+	friend struct FAtomInventoryList;
 };

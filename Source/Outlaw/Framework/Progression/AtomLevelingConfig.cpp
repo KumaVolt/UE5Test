@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawLevelingConfig.h"
+#include "AtomLevelingConfig.h"
 
-UOutlawLevelingConfig::UOutlawLevelingConfig(const FObjectInitializer& ObjectInitializer)
+UAtomLevelingConfig::UAtomLevelingConfig(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-int32 UOutlawLevelingConfig::GetMaxLevel() const
+int32 UAtomLevelingConfig::GetMaxLevel() const
 {
 	return LevelTable.Num();
 }
 
-int32 UOutlawLevelingConfig::GetXPForLevel(int32 Level) const
+int32 UAtomLevelingConfig::GetXPForLevel(int32 Level) const
 {
 	const int32 Index = Level - 1;
 	if (!LevelTable.IsValidIndex(Index))
@@ -22,7 +22,7 @@ int32 UOutlawLevelingConfig::GetXPForLevel(int32 Level) const
 	return LevelTable[Index].RequiredXP;
 }
 
-int32 UOutlawLevelingConfig::GetLevelForXP(int32 TotalXP) const
+int32 UAtomLevelingConfig::GetLevelForXP(int32 TotalXP) const
 {
 	int32 Level = 1;
 	for (int32 i = 0; i < LevelTable.Num(); ++i)
@@ -39,7 +39,7 @@ int32 UOutlawLevelingConfig::GetLevelForXP(int32 TotalXP) const
 	return Level;
 }
 
-int32 UOutlawLevelingConfig::GetSkillPointsForLevel(int32 Level) const
+int32 UAtomLevelingConfig::GetSkillPointsForLevel(int32 Level) const
 {
 	const int32 Index = Level - 1;
 	if (!LevelTable.IsValidIndex(Index))
@@ -51,7 +51,7 @@ int32 UOutlawLevelingConfig::GetSkillPointsForLevel(int32 Level) const
 	return (Points > 0) ? Points : DefaultSkillPointsPerLevel;
 }
 
-int32 UOutlawLevelingConfig::GetTotalSkillPointsForLevel(int32 Level) const
+int32 UAtomLevelingConfig::GetTotalSkillPointsForLevel(int32 Level) const
 {
 	int32 Total = 0;
 	for (int32 i = 1; i <= Level; ++i)

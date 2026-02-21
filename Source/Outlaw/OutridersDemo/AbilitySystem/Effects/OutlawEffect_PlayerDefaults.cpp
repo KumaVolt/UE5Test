@@ -1,5 +1,5 @@
 #include "AbilitySystem/Effects/OutlawEffect_PlayerDefaults.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 
 UOutlawEffect_PlayerDefaults::UOutlawEffect_PlayerDefaults()
 {
@@ -14,12 +14,12 @@ UOutlawEffect_PlayerDefaults::UOutlawEffect_PlayerDefaults()
 		Modifiers.Add(Mod);
 	};
 
-	AddOverride(UOutlawAttributeSet::GetHealthAttribute(), 1000.f);
-	AddOverride(UOutlawAttributeSet::GetMaxHealthAttribute(), 1000.f);
-	AddOverride(UOutlawAttributeSet::GetStaminaAttribute(), 200.f);
-	AddOverride(UOutlawAttributeSet::GetMaxStaminaAttribute(), 200.f);
-	AddOverride(UOutlawAttributeSet::GetStrengthAttribute(), 50.f);
-	AddOverride(UOutlawAttributeSet::GetMaxStrengthAttribute(), 100.f);
-	AddOverride(UOutlawAttributeSet::GetArmorAttribute(), 50.f);
-	AddOverride(UOutlawAttributeSet::GetMaxArmorAttribute(), 100.f);
+	AddOverride(UAtomAttributeSet::GetHealthAttribute(), 1000.f);
+	AddOverride(UAtomAttributeSet::GetMaxHealthAttribute(), 1000.f);
+	AddOverride(UAtomAttributeSet::GetStaminaAttribute(), 200.f);
+	AddOverride(UAtomAttributeSet::GetMaxStaminaAttribute(), 200.f);
+	AddOverride(UAtomAttributeSet::GetStrengthAttribute(), 50.f);
+	AddOverride(UAtomAttributeSet::GetMaxStrengthAttribute(), 100.f);
+	AddOverride(UAtomAttributeSet::GetArmorAttribute(), 50.f);
+	AddOverride(UAtomAttributeSet::GetMaxArmorAttribute(), 100.f);
 }

@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Projectile/OutlawSpellProjectile.h"
+#include "Projectile/AtomSpellProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "Engine/OverlapResult.h"
 
-AOutlawSpellProjectile::AOutlawSpellProjectile(const FObjectInitializer& ObjectInitializer)
+AAtomSpellProjectile::AAtomSpellProjectile(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	Speed = 2000.f;
@@ -17,7 +17,7 @@ AOutlawSpellProjectile::AOutlawSpellProjectile(const FObjectInitializer& ObjectI
 	SplashRadius = 0.f;
 }
 
-void AOutlawSpellProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AAtomSpellProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!HasAuthority())
 	{
@@ -35,7 +35,7 @@ void AOutlawSpellProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	}
 }
 
-void AOutlawSpellProjectile::ApplySplashDamage(const FVector& ImpactLocation)
+void AAtomSpellProjectile::ApplySplashDamage(const FVector& ImpactLocation)
 {
 	if (!SourceASC || !DamageEffectClass || !GetWorld())
 	{

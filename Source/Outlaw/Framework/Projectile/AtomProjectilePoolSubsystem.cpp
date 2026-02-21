@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Projectile/OutlawProjectilePoolSubsystem.h"
-#include "Projectile/OutlawProjectileBase.h"
+#include "Projectile/AtomProjectilePoolSubsystem.h"
+#include "Projectile/AtomProjectileBase.h"
 
-AOutlawProjectileBase* UOutlawProjectilePoolSubsystem::GetProjectile(TSubclassOf<AOutlawProjectileBase> ProjectileClass)
+AAtomProjectileBase* UAtomProjectilePoolSubsystem::GetProjectile(TSubclassOf<AAtomProjectileBase> ProjectileClass)
 {
 	if (!ProjectileClass)
 	{
@@ -11,18 +11,18 @@ AOutlawProjectileBase* UOutlawProjectilePoolSubsystem::GetProjectile(TSubclassOf
 	}
 
 	UClass* Class = ProjectileClass.Get();
-	TArray<TObjectPtr<AOutlawProjectileBase>>* ClassPool = Pool.Find(Class);
+	TArray<TObjectPtr<AAtomProjectileBase>>* ClassPool = Pool.Find(Class);
 
 	if (ClassPool && ClassPool->Num() > 0)
 	{
-		AOutlawProjectileBase* Projectile = (*ClassPool).Pop();
+		AAtomProjectileBase* Projectile = (*ClassPool).Pop();
 		return Projectile;
 	}
 
 	return CreateNewProjectile(ProjectileClass);
 }
 
-void UOutlawProjectilePoolSubsystem::ReturnProjectile(AOutlawProjectileBase* Projectile)
+void UAtomProjectilePoolSubsystem::ReturnProjectile(AAtomProjectileBase* Projectile)
 {
 	if (!Projectile)
 	{
@@ -30,7 +30,7 @@ void UOutlawProjectilePoolSubsystem::ReturnProjectile(AOutlawProjectileBase* Pro
 	}
 
 	UClass* Class = Projectile->GetClass();
-	TArray<TObjectPtr<AOutlawProjectileBase>>& ClassPool = Pool.FindOrAdd(Class);
+	TArray<TObjectPtr<AAtomProjectileBase>>& ClassPool = Pool.FindOrAdd(Class);
 
 	if (ClassPool.Num() < MaxPoolSizePerClass)
 	{
@@ -42,7 +42,7 @@ void UOutlawProjectilePoolSubsystem::ReturnProjectile(AOutlawProjectileBase* Pro
 	}
 }
 
-void UOutlawProjectilePoolSubsystem::PreWarmPool(TSubclassOf<AOutlawProjectileBase> ProjectileClass, int32 Count)
+void UAtomProjectilePoolSubsystem::PreWarmPool(TSubclassOf<AAtomProjectileBase> ProjectileClass, int32 Count)
 {
 	if (!ProjectileClass)
 	{
@@ -50,7 +50,7 @@ void UOutlawProjectilePoolSubsystem::PreWarmPool(TSubclassOf<AOutlawProjectileBa
 	}
 
 	UClass* Class = ProjectileClass.Get();
-	TArray<TObjectPtr<AOutlawProjectileBase>>& ClassPool = Pool.FindOrAdd(Class);
+	TArray<TObjectPtr<AAtomProjectileBase>>& ClassPool = Pool.FindOrAdd(Class);
 
 	for (int32 i = 0; i < Count; ++i)
 	{
@@ -59,7 +59,7 @@ void UOutlawProjectilePoolSubsystem::PreWarmPool(TSubclassOf<AOutlawProjectileBa
 			break;
 		}
 
-		if (AOutlawProjectileBase* Projectile = CreateNewProjectile(ProjectileClass))
+		if (AAtomProjectileBase* Projectile = CreateNewProjectile(ProjectileClass))
 		{
 			Projectile->SetActorHiddenInGame(true);
 			Projectile->SetActorEnableCollision(false);
@@ -69,7 +69,7 @@ void UOutlawProjectilePoolSubsystem::PreWarmPool(TSubclassOf<AOutlawProjectileBa
 	}
 }
 
-AOutlawProjectileBase* UOutlawProjectilePoolSubsystem::CreateNewProjectile(TSubclassOf<AOutlawProjectileBase> ProjectileClass)
+AAtomProjectileBase* UAtomProjectilePoolSubsystem::CreateNewProjectile(TSubclassOf<AAtomProjectileBase> ProjectileClass)
 {
 	UWorld* World = GetWorld();
 	if (!World || !ProjectileClass)
@@ -80,6 +80,6 @@ AOutlawProjectileBase* UOutlawProjectilePoolSubsystem::CreateNewProjectile(TSubc
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AOutlawProjectileBase* Projectile = World->SpawnActor<AOutlawProjectileBase>(ProjectileClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	AAtomProjectileBase* Projectile = World->SpawnActor<AAtomProjectileBase>(ProjectileClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	return Projectile;
 }

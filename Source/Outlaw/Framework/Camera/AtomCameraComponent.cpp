@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Camera/OutlawCameraComponent.h"
+#include "Camera/AtomCameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 
-UOutlawCameraComponent::UOutlawCameraComponent(const FObjectInitializer& ObjectInitializer)
+UAtomCameraComponent::UAtomCameraComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -21,7 +21,7 @@ UOutlawCameraComponent::UOutlawCameraComponent(const FObjectInitializer& ObjectI
 	IsometricConfig.bUsePawnControlRotation = false;
 }
 
-void UOutlawCameraComponent::BeginPlay()
+void UAtomCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	InitializeSpringArm();
@@ -30,10 +30,10 @@ void UOutlawCameraComponent::BeginPlay()
 	TargetFieldOfView = DefaultFieldOfView;
 	SetFieldOfView(DefaultFieldOfView);
 
-	SetCameraMode(EOutlawCameraMode::OTS);
+	SetCameraMode(EAtomCameraMode::OTS);
 }
 
-void UOutlawCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UAtomCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -41,7 +41,7 @@ void UOutlawCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (SpringArm)
 	{
-		FRotator BaseRotation = CurrentMode == EOutlawCameraMode::OTS 
+		FRotator BaseRotation = CurrentMode == EAtomCameraMode::OTS 
 			? SpringArm->GetComponentRotation() 
 			: IsometricConfig.CameraAngle;
 
@@ -49,7 +49,7 @@ void UOutlawCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FinalRotation.Pitch += CurrentRecoilOffset.X;
 		FinalRotation.Yaw += CurrentRecoilOffset.Y;
 
-		if (CurrentMode == EOutlawCameraMode::OTS && SpringArm->bUsePawnControlRotation)
+		if (CurrentMode == EAtomCameraMode::OTS && SpringArm->bUsePawnControlRotation)
 		{
 			AActor* Owner = GetOwner();
 			if (APawn* Pawn = Cast<APawn>(Owner))
@@ -60,7 +60,7 @@ void UOutlawCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				FinalRotation.Yaw += CurrentRecoilOffset.Y;
 			}
 		}
-		else if (CurrentMode == EOutlawCameraMode::Isometric)
+		else if (CurrentMode == EAtomCameraMode::Isometric)
 		{
 			FinalRotation = IsometricConfig.CameraAngle;
 			FinalRotation.Pitch += CurrentRecoilOffset.X;
@@ -72,12 +72,12 @@ void UOutlawCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	BlendCameraSettings(DeltaTime);
 }
 
-void UOutlawCameraComponent::SetCameraMode(EOutlawCameraMode NewMode)
+void UAtomCameraComponent::SetCameraMode(EAtomCameraMode NewMode)
 {
 	if (CurrentMode == NewMode) return;
 	CurrentMode = NewMode;
 
-	const FOutlawCameraConfig& TargetConfig = (NewMode == EOutlawCameraMode::OTS) ? OTSConfig : IsometricConfig;
+	const FAtomCameraConfig& TargetConfig = (NewMode == EAtomCameraMode::OTS) ? OTSConfig : IsometricConfig;
 
 	if (SpringArm)
 	{
@@ -90,31 +90,31 @@ void UOutlawCameraComponent::SetCameraMode(EOutlawCameraMode NewMode)
 	TargetFieldOfView = bIsADS ? ADSFieldOfView : TargetConfig.FieldOfView;
 }
 
-void UOutlawCameraComponent::EnterADS()
+void UAtomCameraComponent::EnterADS()
 {
-	if (CurrentMode != EOutlawCameraMode::OTS) return;
+	if (CurrentMode != EAtomCameraMode::OTS) return;
 	if (bIsADS) return;
 
 	bIsADS = true;
 	TargetFieldOfView = ADSFieldOfView;
 }
 
-void UOutlawCameraComponent::ExitADS()
+void UAtomCameraComponent::ExitADS()
 {
 	if (!bIsADS) return;
 
 	bIsADS = false;
-	const FOutlawCameraConfig& CurrentConfig = (CurrentMode == EOutlawCameraMode::OTS) ? OTSConfig : IsometricConfig;
+	const FAtomCameraConfig& CurrentConfig = (CurrentMode == EAtomCameraMode::OTS) ? OTSConfig : IsometricConfig;
 	TargetFieldOfView = CurrentConfig.FieldOfView;
 }
 
-void UOutlawCameraComponent::ApplyRecoil(float PitchRecoil, float YawRecoil)
+void UAtomCameraComponent::ApplyRecoil(float PitchRecoil, float YawRecoil)
 {
 	CurrentRecoilOffset.X = FMath::Clamp(CurrentRecoilOffset.X + PitchRecoil, -MaxRecoilPitch, MaxRecoilPitch);
 	CurrentRecoilOffset.Y = FMath::Clamp(CurrentRecoilOffset.Y + YawRecoil, -MaxRecoilYaw, MaxRecoilYaw);
 }
 
-void UOutlawCameraComponent::ApplyScreenShake(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale)
+void UAtomCameraComponent::ApplyScreenShake(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale)
 {
 	if (!ShakeClass) return;
 
@@ -133,7 +133,7 @@ void UOutlawCameraComponent::ApplyScreenShake(TSubclassOf<UCameraShakeBase> Shak
 	CameraManager->StartCameraShake(ShakeClass, Scale);
 }
 
-void UOutlawCameraComponent::InitializeSpringArm()
+void UAtomCameraComponent::InitializeSpringArm()
 {
 	AActor* Owner = GetOwner();
 	if (!Owner) return;
@@ -148,7 +148,7 @@ void UOutlawCameraComponent::InitializeSpringArm()
 	}
 }
 
-void UOutlawCameraComponent::BlendCameraSettings(float DeltaTime)
+void UAtomCameraComponent::BlendCameraSettings(float DeltaTime)
 {
 	float CurrentFOV = FieldOfView;
 	float NewFOV = FMath::FInterpTo(CurrentFOV, TargetFieldOfView, DeltaTime, CameraModeBlendSpeed);
@@ -156,7 +156,7 @@ void UOutlawCameraComponent::BlendCameraSettings(float DeltaTime)
 
 	if (SpringArm)
 	{
-		const FOutlawCameraConfig& TargetConfig = (CurrentMode == EOutlawCameraMode::OTS) ? OTSConfig : IsometricConfig;
+		const FAtomCameraConfig& TargetConfig = (CurrentMode == EAtomCameraMode::OTS) ? OTSConfig : IsometricConfig;
 		
 		float CurrentArmLength = SpringArm->TargetArmLength;
 		float NewArmLength = FMath::FInterpTo(CurrentArmLength, TargetConfig.ArmLength, DeltaTime, CameraModeBlendSpeed);

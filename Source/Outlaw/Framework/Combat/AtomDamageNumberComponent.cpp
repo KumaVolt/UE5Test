@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawDamageNumberComponent.h"
-#include "OutlawCombatTags.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AtomDamageNumberComponent.h"
+#include "AtomCombatTags.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "AbilitySystemInterface.h"
-#include "UI/OutlawDamageNumberWidget.h"
+#include "UI/AtomDamageNumberWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "GameplayTagContainer.h"
 
-UOutlawDamageNumberComponent::UOutlawDamageNumberComponent(const FObjectInitializer& ObjectInitializer)
+UAtomDamageNumberComponent::UAtomDamageNumberComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawDamageNumberComponent::BeginPlay()
+void UAtomDamageNumberComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -43,23 +43,23 @@ void UOutlawDamageNumberComponent::BeginPlay()
 	{
 		BoundASC = ASC;
 		IncomingDamageDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetIncomingDamageAttribute()).AddUObject(
-				this, &UOutlawDamageNumberComponent::OnDamageReceived);
+			UAtomAttributeSet::GetIncomingDamageAttribute()).AddUObject(
+				this, &UAtomDamageNumberComponent::OnDamageReceived);
 	}
 }
 
-void UOutlawDamageNumberComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UAtomDamageNumberComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (BoundASC.IsValid() && IncomingDamageDelegateHandle.IsValid())
 	{
 		BoundASC->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetIncomingDamageAttribute()).Remove(IncomingDamageDelegateHandle);
+			UAtomAttributeSet::GetIncomingDamageAttribute()).Remove(IncomingDamageDelegateHandle);
 	}
 
 	Super::EndPlay(EndPlayReason);
 }
 
-void UOutlawDamageNumberComponent::OnDamageReceived(const FOnAttributeChangeData& Data)
+void UAtomDamageNumberComponent::OnDamageReceived(const FOnAttributeChangeData& Data)
 {
 	if (Data.NewValue <= 0.f || !DamageNumberWidgetClass)
 	{
@@ -75,7 +75,7 @@ void UOutlawDamageNumberComponent::OnDamageReceived(const FOnAttributeChangeData
 	bWasCritical = false;
 	if (BoundASC.IsValid())
 	{
-		if (BoundASC->HasMatchingGameplayTag(OutlawCombatTags::CriticalHit))
+		if (BoundASC->HasMatchingGameplayTag(AtomCombatTags::CriticalHit))
 		{
 			bWasCritical = true;
 		}
@@ -83,7 +83,7 @@ void UOutlawDamageNumberComponent::OnDamageReceived(const FOnAttributeChangeData
 
 	const FVector SpawnLocation = Owner->GetActorLocation() + SpawnOffset;
 
-	UOutlawDamageNumberWidget* Widget = CreateWidget<UOutlawDamageNumberWidget>(
+	UAtomDamageNumberWidget* Widget = CreateWidget<UAtomDamageNumberWidget>(
 		Owner->GetWorld(),
 		DamageNumberWidgetClass
 	);

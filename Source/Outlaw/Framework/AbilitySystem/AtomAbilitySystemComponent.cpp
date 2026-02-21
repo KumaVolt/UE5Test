@@ -1,22 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawAbilitySystemComponent.h"
-#include "OutlawAbilitySet.h"
-#include "OutlawGameplayAbility.h"
+#include "AtomAbilitySystemComponent.h"
+#include "AtomAbilitySet.h"
+#include "AtomGameplayAbility.h"
 
-UOutlawAbilitySystemComponent::UOutlawAbilitySystemComponent()
+UAtomAbilitySystemComponent::UAtomAbilitySystemComponent()
 {
 	SetIsReplicated(true);
 }
 
-void UOutlawAbilitySystemComponent::BeginPlay()
+void UAtomAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-FOutlawAbilitySetGrantedHandles UOutlawAbilitySystemComponent::GrantAbilitySet(const UOutlawAbilitySet* AbilitySet, UObject* SourceObject)
+FAtomAbilitySetGrantedHandles UAtomAbilitySystemComponent::GrantAbilitySet(const UAtomAbilitySet* AbilitySet, UObject* SourceObject)
 {
-	FOutlawAbilitySetGrantedHandles Handles;
+	FAtomAbilitySetGrantedHandles Handles;
 
 	if (AbilitySet)
 	{
@@ -26,12 +26,12 @@ FOutlawAbilitySetGrantedHandles UOutlawAbilitySystemComponent::GrantAbilitySet(c
 	return Handles;
 }
 
-void UOutlawAbilitySystemComponent::RevokeAbilitySet(FOutlawAbilitySetGrantedHandles& Handles)
+void UAtomAbilitySystemComponent::RevokeAbilitySet(FAtomAbilitySetGrantedHandles& Handles)
 {
 	Handles.RevokeFromASC(this);
 }
 
-void UOutlawAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+void UAtomAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid())
 	{
@@ -40,7 +40,7 @@ void UOutlawAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& I
 	}
 }
 
-void UOutlawAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+void UAtomAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid())
 	{
@@ -49,7 +49,7 @@ void UOutlawAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& 
 	}
 }
 
-void UOutlawAbilitySystemComponent::ProcessAbilityInput()
+void UAtomAbilitySystemComponent::ProcessAbilityInput()
 {
 	// Process pressed tags - try to activate matching abilities
 	for (const FGameplayTag& Tag : InputPressedTags)

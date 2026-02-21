@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawAbilityTypes.h"
+#include "AtomAbilityTypes.h"
 #include "AbilitySystemComponent.h"
 
-void FOutlawAbilitySetGrantedHandles::RevokeFromASC(UAbilitySystemComponent* ASC)
+void FAtomAbilitySetGrantedHandles::RevokeFromASC(UAbilitySystemComponent* ASC)
 {
 	if (!ASC)
 	{

@@ -1,31 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawAffixPoolDefinition.h"
-#include "OutlawAffixDefinition.h"
+#include "AtomAffixPoolDefinition.h"
+#include "AtomAffixDefinition.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawAffixPool, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomAffixPool, Log, All);
 
-UOutlawAffixPoolDefinition::UOutlawAffixPoolDefinition(const FObjectInitializer& ObjectInitializer)
+UAtomAffixPoolDefinition::UAtomAffixPoolDefinition(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-TArray<FOutlawItemAffix> UOutlawAffixPoolDefinition::RollAffixes(int32 ItemLevel, int32 NumPrefixes, int32 NumSuffixes) const
+TArray<FAtomItemAffix> UAtomAffixPoolDefinition::RollAffixes(int32 ItemLevel, int32 NumPrefixes, int32 NumSuffixes) const
 {
-	TArray<FOutlawItemAffix> Result;
+	TArray<FAtomItemAffix> Result;
 
 	// Separate eligible affixes by slot type
-	TArray<UOutlawAffixDefinition*> EligiblePrefixes;
-	TArray<UOutlawAffixDefinition*> EligibleSuffixes;
+	TArray<UAtomAffixDefinition*> EligiblePrefixes;
+	TArray<UAtomAffixDefinition*> EligibleSuffixes;
 
-	for (const TObjectPtr<UOutlawAffixDefinition>& AffixDef : PossibleAffixes)
+	for (const TObjectPtr<UAtomAffixDefinition>& AffixDef : PossibleAffixes)
 	{
 		if (!AffixDef || AffixDef->RequiredItemLevel > ItemLevel)
 		{
 			continue;
 		}
 
-		if (AffixDef->AffixSlot == EOutlawAffixSlot::Prefix)
+		if (AffixDef->AffixSlot == EAtomAffixSlot::Prefix)
 		{
 			EligiblePrefixes.Add(AffixDef);
 		}
@@ -36,12 +36,12 @@ TArray<FOutlawItemAffix> UOutlawAffixPoolDefinition::RollAffixes(int32 ItemLevel
 	}
 
 	// Helper lambda: weighted random pick from a pool, excluding already-used group tags
-	auto RollFromPool = [&Result](TArray<UOutlawAffixDefinition*>& Pool, int32 Count, EOutlawAffixSlot Slot)
+	auto RollFromPool = [&Result](TArray<UAtomAffixDefinition*>& Pool, int32 Count, EAtomAffixSlot Slot)
 	{
 		TSet<FGameplayTag> UsedGroups;
 
 		// Collect groups already used by previously rolled affixes
-		for (const FOutlawItemAffix& Existing : Result)
+		for (const FAtomItemAffix& Existing : Result)
 		{
 			if (Existing.AffixDef && Existing.AffixDef->AffixGroupTag.IsValid())
 			{
@@ -52,11 +52,11 @@ TArray<FOutlawItemAffix> UOutlawAffixPoolDefinition::RollAffixes(int32 ItemLevel
 		for (int32 i = 0; i < Count; ++i)
 		{
 			// Build weighted candidate list excluding used groups
-			TArray<UOutlawAffixDefinition*> Candidates;
+			TArray<UAtomAffixDefinition*> Candidates;
 			TArray<int32> Weights;
 			int32 TotalWeight = 0;
 
-			for (UOutlawAffixDefinition* Def : Pool)
+			for (UAtomAffixDefinition* Def : Pool)
 			{
 				if (Def->AffixGroupTag.IsValid() && UsedGroups.Contains(Def->AffixGroupTag))
 				{
@@ -85,10 +85,10 @@ TArray<FOutlawItemAffix> UOutlawAffixPoolDefinition::RollAffixes(int32 ItemLevel
 				}
 			}
 
-			UOutlawAffixDefinition* Selected = Candidates[SelectedIndex];
+			UAtomAffixDefinition* Selected = Candidates[SelectedIndex];
 
 			// Roll the value
-			FOutlawItemAffix NewAffix;
+			FAtomItemAffix NewAffix;
 			NewAffix.AffixDef = Selected;
 			NewAffix.Slot = Slot;
 			NewAffix.RolledValue = FMath::FRandRange(Selected->ValueMin, Selected->ValueMax);
@@ -102,8 +102,8 @@ TArray<FOutlawItemAffix> UOutlawAffixPoolDefinition::RollAffixes(int32 ItemLevel
 		}
 	};
 
-	RollFromPool(EligiblePrefixes, FMath::Min(NumPrefixes, MaxPrefixes), EOutlawAffixSlot::Prefix);
-	RollFromPool(EligibleSuffixes, FMath::Min(NumSuffixes, MaxSuffixes), EOutlawAffixSlot::Suffix);
+	RollFromPool(EligiblePrefixes, FMath::Min(NumPrefixes, MaxPrefixes), EAtomAffixSlot::Prefix);
+	RollFromPool(EligibleSuffixes, FMath::Min(NumSuffixes, MaxSuffixes), EAtomAffixSlot::Suffix);
 
 	return Result;
 }

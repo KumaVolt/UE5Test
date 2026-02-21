@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawAnimationTypes.generated.h"
+#include "AtomAnimationTypes.generated.h"
 
 class UAnimMontage;
 
@@ -12,7 +12,7 @@ class UAnimMontage;
  * Hit reaction type based on damage percentage.
  */
 UENUM(BlueprintType)
-enum class EOutlawHitReactionType : uint8
+enum class EAtomHitReactionType : uint8
 {
 	None        UMETA(DisplayName = "None"),
 	Light       UMETA(DisplayName = "Light"),     // < 10% MaxHealth
@@ -24,7 +24,7 @@ enum class EOutlawHitReactionType : uint8
  * Directional hit reaction variants.
  */
 UENUM(BlueprintType)
-enum class EOutlawHitDirection : uint8
+enum class EAtomHitDirection : uint8
 {
 	Front       UMETA(DisplayName = "Front"),
 	Back        UMETA(DisplayName = "Back"),
@@ -36,15 +36,15 @@ enum class EOutlawHitDirection : uint8
  * Configuration for a single hit reaction montage.
  */
 USTRUCT(BlueprintType)
-struct FOutlawHitReactionConfig
+struct FAtomHitReactionConfig
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EOutlawHitReactionType ReactionType = EOutlawHitReactionType::None;
+	EAtomHitReactionType ReactionType = EAtomHitReactionType::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EOutlawHitDirection Direction = EOutlawHitDirection::Front;
+	EAtomHitDirection Direction = EAtomHitDirection::Front;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> Montage = nullptr;
@@ -57,7 +57,7 @@ struct FOutlawHitReactionConfig
  * Namespace for Animation Gameplay Tags.
  * Register these tags in your project's DefaultGameplayTags.ini or via data asset.
  */
-namespace OutlawAnimTags
+namespace AtomAnimTags
 {
 	// Combat.DamageWindowActive — set during melee damage window notifies
 	inline const FGameplayTag DamageWindowActive = FGameplayTag::RequestGameplayTag(TEXT("Combat.DamageWindowActive"));

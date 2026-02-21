@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "OutlawDeathTypes.h"
-#include "OutlawCombatLogComponent.generated.h"
+#include "AtomDeathTypes.h"
+#include "AtomCombatLogComponent.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawCombatLogComponent : public UActorComponent
+class OUTLAW_API UAtomCombatLogComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawCombatLogComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomCombatLogComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UFUNCTION(BlueprintCallable, Category = "CombatLog")
-	void AddEntry(const FOutlawCombatLogEntry& Entry);
+	void AddEntry(const FAtomCombatLogEntry& Entry);
 
 	UFUNCTION(BlueprintCallable, Category = "CombatLog")
-	const TArray<FOutlawCombatLogEntry>& GetEntries() const { return CombatLogEntries; }
+	const TArray<FAtomCombatLogEntry>& GetEntries() const { return CombatLogEntries; }
 
 	UPROPERTY(BlueprintAssignable, Category = "CombatLog")
 	FOnCombatLogEntryAdded OnCombatLogEntryAdded;
@@ -29,5 +29,5 @@ public:
 
 private:
 	UPROPERTY()
-	TArray<FOutlawCombatLogEntry> CombatLogEntries;
+	TArray<FAtomCombatLogEntry> CombatLogEntries;
 };

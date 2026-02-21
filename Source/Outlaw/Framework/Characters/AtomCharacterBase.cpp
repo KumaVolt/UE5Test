@@ -1,21 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawCharacterBase.h"
-#include "AbilitySystem/OutlawAbilitySystemComponent.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
+#include "AtomCharacterBase.h"
+#include "AbilitySystem/AtomAbilitySystemComponent.h"
+#include "AbilitySystem/AtomAbilitySet.h"
 
-AOutlawCharacterBase::AOutlawCharacterBase(const FObjectInitializer& ObjectInitializer)
+AAtomCharacterBase::AAtomCharacterBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-UAbilitySystemComponent* AOutlawCharacterBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* AAtomCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
 
-void AOutlawCharacterBase::GrantDefaultAbilitySet()
+void AAtomCharacterBase::GrantDefaultAbilitySet()
 {
 	if (!AbilitySystemComponent || !DefaultAbilitySet)
 	{
@@ -30,7 +30,7 @@ void AOutlawCharacterBase::GrantDefaultAbilitySet()
 	DefaultAbilitySetHandles = AbilitySystemComponent->GrantAbilitySet(DefaultAbilitySet, this);
 }
 
-void AOutlawCharacterBase::RevokeDefaultAbilitySet()
+void AAtomCharacterBase::RevokeDefaultAbilitySet()
 {
 	if (!AbilitySystemComponent)
 	{

@@ -5,26 +5,26 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Net/Serialization/FastArraySerializer.h"
-#include "AbilitySystem/OutlawAbilityTypes.h"
-#include "OutlawInventoryTypes.generated.h"
+#include "AbilitySystem/AtomAbilityTypes.h"
+#include "AtomInventoryTypes.generated.h"
 
-class UOutlawItemDefinition;
-class UOutlawItemInstance;
-class UOutlawInventoryComponent;
-class UOutlawWeaponModDefinition;
-class UOutlawSkillGemDefinition;
-class UOutlawAffixDefinition;
+class UAtomItemDefinition;
+class UAtomItemInstance;
+class UAtomInventoryComponent;
+class UAtomWeaponModDefinition;
+class UAtomSkillGemDefinition;
+class UAtomAffixDefinition;
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawInventoryEntry — A single inventory slot (FFastArraySerializer item)
+// FAtomInventoryEntry — A single inventory slot (FFastArraySerializer item)
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawInventoryEntry : public FFastArraySerializerItem
+struct FAtomInventoryEntry : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
-	FOutlawInventoryEntry()
+	FAtomInventoryEntry()
 		: ItemDef(nullptr)
 		, StackCount(0)
 		, InstanceId(INDEX_NONE)
@@ -35,7 +35,7 @@ struct FOutlawInventoryEntry : public FFastArraySerializerItem
 
 	/** The item definition for this entry. */
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
-	TObjectPtr<UOutlawItemDefinition> ItemDef;
+	TObjectPtr<UAtomItemDefinition> ItemDef;
 
 	/** How many items are in this stack. */
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
@@ -55,60 +55,60 @@ struct FOutlawInventoryEntry : public FFastArraySerializerItem
 
 	/** Per-item mutable state (ammo, affixes, gems, etc.). Only set for weapons. */
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
-	TObjectPtr<UOutlawItemInstance> ItemInstance;
+	TObjectPtr<UAtomItemInstance> ItemInstance;
 
 	// FFastArraySerializerItem callbacks
-	void PreReplicatedRemove(const struct FOutlawInventoryList& InArraySerializer);
-	void PostReplicatedAdd(const struct FOutlawInventoryList& InArraySerializer);
-	void PostReplicatedChange(const struct FOutlawInventoryList& InArraySerializer);
+	void PreReplicatedRemove(const struct FAtomInventoryList& InArraySerializer);
+	void PostReplicatedAdd(const struct FAtomInventoryList& InArraySerializer);
+	void PostReplicatedChange(const struct FAtomInventoryList& InArraySerializer);
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawInventoryList — Replicated array of inventory entries
+// FAtomInventoryList — Replicated array of inventory entries
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawInventoryList : public FFastArraySerializer
+struct FAtomInventoryList : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
-	FOutlawInventoryList()
+	FAtomInventoryList()
 		: OwnerComponent(nullptr)
 	{
 	}
 
-	explicit FOutlawInventoryList(UOutlawInventoryComponent* InOwner)
+	explicit FAtomInventoryList(UAtomInventoryComponent* InOwner)
 		: OwnerComponent(InOwner)
 	{
 	}
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 	{
-		return FFastArraySerializer::FastArrayDeltaSerialize<FOutlawInventoryEntry, FOutlawInventoryList>(Entries, DeltaParms, *this);
+		return FFastArraySerializer::FastArrayDeltaSerialize<FAtomInventoryEntry, FAtomInventoryList>(Entries, DeltaParms, *this);
 	}
 
 	/** Add an entry and mark the array dirty. Returns the new entry's index. GridX/GridY default to INDEX_NONE (flat mode). */
-	int32 AddEntry(UOutlawItemDefinition* ItemDef, int32 StackCount, int32 InstanceId, int32 GridX = INDEX_NONE, int32 GridY = INDEX_NONE);
+	int32 AddEntry(UAtomItemDefinition* ItemDef, int32 StackCount, int32 InstanceId, int32 GridX = INDEX_NONE, int32 GridY = INDEX_NONE);
 
 	/** Remove an entry by instance ID. Returns true if found and removed. */
 	bool RemoveEntry(int32 InstanceId);
 
 	/** Find an entry by instance ID. Returns nullptr if not found. */
-	FOutlawInventoryEntry* FindEntry(int32 InstanceId);
-	const FOutlawInventoryEntry* FindEntry(int32 InstanceId) const;
+	FAtomInventoryEntry* FindEntry(int32 InstanceId);
+	const FAtomInventoryEntry* FindEntry(int32 InstanceId) const;
 
 	/** All inventory entries. */
 	UPROPERTY()
-	TArray<FOutlawInventoryEntry> Entries;
+	TArray<FAtomInventoryEntry> Entries;
 
 	/** Back-pointer to the owning component. */
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UOutlawInventoryComponent> OwnerComponent;
+	TObjectPtr<UAtomInventoryComponent> OwnerComponent;
 };
 
-/** Enable NetDeltaSerialize for FOutlawInventoryList. */
+/** Enable NetDeltaSerialize for FAtomInventoryList. */
 template<>
-struct TStructOpsTypeTraits<FOutlawInventoryList> : public TStructOpsTypeTraitsBase2<FOutlawInventoryList>
+struct TStructOpsTypeTraits<FAtomInventoryList> : public TStructOpsTypeTraitsBase2<FAtomInventoryList>
 {
 	enum
 	{
@@ -117,15 +117,15 @@ struct TStructOpsTypeTraits<FOutlawInventoryList> : public TStructOpsTypeTraitsB
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawEquipmentSlotInfo — Tracks what's equipped in each slot
+// FAtomEquipmentSlotInfo — Tracks what's equipped in each slot
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawEquipmentSlotInfo
+struct FAtomEquipmentSlotInfo
 {
 	GENERATED_BODY()
 
-	FOutlawEquipmentSlotInfo()
+	FAtomEquipmentSlotInfo()
 		: EquippedItemInstanceId(INDEX_NONE)
 	{
 	}
@@ -140,15 +140,15 @@ struct FOutlawEquipmentSlotInfo
 
 	/** Handles for abilities granted by the equipped item. Not replicated — server only. */
 	UPROPERTY(NotReplicated)
-	FOutlawAbilitySetGrantedHandles GrantedHandles;
+	FAtomAbilitySetGrantedHandles GrantedHandles;
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawSavedAffix — Serialized affix for save/load
+// FAtomSavedAffix — Serialized affix for save/load
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawSavedAffix
+struct FAtomSavedAffix
 {
 	GENERATED_BODY()
 
@@ -166,11 +166,11 @@ struct FOutlawSavedAffix
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawInventoryItemSaveEntry — Single item save record
+// FAtomInventoryItemSaveEntry — Single item save record
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawInventoryItemSaveEntry
+struct FAtomInventoryItemSaveEntry
 {
 	GENERATED_BODY()
 
@@ -206,7 +206,7 @@ struct FOutlawInventoryItemSaveEntry
 
 	/** Saved affix definitions and rolled values. */
 	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
-	TArray<FOutlawSavedAffix> SavedAffixes;
+	TArray<FAtomSavedAffix> SavedAffixes;
 
 	/** Saved socketed gem paths per socket index. */
 	UPROPERTY(BlueprintReadWrite, Category = "Save|Weapon")
@@ -222,14 +222,14 @@ struct FOutlawInventoryItemSaveEntry
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawInventorySaveData — Complete inventory snapshot for save/load
+// FAtomInventorySaveData — Complete inventory snapshot for save/load
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawInventorySaveData
+struct FAtomInventorySaveData
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "Save")
-	TArray<FOutlawInventoryItemSaveEntry> Items;
+	TArray<FAtomInventoryItemSaveEntry> Items;
 };

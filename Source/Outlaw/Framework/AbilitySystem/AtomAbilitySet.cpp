@@ -1,31 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawAbilitySet.h"
+#include "AtomAbilitySet.h"
 #include "AbilitySystemComponent.h"
-#include "OutlawGameplayAbility.h"
+#include "AtomGameplayAbility.h"
 #include "Engine/DataTable.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawAbilitySet, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomAbilitySet, Log, All);
 
-UOutlawAbilitySet::UOutlawAbilitySet(const FObjectInitializer& ObjectInitializer)
+UAtomAbilitySet::UAtomAbilitySet(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-void UOutlawAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObject* SourceObject, FOutlawAbilitySetGrantedHandles& OutHandles) const
+void UAtomAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObject* SourceObject, FAtomAbilitySetGrantedHandles& OutHandles) const
 {
 	if (!ASC)
 	{
-		UE_LOG(LogOutlawAbilitySet, Error, TEXT("GiveToAbilitySystem called with null ASC. Set: %s"), *GetName());
+		UE_LOG(LogAtomAbilitySet, Error, TEXT("GiveToAbilitySystem called with null ASC. Set: %s"), *GetName());
 		return;
 	}
 
 	// Grant abilities
-	for (const FOutlawAbilityBindInfo& AbilityInfo : Abilities)
+	for (const FAtomAbilityBindInfo& AbilityInfo : Abilities)
 	{
 		if (!AbilityInfo.AbilityClass)
 		{
-			UE_LOG(LogOutlawAbilitySet, Error, TEXT("Null ability class in set %s. Skipping."), *GetName());
+			UE_LOG(LogAtomAbilitySet, Error, TEXT("Null ability class in set %s. Skipping."), *GetName());
 			continue;
 		}
 
@@ -42,11 +42,11 @@ void UOutlawAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObjec
 	}
 
 	// Apply effects
-	for (const FOutlawGrantedEffect& EffectInfo : Effects)
+	for (const FAtomGrantedEffect& EffectInfo : Effects)
 	{
 		if (!EffectInfo.EffectClass)
 		{
-			UE_LOG(LogOutlawAbilitySet, Error, TEXT("Null effect class in set %s. Skipping."), *GetName());
+			UE_LOG(LogAtomAbilitySet, Error, TEXT("Null effect class in set %s. Skipping."), *GetName());
 			continue;
 		}
 
@@ -62,11 +62,11 @@ void UOutlawAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObjec
 	}
 
 	// Grant attribute sets
-	for (const FOutlawGrantedAttributeSet& AttribSetInfo : AttributeSets)
+	for (const FAtomGrantedAttributeSet& AttribSetInfo : AttributeSets)
 	{
 		if (!AttribSetInfo.AttributeSetClass)
 		{
-			UE_LOG(LogOutlawAbilitySet, Error, TEXT("Null attribute set class in set %s. Skipping."), *GetName());
+			UE_LOG(LogAtomAbilitySet, Error, TEXT("Null attribute set class in set %s. Skipping."), *GetName());
 			continue;
 		}
 
@@ -76,27 +76,27 @@ void UOutlawAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObjec
 	}
 }
 
-void UOutlawAbilitySet::PopulateFromDataTable(const UDataTable* DataTable)
+void UAtomAbilitySet::PopulateFromDataTable(const UDataTable* DataTable)
 {
 	if (!DataTable)
 	{
-		UE_LOG(LogOutlawAbilitySet, Warning, TEXT("PopulateFromDataTable called with null DataTable."));
+		UE_LOG(LogAtomAbilitySet, Warning, TEXT("PopulateFromDataTable called with null DataTable."));
 		return;
 	}
 
 	Abilities.Reset();
 
-	TArray<FOutlawAbilityTableRow*> Rows;
-	DataTable->GetAllRows<FOutlawAbilityTableRow>(TEXT("PopulateFromDataTable"), Rows);
+	TArray<FAtomAbilityTableRow*> Rows;
+	DataTable->GetAllRows<FAtomAbilityTableRow>(TEXT("PopulateFromDataTable"), Rows);
 
-	for (const FOutlawAbilityTableRow* Row : Rows)
+	for (const FAtomAbilityTableRow* Row : Rows)
 	{
 		if (!Row || !Row->AbilityClass)
 		{
 			continue;
 		}
 
-		FOutlawAbilityBindInfo Info;
+		FAtomAbilityBindInfo Info;
 		Info.AbilityClass = Row->AbilityClass;
 		Info.AbilityLevel = Row->AbilityLevel;
 		Info.InputTag = Row->InputTag;

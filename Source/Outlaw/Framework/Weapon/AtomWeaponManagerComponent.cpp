@@ -1,43 +1,43 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawWeaponManagerComponent.h"
-#include "Inventory/OutlawItemInstance.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Inventory/OutlawInventoryComponent.h"
-#include "OutlawShooterWeaponData.h"
-#include "OutlawARPGWeaponData.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
-#include "AbilitySystem/OutlawWeaponAttributeSet.h"
+#include "AtomWeaponManagerComponent.h"
+#include "Inventory/AtomItemInstance.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Inventory/AtomInventoryComponent.h"
+#include "AtomShooterWeaponData.h"
+#include "AtomARPGWeaponData.h"
+#include "AbilitySystem/AtomAbilitySet.h"
+#include "AbilitySystem/AtomWeaponAttributeSet.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawWeaponManager, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomWeaponManager, Log, All);
 
-UOutlawWeaponManagerComponent::UOutlawWeaponManagerComponent(const FObjectInitializer& ObjectInitializer)
+UAtomWeaponManagerComponent::UAtomWeaponManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 }
 
-void UOutlawWeaponManagerComponent::BeginPlay()
+void UAtomWeaponManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void UOutlawWeaponManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UAtomWeaponManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UOutlawWeaponManagerComponent, ActiveWeaponSlotTag);
-	DOREPLIFETIME(UOutlawWeaponManagerComponent, ActiveWeaponSetIndex);
-	DOREPLIFETIME(UOutlawWeaponManagerComponent, ReserveAmmo);
+	DOREPLIFETIME(UAtomWeaponManagerComponent, ActiveWeaponSlotTag);
+	DOREPLIFETIME(UAtomWeaponManagerComponent, ActiveWeaponSetIndex);
+	DOREPLIFETIME(UAtomWeaponManagerComponent, ReserveAmmo);
 }
 
 // ── Shooter API ─────────────────────────────────────────────────
 
-void UOutlawWeaponManagerComponent::CycleWeapon()
+void UAtomWeaponManagerComponent::CycleWeapon()
 {
 	if (!GetOwner()->HasAuthority() || ShooterWeaponSlotOrder.Num() == 0)
 	{
@@ -58,7 +58,7 @@ void UOutlawWeaponManagerComponent::CycleWeapon()
 	SwitchToWeaponSlot(ShooterWeaponSlotOrder[CurrentIndex]);
 }
 
-void UOutlawWeaponManagerComponent::SwitchToWeaponSlot(FGameplayTag SlotTag)
+void UAtomWeaponManagerComponent::SwitchToWeaponSlot(FGameplayTag SlotTag)
 {
 	if (!GetOwner()->HasAuthority())
 	{
@@ -71,7 +71,7 @@ void UOutlawWeaponManagerComponent::SwitchToWeaponSlot(FGameplayTag SlotTag)
 	}
 
 	// Deactivate current weapon
-	UOutlawItemInstance* OldWeapon = GetActiveWeapon();
+	UAtomItemInstance* OldWeapon = GetActiveWeapon();
 	if (OldWeapon)
 	{
 		DeactivateWeapon(OldWeapon);
@@ -80,7 +80,7 @@ void UOutlawWeaponManagerComponent::SwitchToWeaponSlot(FGameplayTag SlotTag)
 	ActiveWeaponSlotTag = SlotTag;
 
 	// Activate new weapon
-	UOutlawItemInstance* NewWeapon = GetWeaponInSlot(SlotTag);
+	UAtomItemInstance* NewWeapon = GetWeaponInSlot(SlotTag);
 	if (NewWeapon)
 	{
 		ActivateWeapon(NewWeapon);
@@ -89,7 +89,7 @@ void UOutlawWeaponManagerComponent::SwitchToWeaponSlot(FGameplayTag SlotTag)
 	OnActiveWeaponChanged.Broadcast(NewWeapon);
 }
 
-UOutlawItemInstance* UOutlawWeaponManagerComponent::GetActiveWeapon() const
+UAtomItemInstance* UAtomWeaponManagerComponent::GetActiveWeapon() const
 {
 	if (!ActiveWeaponSlotTag.IsValid())
 	{
@@ -98,9 +98,9 @@ UOutlawItemInstance* UOutlawWeaponManagerComponent::GetActiveWeapon() const
 	return GetWeaponInSlot(ActiveWeaponSlotTag);
 }
 
-int32 UOutlawWeaponManagerComponent::GetReserveAmmo(FGameplayTag AmmoTypeTag) const
+int32 UAtomWeaponManagerComponent::GetReserveAmmo(FGameplayTag AmmoTypeTag) const
 {
-	for (const FOutlawReserveAmmoEntry& Entry : ReserveAmmo)
+	for (const FAtomReserveAmmoEntry& Entry : ReserveAmmo)
 	{
 		if (Entry.AmmoTypeTag == AmmoTypeTag)
 		{
@@ -110,14 +110,14 @@ int32 UOutlawWeaponManagerComponent::GetReserveAmmo(FGameplayTag AmmoTypeTag) co
 	return 0;
 }
 
-void UOutlawWeaponManagerComponent::AddReserveAmmo(FGameplayTag AmmoTypeTag, int32 Amount)
+void UAtomWeaponManagerComponent::AddReserveAmmo(FGameplayTag AmmoTypeTag, int32 Amount)
 {
 	if (!GetOwner()->HasAuthority() || Amount <= 0 || !AmmoTypeTag.IsValid())
 	{
 		return;
 	}
 
-	for (FOutlawReserveAmmoEntry& Entry : ReserveAmmo)
+	for (FAtomReserveAmmoEntry& Entry : ReserveAmmo)
 	{
 		if (Entry.AmmoTypeTag == AmmoTypeTag)
 		{
@@ -127,20 +127,20 @@ void UOutlawWeaponManagerComponent::AddReserveAmmo(FGameplayTag AmmoTypeTag, int
 	}
 
 	// Create new entry
-	FOutlawReserveAmmoEntry NewEntry;
+	FAtomReserveAmmoEntry NewEntry;
 	NewEntry.AmmoTypeTag = AmmoTypeTag;
 	NewEntry.Amount = Amount;
 	ReserveAmmo.Add(NewEntry);
 }
 
-int32 UOutlawWeaponManagerComponent::ConsumeReserveAmmo(FGameplayTag AmmoTypeTag, int32 Amount)
+int32 UAtomWeaponManagerComponent::ConsumeReserveAmmo(FGameplayTag AmmoTypeTag, int32 Amount)
 {
 	if (!GetOwner()->HasAuthority() || Amount <= 0 || !AmmoTypeTag.IsValid())
 	{
 		return 0;
 	}
 
-	for (FOutlawReserveAmmoEntry& Entry : ReserveAmmo)
+	for (FAtomReserveAmmoEntry& Entry : ReserveAmmo)
 	{
 		if (Entry.AmmoTypeTag == AmmoTypeTag)
 		{
@@ -159,7 +159,7 @@ int32 UOutlawWeaponManagerComponent::ConsumeReserveAmmo(FGameplayTag AmmoTypeTag
 
 // ── ARPG API ────────────────────────────────────────────────────
 
-void UOutlawWeaponManagerComponent::SwapWeaponSet()
+void UAtomWeaponManagerComponent::SwapWeaponSet()
 {
 	if (!GetOwner()->HasAuthority())
 	{
@@ -170,7 +170,7 @@ void UOutlawWeaponManagerComponent::SwapWeaponSet()
 	RevokeWeaponSetAbilities(ActiveWeaponSetIndex);
 
 	// Deactivate current active weapon (for attribute clearing)
-	UOutlawItemInstance* OldWeapon = GetActiveWeapon();
+	UAtomItemInstance* OldWeapon = GetActiveWeapon();
 	if (OldWeapon)
 	{
 		DeactivateWeapon(OldWeapon);
@@ -183,7 +183,7 @@ void UOutlawWeaponManagerComponent::SwapWeaponSet()
 	GrantWeaponSetAbilities(ActiveWeaponSetIndex);
 
 	// Activate first weapon in new set for stats
-	TArray<UOutlawItemInstance*> NewSetWeapons = GetWeaponsInSet(ActiveWeaponSetIndex);
+	TArray<UAtomItemInstance*> NewSetWeapons = GetWeaponsInSet(ActiveWeaponSetIndex);
 	if (NewSetWeapons.Num() > 0 && NewSetWeapons[0])
 	{
 		ActivateWeapon(NewSetWeapons[0]);
@@ -193,14 +193,14 @@ void UOutlawWeaponManagerComponent::SwapWeaponSet()
 	OnActiveWeaponChanged.Broadcast(NewSetWeapons.Num() > 0 ? NewSetWeapons[0] : nullptr);
 }
 
-TArray<UOutlawItemInstance*> UOutlawWeaponManagerComponent::GetWeaponsInSet(int32 SetIndex) const
+TArray<UAtomItemInstance*> UAtomWeaponManagerComponent::GetWeaponsInSet(int32 SetIndex) const
 {
-	TArray<UOutlawItemInstance*> Result;
+	TArray<UAtomItemInstance*> Result;
 	const TArray<FGameplayTag>& SlotTags = (SetIndex == 0) ? ARPGWeaponSetI : ARPGWeaponSetII;
 
 	for (const FGameplayTag& SlotTag : SlotTags)
 	{
-		UOutlawItemInstance* Instance = GetWeaponInSlot(SlotTag);
+		UAtomItemInstance* Instance = GetWeaponInSlot(SlotTag);
 		if (Instance)
 		{
 			Result.Add(Instance);
@@ -212,7 +212,7 @@ TArray<UOutlawItemInstance*> UOutlawWeaponManagerComponent::GetWeaponsInSet(int3
 
 // ── Inventory Callbacks ─────────────────────────────────────────
 
-void UOutlawWeaponManagerComponent::OnWeaponEquipped(UOutlawItemInstance* Instance, FGameplayTag SlotTag)
+void UAtomWeaponManagerComponent::OnWeaponEquipped(UAtomItemInstance* Instance, FGameplayTag SlotTag)
 {
 	if (!Instance)
 	{
@@ -238,7 +238,7 @@ void UOutlawWeaponManagerComponent::OnWeaponEquipped(UOutlawItemInstance* Instan
 	}
 }
 
-void UOutlawWeaponManagerComponent::OnWeaponUnequipped(UOutlawItemInstance* Instance, FGameplayTag SlotTag)
+void UAtomWeaponManagerComponent::OnWeaponUnequipped(UAtomItemInstance* Instance, FGameplayTag SlotTag)
 {
 	if (!Instance)
 	{
@@ -266,7 +266,7 @@ void UOutlawWeaponManagerComponent::OnWeaponUnequipped(UOutlawItemInstance* Inst
 
 // ── Attribute Management ────────────────────────────────────────
 
-void UOutlawWeaponManagerComponent::ApplyWeaponStatsToASC(UOutlawItemInstance* Instance)
+void UAtomWeaponManagerComponent::ApplyWeaponStatsToASC(UAtomItemInstance* Instance)
 {
 	if (!Instance || !Instance->ItemDef)
 	{
@@ -279,19 +279,19 @@ void UOutlawWeaponManagerComponent::ApplyWeaponStatsToASC(UOutlawItemInstance* I
 		return;
 	}
 
-	const UOutlawWeaponAttributeSet* WeaponAttribs = ASC->GetSet<UOutlawWeaponAttributeSet>();
+	const UAtomWeaponAttributeSet* WeaponAttribs = ASC->GetSet<UAtomWeaponAttributeSet>();
 	if (!WeaponAttribs)
 	{
 		return;
 	}
 
 	// Cast away const — we're the authority setting base values
-	UOutlawWeaponAttributeSet* MutableAttribs = const_cast<UOutlawWeaponAttributeSet*>(WeaponAttribs);
+	UAtomWeaponAttributeSet* MutableAttribs = const_cast<UAtomWeaponAttributeSet*>(WeaponAttribs);
 
 	// Apply shooter stats
 	if (Instance->ItemDef->ShooterWeaponData)
 	{
-		const UOutlawShooterWeaponData* Data = Instance->ItemDef->ShooterWeaponData;
+		const UAtomShooterWeaponData* Data = Instance->ItemDef->ShooterWeaponData;
 		MutableAttribs->SetFirepower(Data->Firepower);
 		MutableAttribs->SetRPM(Data->RPM);
 		MutableAttribs->SetAccuracy(Data->Accuracy);
@@ -303,7 +303,7 @@ void UOutlawWeaponManagerComponent::ApplyWeaponStatsToASC(UOutlawItemInstance* I
 	// Apply ARPG stats
 	if (Instance->ItemDef->ARPGWeaponData)
 	{
-		const UOutlawARPGWeaponData* Data = Instance->ItemDef->ARPGWeaponData;
+		const UAtomARPGWeaponData* Data = Instance->ItemDef->ARPGWeaponData;
 		MutableAttribs->SetPhysicalDamageMin(Data->PhysicalDamageMin);
 		MutableAttribs->SetPhysicalDamageMax(Data->PhysicalDamageMax);
 		MutableAttribs->SetAttackSpeed(Data->AttackSpeed);
@@ -311,7 +311,7 @@ void UOutlawWeaponManagerComponent::ApplyWeaponStatsToASC(UOutlawItemInstance* I
 	}
 }
 
-void UOutlawWeaponManagerComponent::ClearWeaponStatsFromASC()
+void UAtomWeaponManagerComponent::ClearWeaponStatsFromASC()
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -319,13 +319,13 @@ void UOutlawWeaponManagerComponent::ClearWeaponStatsFromASC()
 		return;
 	}
 
-	const UOutlawWeaponAttributeSet* WeaponAttribs = ASC->GetSet<UOutlawWeaponAttributeSet>();
+	const UAtomWeaponAttributeSet* WeaponAttribs = ASC->GetSet<UAtomWeaponAttributeSet>();
 	if (!WeaponAttribs)
 	{
 		return;
 	}
 
-	UOutlawWeaponAttributeSet* MutableAttribs = const_cast<UOutlawWeaponAttributeSet*>(WeaponAttribs);
+	UAtomWeaponAttributeSet* MutableAttribs = const_cast<UAtomWeaponAttributeSet*>(WeaponAttribs);
 	MutableAttribs->SetFirepower(0.0f);
 	MutableAttribs->SetRPM(0.0f);
 	MutableAttribs->SetAccuracy(0.0f);
@@ -340,7 +340,7 @@ void UOutlawWeaponManagerComponent::ClearWeaponStatsFromASC()
 
 // ── Private Helpers ─────────────────────────────────────────────
 
-UAbilitySystemComponent* UOutlawWeaponManagerComponent::GetASC() const
+UAbilitySystemComponent* UAtomWeaponManagerComponent::GetASC() const
 {
 	AActor* Owner = GetOwner();
 	if (!Owner)
@@ -367,15 +367,15 @@ UAbilitySystemComponent* UOutlawWeaponManagerComponent::GetASC() const
 	return nullptr;
 }
 
-UOutlawInventoryComponent* UOutlawWeaponManagerComponent::GetInventoryComponent() const
+UAtomInventoryComponent* UAtomWeaponManagerComponent::GetInventoryComponent() const
 {
 	AActor* Owner = GetOwner();
-	return Owner ? Owner->FindComponentByClass<UOutlawInventoryComponent>() : nullptr;
+	return Owner ? Owner->FindComponentByClass<UAtomInventoryComponent>() : nullptr;
 }
 
-UOutlawItemInstance* UOutlawWeaponManagerComponent::GetWeaponInSlot(FGameplayTag SlotTag) const
+UAtomItemInstance* UAtomWeaponManagerComponent::GetWeaponInSlot(FGameplayTag SlotTag) const
 {
-	UOutlawInventoryComponent* Inventory = GetInventoryComponent();
+	UAtomInventoryComponent* Inventory = GetInventoryComponent();
 	if (!Inventory)
 	{
 		return nullptr;
@@ -384,7 +384,7 @@ UOutlawItemInstance* UOutlawWeaponManagerComponent::GetWeaponInSlot(FGameplayTag
 	return Inventory->GetItemInstance(SlotTag);
 }
 
-void UOutlawWeaponManagerComponent::ActivateWeapon(UOutlawItemInstance* Instance)
+void UAtomWeaponManagerComponent::ActivateWeapon(UAtomItemInstance* Instance)
 {
 	if (!Instance || !Instance->ItemDef)
 	{
@@ -400,7 +400,7 @@ void UOutlawWeaponManagerComponent::ActivateWeapon(UOutlawItemInstance* Instance
 	// Grant weapon-specific ability sets
 	if (Instance->ItemDef->ShooterWeaponData)
 	{
-		const UOutlawShooterWeaponData* Data = Instance->ItemDef->ShooterWeaponData;
+		const UAtomShooterWeaponData* Data = Instance->ItemDef->ShooterWeaponData;
 		if (Data->FireAbilitySet)
 		{
 			Data->FireAbilitySet->GiveToAbilitySystem(ASC, Instance, ActiveWeaponAbilityHandles);
@@ -413,7 +413,7 @@ void UOutlawWeaponManagerComponent::ActivateWeapon(UOutlawItemInstance* Instance
 
 	if (Instance->ItemDef->ARPGWeaponData)
 	{
-		const UOutlawARPGWeaponData* Data = Instance->ItemDef->ARPGWeaponData;
+		const UAtomARPGWeaponData* Data = Instance->ItemDef->ARPGWeaponData;
 		if (Data->DefaultAttackAbilitySet)
 		{
 			Data->DefaultAttackAbilitySet->GiveToAbilitySystem(ASC, Instance, ActiveWeaponAbilityHandles);
@@ -424,7 +424,7 @@ void UOutlawWeaponManagerComponent::ActivateWeapon(UOutlawItemInstance* Instance
 	ApplyWeaponStatsToASC(Instance);
 }
 
-void UOutlawWeaponManagerComponent::DeactivateWeapon(UOutlawItemInstance* Instance)
+void UAtomWeaponManagerComponent::DeactivateWeapon(UAtomItemInstance* Instance)
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (ASC)
@@ -435,7 +435,7 @@ void UOutlawWeaponManagerComponent::DeactivateWeapon(UOutlawItemInstance* Instan
 	ClearWeaponStatsFromASC();
 }
 
-void UOutlawWeaponManagerComponent::GrantWeaponSetAbilities(int32 SetIndex)
+void UAtomWeaponManagerComponent::GrantWeaponSetAbilities(int32 SetIndex)
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -443,8 +443,8 @@ void UOutlawWeaponManagerComponent::GrantWeaponSetAbilities(int32 SetIndex)
 		return;
 	}
 
-	TArray<UOutlawItemInstance*> Weapons = GetWeaponsInSet(SetIndex);
-	for (UOutlawItemInstance* Weapon : Weapons)
+	TArray<UAtomItemInstance*> Weapons = GetWeaponsInSet(SetIndex);
+	for (UAtomItemInstance* Weapon : Weapons)
 	{
 		if (Weapon)
 		{
@@ -453,7 +453,7 @@ void UOutlawWeaponManagerComponent::GrantWeaponSetAbilities(int32 SetIndex)
 	}
 }
 
-void UOutlawWeaponManagerComponent::RevokeWeaponSetAbilities(int32 SetIndex)
+void UAtomWeaponManagerComponent::RevokeWeaponSetAbilities(int32 SetIndex)
 {
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
@@ -461,8 +461,8 @@ void UOutlawWeaponManagerComponent::RevokeWeaponSetAbilities(int32 SetIndex)
 		return;
 	}
 
-	TArray<UOutlawItemInstance*> Weapons = GetWeaponsInSet(SetIndex);
-	for (UOutlawItemInstance* Weapon : Weapons)
+	TArray<UAtomItemInstance*> Weapons = GetWeaponsInSet(SetIndex);
+	for (UAtomItemInstance* Weapon : Weapons)
 	{
 		if (Weapon)
 		{

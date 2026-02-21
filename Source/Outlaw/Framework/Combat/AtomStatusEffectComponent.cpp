@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawStatusEffectComponent.h"
+#include "AtomStatusEffectComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 
-UOutlawStatusEffectComponent::UOutlawStatusEffectComponent(const FObjectInitializer& ObjectInitializer)
+UAtomStatusEffectComponent::UAtomStatusEffectComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawStatusEffectComponent::BeginPlay()
+void UAtomStatusEffectComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -40,11 +40,11 @@ void UOutlawStatusEffectComponent::BeginPlay()
 		BoundASC = ASC;
 		FGameplayTag StatusRootTag = FGameplayTag::RequestGameplayTag(FName("Status"));
 		ASC->RegisterGameplayTagEvent(StatusRootTag, EGameplayTagEventType::NewOrRemoved).AddUObject(
-			this, &UOutlawStatusEffectComponent::OnStatusTagChanged);
+			this, &UAtomStatusEffectComponent::OnStatusTagChanged);
 	}
 }
 
-void UOutlawStatusEffectComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UAtomStatusEffectComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	BoundASC.Reset();
 	ActiveEffects.Empty();
@@ -52,24 +52,24 @@ void UOutlawStatusEffectComponent::EndPlay(const EEndPlayReason::Type EndPlayRea
 	Super::EndPlay(EndPlayReason);
 }
 
-TArray<FOutlawActiveStatusEffect> UOutlawStatusEffectComponent::GetActiveStatusEffects() const
+TArray<FAtomActiveStatusEffect> UAtomStatusEffectComponent::GetActiveStatusEffects() const
 {
 	return ActiveEffects;
 }
 
-bool UOutlawStatusEffectComponent::HasStatusEffect(FGameplayTag StatusTag) const
+bool UAtomStatusEffectComponent::HasStatusEffect(FGameplayTag StatusTag) const
 {
-	return ActiveEffects.ContainsByPredicate([&StatusTag](const FOutlawActiveStatusEffect& Effect)
+	return ActiveEffects.ContainsByPredicate([&StatusTag](const FAtomActiveStatusEffect& Effect)
 	{
 		return Effect.StatusTag.MatchesTagExact(StatusTag);
 	});
 }
 
-void UOutlawStatusEffectComponent::OnStatusTagChanged(const FGameplayTag StatusTag, int32 NewCount)
+void UAtomStatusEffectComponent::OnStatusTagChanged(const FGameplayTag StatusTag, int32 NewCount)
 {
 	if (NewCount > 0)
 	{
-		FOutlawActiveStatusEffect* Existing = ActiveEffects.FindByPredicate([&StatusTag](const FOutlawActiveStatusEffect& Effect)
+		FAtomActiveStatusEffect* Existing = ActiveEffects.FindByPredicate([&StatusTag](const FAtomActiveStatusEffect& Effect)
 		{
 			return Effect.StatusTag.MatchesTagExact(StatusTag);
 		});
@@ -80,14 +80,14 @@ void UOutlawStatusEffectComponent::OnStatusTagChanged(const FGameplayTag StatusT
 		}
 		else
 		{
-			FOutlawActiveStatusEffect NewEffect(StatusTag, NewCount, -1.f);
+			FAtomActiveStatusEffect NewEffect(StatusTag, NewCount, -1.f);
 			ActiveEffects.Add(NewEffect);
 			OnStatusEffectAdded.Broadcast(StatusTag, NewCount);
 		}
 	}
 	else
 	{
-		int32 RemovedIndex = ActiveEffects.IndexOfByPredicate([&StatusTag](const FOutlawActiveStatusEffect& Effect)
+		int32 RemovedIndex = ActiveEffects.IndexOfByPredicate([&StatusTag](const FAtomActiveStatusEffect& Effect)
 		{
 			return Effect.StatusTag.MatchesTagExact(StatusTag);
 		});

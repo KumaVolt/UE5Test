@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "OutlawEnemyCharacter.h"
-#include "AbilitySystem/OutlawAbilitySystemComponent.h"
-#include "AI/OutlawAIController.h"
+#include "AbilitySystem/AtomAbilitySystemComponent.h"
+#include "AI/AtomAIController.h"
 #include "AI/OutlawDemoAIBehavior.h"
-#include "Combat/OutlawDeathComponent.h"
-#include "Combat/OutlawEnemyDeathHandler.h"
-#include "Combat/OutlawDamageNumberComponent.h"
-#include "Animation/OutlawHitReactionComponent.h"
-#include "Combat/OutlawStatusEffectComponent.h"
+#include "Combat/AtomDeathComponent.h"
+#include "Combat/AtomEnemyDeathHandler.h"
+#include "Combat/AtomDamageNumberComponent.h"
+#include "Animation/AtomHitReactionComponent.h"
+#include "Combat/AtomStatusEffectComponent.h"
 #include "Game/OutlawDemoAbilitySets.h"
 #include "Game/OutlawDemoDataSubsystem.h"
 #include "UI/OutlawDemoDamageNumber.h"
@@ -22,27 +22,27 @@ AOutlawEnemyCharacter::AOutlawEnemyCharacter(const FObjectInitializer& ObjectIni
 	PrimaryActorTick.bCanEverTick = true;
 
 	// ASC on enemy (Minimal replication)
-	AbilitySystemComponent = CreateDefaultSubobject<UOutlawAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UAtomAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	// AI
-	AIControllerClass = AOutlawAIController::StaticClass();
+	AIControllerClass = AAtomAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	// Combat components
-	DeathComponent = CreateDefaultSubobject<UOutlawDeathComponent>(TEXT("Death"));
+	DeathComponent = CreateDefaultSubobject<UAtomDeathComponent>(TEXT("Death"));
 
-	EnemyDeathHandler = CreateDefaultSubobject<UOutlawEnemyDeathHandler>(TEXT("EnemyDeathHandler"));
+	EnemyDeathHandler = CreateDefaultSubobject<UAtomEnemyDeathHandler>(TEXT("EnemyDeathHandler"));
 	EnemyDeathHandler->BaseXPReward = 50;
 	EnemyDeathHandler->NumLootDrops = 1;
 
-	DamageNumberComponent = CreateDefaultSubobject<UOutlawDamageNumberComponent>(TEXT("DamageNumber"));
+	DamageNumberComponent = CreateDefaultSubobject<UAtomDamageNumberComponent>(TEXT("DamageNumber"));
 	DamageNumberComponent->DamageNumberWidgetClass = UOutlawDemoDamageNumber::StaticClass();
 
-	HitReactionComponent = CreateDefaultSubobject<UOutlawHitReactionComponent>(TEXT("HitReaction"));
+	HitReactionComponent = CreateDefaultSubobject<UAtomHitReactionComponent>(TEXT("HitReaction"));
 	HitReactionComponent->bCanBeStaggered = true;
 
-	StatusEffectComponent = CreateDefaultSubobject<UOutlawStatusEffectComponent>(TEXT("StatusEffects"));
+	StatusEffectComponent = CreateDefaultSubobject<UAtomStatusEffectComponent>(TEXT("StatusEffects"));
 
 	// AI Behavior (replaces StateTree)
 	AIBehaviorComponent = CreateDefaultSubobject<UOutlawDemoAIBehavior>(TEXT("AIBehavior"));

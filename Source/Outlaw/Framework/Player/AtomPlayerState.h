@@ -5,21 +5,21 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "AbilitySystemInterface.h"
-#include "OutlawPlayerState.generated.h"
+#include "AtomPlayerState.generated.h"
 
-class UOutlawAbilitySystemComponent;
+class UAtomAbilitySystemComponent;
 
 UCLASS()
-class OUTLAW_API AOutlawPlayerState : public APlayerState, public IAbilitySystemInterface
+class OUTLAW_API AAtomPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
 public:
-	AOutlawPlayerState();
+	AAtomPlayerState();
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	UPROPERTY()
-	TObjectPtr<UOutlawAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAtomAbilitySystemComponent> AbilitySystemComponent;
 };

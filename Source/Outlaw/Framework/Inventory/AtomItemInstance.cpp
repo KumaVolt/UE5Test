@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawItemInstance.h"
-#include "OutlawItemDefinition.h"
+#include "AtomItemInstance.h"
+#include "AtomItemDefinition.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
-#include "Weapon/OutlawAffixDefinition.h"
-#include "Weapon/OutlawAffixPoolDefinition.h"
-#include "Weapon/OutlawSkillGemDefinition.h"
-#include "Weapon/OutlawWeaponModDefinition.h"
-#include "Weapon/OutlawARPGWeaponData.h"
+#include "AbilitySystem/AtomAbilitySet.h"
+#include "Weapon/AtomAffixDefinition.h"
+#include "Weapon/AtomAffixPoolDefinition.h"
+#include "Weapon/AtomSkillGemDefinition.h"
+#include "Weapon/AtomWeaponModDefinition.h"
+#include "Weapon/AtomARPGWeaponData.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawItemInstance, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomItemInstance, Log, All);
 
-UOutlawItemInstance::UOutlawItemInstance(const FObjectInitializer& ObjectInitializer)
+UAtomItemInstance::UAtomItemInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
 // ── Shooter Mod API ─────────────────────────────────────────────
 
-void UOutlawItemInstance::InstallMod(UOutlawWeaponModDefinition* ModDef, int32 Tier, UAbilitySystemComponent* ASC)
+void UAtomItemInstance::InstallMod(UAtomWeaponModDefinition* ModDef, int32 Tier, UAbilitySystemComponent* ASC)
 {
 	if (!ModDef || !ASC || (Tier != 1 && Tier != 2))
 	{
@@ -47,7 +47,7 @@ void UOutlawItemInstance::InstallMod(UOutlawWeaponModDefinition* ModDef, int32 T
 	}
 }
 
-void UOutlawItemInstance::RemoveMod(int32 Tier, UAbilitySystemComponent* ASC)
+void UAtomItemInstance::RemoveMod(int32 Tier, UAbilitySystemComponent* ASC)
 {
 	if (!ASC || (Tier != 1 && Tier != 2))
 	{
@@ -74,20 +74,20 @@ void UOutlawItemInstance::RemoveMod(int32 Tier, UAbilitySystemComponent* ASC)
 
 // ── ARPG Gem API ────────────────────────────────────────────────
 
-bool UOutlawItemInstance::SocketGem(UOutlawSkillGemDefinition* GemDef, int32 SocketIndex)
+bool UAtomItemInstance::SocketGem(UAtomSkillGemDefinition* GemDef, int32 SocketIndex)
 {
 	if (!GemDef || !SocketSlots.IsValidIndex(SocketIndex))
 	{
 		return false;
 	}
 
-	FOutlawSocketSlot& Socket = SocketSlots[SocketIndex];
+	FAtomSocketSlot& Socket = SocketSlots[SocketIndex];
 
 	// Check socket type compatibility
 	if (Socket.SocketTypeTag.IsValid() && GemDef->RequiredSocketTypeTag.IsValid()
 		&& Socket.SocketTypeTag != GemDef->RequiredSocketTypeTag)
 	{
-		UE_LOG(LogOutlawItemInstance, Warning, TEXT("SocketGem: Gem '%s' requires socket type '%s' but socket has '%s'."),
+		UE_LOG(LogAtomItemInstance, Warning, TEXT("SocketGem: Gem '%s' requires socket type '%s' but socket has '%s'."),
 			*GemDef->DisplayName.ToString(), *GemDef->RequiredSocketTypeTag.ToString(), *Socket.SocketTypeTag.ToString());
 		return false;
 	}
@@ -102,32 +102,32 @@ bool UOutlawItemInstance::SocketGem(UOutlawSkillGemDefinition* GemDef, int32 Soc
 	return true;
 }
 
-UOutlawSkillGemDefinition* UOutlawItemInstance::UnsocketGem(int32 SocketIndex)
+UAtomSkillGemDefinition* UAtomItemInstance::UnsocketGem(int32 SocketIndex)
 {
 	if (!SocketSlots.IsValidIndex(SocketIndex))
 	{
 		return nullptr;
 	}
 
-	FOutlawSocketSlot& Socket = SocketSlots[SocketIndex];
-	UOutlawSkillGemDefinition* RemovedGem = Socket.SocketedGem;
+	FAtomSocketSlot& Socket = SocketSlots[SocketIndex];
+	UAtomSkillGemDefinition* RemovedGem = Socket.SocketedGem;
 	Socket.SocketedGem = nullptr;
 	return RemovedGem;
 }
 
 // ── ARPG Affix API ──────────────────────────────────────────────
 
-void UOutlawItemInstance::RollAffixes(int32 ItemLevel)
+void UAtomItemInstance::RollAffixes(int32 ItemLevel)
 {
 	if (!ItemDef)
 	{
 		return;
 	}
 
-	const UOutlawARPGWeaponData* ARPGData = ItemDef->ARPGWeaponData;
+	const UAtomARPGWeaponData* ARPGData = ItemDef->ARPGWeaponData;
 	if (!ARPGData || !ARPGData->AffixPool)
 	{
-		UE_LOG(LogOutlawItemInstance, Warning, TEXT("RollAffixes: Item '%s' has no ARPG weapon data or affix pool."),
+		UE_LOG(LogAtomItemInstance, Warning, TEXT("RollAffixes: Item '%s' has no ARPG weapon data or affix pool."),
 			*ItemDef->DisplayName.ToString());
 		return;
 	}
@@ -143,7 +143,7 @@ void UOutlawItemInstance::RollAffixes(int32 ItemLevel)
 	Affixes = ARPGData->AffixPool->RollAffixes(ItemLevel, NumPrefixes, NumSuffixes);
 }
 
-void UOutlawItemInstance::GrantAffixEffects(UAbilitySystemComponent* ASC)
+void UAtomItemInstance::GrantAffixEffects(UAbilitySystemComponent* ASC)
 {
 	if (!ASC)
 	{
@@ -153,7 +153,7 @@ void UOutlawItemInstance::GrantAffixEffects(UAbilitySystemComponent* ASC)
 	// Revoke any existing affix effects first
 	RevokeAffixEffects(ASC);
 
-	for (const FOutlawItemAffix& Affix : Affixes)
+	for (const FAtomItemAffix& Affix : Affixes)
 	{
 		if (!Affix.AffixDef || !Affix.AffixDef->AffixEffect)
 		{
@@ -181,7 +181,7 @@ void UOutlawItemInstance::GrantAffixEffects(UAbilitySystemComponent* ASC)
 	}
 }
 
-void UOutlawItemInstance::RevokeAffixEffects(UAbilitySystemComponent* ASC)
+void UAtomItemInstance::RevokeAffixEffects(UAbilitySystemComponent* ASC)
 {
 	if (!ASC)
 	{
@@ -200,7 +200,7 @@ void UOutlawItemInstance::RevokeAffixEffects(UAbilitySystemComponent* ASC)
 
 // ── ARPG Gem Ability API ────────────────────────────────────────
 
-void UOutlawItemInstance::GrantSocketedGemAbilities(UAbilitySystemComponent* ASC)
+void UAtomItemInstance::GrantSocketedGemAbilities(UAbilitySystemComponent* ASC)
 {
 	if (!ASC)
 	{
@@ -214,7 +214,7 @@ void UOutlawItemInstance::GrantSocketedGemAbilities(UAbilitySystemComponent* ASC
 
 	for (int32 i = 0; i < SocketSlots.Num(); ++i)
 	{
-		const FOutlawSocketSlot& Socket = SocketSlots[i];
+		const FAtomSocketSlot& Socket = SocketSlots[i];
 		if (Socket.SocketedGem && Socket.SocketedGem->GrantedAbilitySet)
 		{
 			Socket.SocketedGem->GrantedAbilitySet->GiveToAbilitySystem(ASC, this, SocketedGemHandles[i]);
@@ -222,14 +222,14 @@ void UOutlawItemInstance::GrantSocketedGemAbilities(UAbilitySystemComponent* ASC
 	}
 }
 
-void UOutlawItemInstance::RevokeSocketedGemAbilities(UAbilitySystemComponent* ASC)
+void UAtomItemInstance::RevokeSocketedGemAbilities(UAbilitySystemComponent* ASC)
 {
 	if (!ASC)
 	{
 		return;
 	}
 
-	for (FOutlawAbilitySetGrantedHandles& Handles : SocketedGemHandles)
+	for (FAtomAbilitySetGrantedHandles& Handles : SocketedGemHandles)
 	{
 		Handles.RevokeFromASC(ASC);
 	}

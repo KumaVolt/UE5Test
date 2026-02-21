@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawDifficultyConfig.generated.h"
+#include "AtomDifficultyConfig.generated.h"
 
 UCLASS(BlueprintType)
-class OUTLAW_API UOutlawDifficultyConfig : public UPrimaryDataAsset
+class OUTLAW_API UAtomDifficultyConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 

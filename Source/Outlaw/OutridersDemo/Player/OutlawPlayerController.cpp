@@ -1,5 +1,5 @@
 #include "Player/OutlawPlayerController.h"
-#include "UI/OutlawHUDLayout.h"
+#include "UI/AtomHUDLayout.h"
 #include "UI/OutlawDemoHUD.h"
 #include "UI/OutlawDemoOverlayScreen.h"
 #include "UI/OutlawDemoInventoryScreen.h"
@@ -31,7 +31,7 @@ void AOutlawPlayerController::CreateHUD()
 {
 	if (IsLocalController() && HUDLayoutClass && !HUDLayoutWidget)
 	{
-		HUDLayoutWidget = CreateWidget<UOutlawHUDLayout>(this, HUDLayoutClass);
+		HUDLayoutWidget = CreateWidget<UAtomHUDLayout>(this, HUDLayoutClass);
 		if (HUDLayoutWidget)
 		{
 			HUDLayoutWidget->AddToViewport();

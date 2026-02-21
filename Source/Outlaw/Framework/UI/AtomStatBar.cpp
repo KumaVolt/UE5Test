@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "UI/OutlawStatBar.h"
+#include "UI/AtomStatBar.h"
 #include "AbilitySystemComponent.h"
 
-void UOutlawStatBar::InitializeWithAbilitySystem(UAbilitySystemComponent* ASC)
+void UAtomStatBar::InitializeWithAbilitySystem(UAbilitySystemComponent* ASC)
 {
 	if (!ASC || !AttributeToTrack.IsValid() || !MaxAttributeToTrack.IsValid())
 	{
@@ -21,10 +21,10 @@ void UOutlawStatBar::InitializeWithAbilitySystem(UAbilitySystemComponent* ASC)
 
 	// Bind to attribute change delegates
 	AttributeDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(AttributeToTrack)
-		.AddUObject(this, &UOutlawStatBar::HandleAttributeChanged);
+		.AddUObject(this, &UAtomStatBar::HandleAttributeChanged);
 
 	MaxAttributeDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(MaxAttributeToTrack)
-		.AddUObject(this, &UOutlawStatBar::HandleMaxAttributeChanged);
+		.AddUObject(this, &UAtomStatBar::HandleMaxAttributeChanged);
 
 	// Read initial values
 	bool bFound = false;
@@ -34,7 +34,7 @@ void UOutlawStatBar::InitializeWithAbilitySystem(UAbilitySystemComponent* ASC)
 	BroadcastStatChanged();
 }
 
-void UOutlawStatBar::NativeDestruct()
+void UAtomStatBar::NativeDestruct()
 {
 	if (BoundASC.IsValid())
 	{
@@ -45,19 +45,19 @@ void UOutlawStatBar::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UOutlawStatBar::HandleAttributeChanged(const FOnAttributeChangeData& Data)
+void UAtomStatBar::HandleAttributeChanged(const FOnAttributeChangeData& Data)
 {
 	CachedCurrentValue = Data.NewValue;
 	BroadcastStatChanged();
 }
 
-void UOutlawStatBar::HandleMaxAttributeChanged(const FOnAttributeChangeData& Data)
+void UAtomStatBar::HandleMaxAttributeChanged(const FOnAttributeChangeData& Data)
 {
 	CachedMaxValue = Data.NewValue;
 	BroadcastStatChanged();
 }
 
-void UOutlawStatBar::BroadcastStatChanged()
+void UAtomStatBar::BroadcastStatChanged()
 {
 	const float Percent = CachedMaxValue > 0.f ? FMath::Clamp(CachedCurrentValue / CachedMaxValue, 0.f, 1.f) : 0.f;
 	OnStatChanged(CachedCurrentValue, CachedMaxValue, Percent);

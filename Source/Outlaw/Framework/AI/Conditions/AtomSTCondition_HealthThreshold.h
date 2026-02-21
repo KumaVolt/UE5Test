@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "StateTreeConditionBase.h"
-#include "OutlawSTCondition_HealthThreshold.generated.h"
+#include "AtomSTCondition_HealthThreshold.generated.h"
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTCondition_HealthThresholdInstanceData
+struct OUTLAW_API FAtomSTCondition_HealthThresholdInstanceData
 {
 	GENERATED_BODY()
 
@@ -19,13 +19,13 @@ struct OUTLAW_API FOutlawSTCondition_HealthThresholdInstanceData
 };
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTCondition_HealthThreshold : public FStateTreeConditionBase
+struct OUTLAW_API FAtomSTCondition_HealthThreshold : public FStateTreeConditionBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FOutlawSTCondition_HealthThresholdInstanceData;
+	using FInstanceDataType = FAtomSTCondition_HealthThresholdInstanceData;
 
-	FOutlawSTCondition_HealthThreshold() = default;
+	FAtomSTCondition_HealthThreshold() = default;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

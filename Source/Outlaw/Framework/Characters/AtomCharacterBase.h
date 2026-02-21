@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAbilityTypes.h"
+#include "AbilitySystem/AtomAbilityTypes.h"
 #include "GameFramework/Character.h"
-#include "OutlawCharacterBase.generated.h"
+#include "AtomCharacterBase.generated.h"
 
-class UOutlawAbilitySystemComponent;
-class UOutlawAbilitySet;
+class UAtomAbilitySystemComponent;
+class UAtomAbilitySet;
 
 UCLASS()
-class OUTLAW_API AOutlawCharacterBase : public ACharacter, public IAbilitySystemInterface
+class OUTLAW_API AAtomCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AAtomCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -27,12 +27,12 @@ protected:
 	void RevokeDefaultAbilitySet();
 
 	UPROPERTY()
-	TObjectPtr<UOutlawAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAtomAbilitySystemComponent> AbilitySystemComponent;
 
 	/** The default ability set granted at spawn. */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	TObjectPtr<UOutlawAbilitySet> DefaultAbilitySet;
+	TObjectPtr<UAtomAbilitySet> DefaultAbilitySet;
 
 	/** Handles for the currently granted default ability set. */
-	FOutlawAbilitySetGrantedHandles DefaultAbilitySetHandles;
+	FAtomAbilitySetGrantedHandles DefaultAbilitySetHandles;
 };

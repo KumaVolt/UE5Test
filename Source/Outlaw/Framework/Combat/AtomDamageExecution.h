@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
-#include "OutlawDamageExecution.generated.h"
+#include "AtomDamageExecution.generated.h"
 
 UCLASS()
-class OUTLAW_API UOutlawDamageExecution : public UGameplayEffectExecutionCalculation
+class OUTLAW_API UAtomDamageExecution : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawDamageExecution();
+	UAtomDamageExecution();
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	                                    FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;

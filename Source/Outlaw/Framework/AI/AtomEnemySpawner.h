@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AI/OutlawAITypes.h"
-#include "OutlawEnemySpawner.generated.h"
+#include "AI/AtomAITypes.h"
+#include "AtomEnemySpawner.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveStartedSignature, int32, WaveIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveCompletedSignature, int32, WaveIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllWavesCompletedSignature);
 
 UCLASS(Blueprintable, ClassGroup=(Custom))
-class OUTLAW_API AOutlawEnemySpawner : public AActor
+class OUTLAW_API AAtomEnemySpawner : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawEnemySpawner();
+	AAtomEnemySpawner();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -33,10 +33,10 @@ public:
 	void TriggerSpawn(int32 Count);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
-	EOutlawSpawnerMode SpawnerMode = EOutlawSpawnerMode::WaveBased;
+	EAtomSpawnerMode SpawnerMode = EAtomSpawnerMode::WaveBased;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
-	TArray<FOutlawWaveSpawnData> Waves;
+	TArray<FAtomWaveSpawnData> Waves;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
 	int32 MaxActiveEnemies = 10;

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawSkillGemDefinition.h"
+#include "AtomSkillGemDefinition.h"
 
-UOutlawSkillGemDefinition::UOutlawSkillGemDefinition(const FObjectInitializer& ObjectInitializer)
+UAtomSkillGemDefinition::UAtomSkillGemDefinition(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }

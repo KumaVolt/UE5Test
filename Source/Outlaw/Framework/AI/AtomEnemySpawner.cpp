@@ -1,37 +1,37 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/OutlawEnemySpawner.h"
+#include "AI/AtomEnemySpawner.h"
 #include "Engine/World.h"
 #include "NavigationSystem.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/AssetManager.h"
 
-AOutlawEnemySpawner::AOutlawEnemySpawner()
+AAtomEnemySpawner::AAtomEnemySpawner()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 }
 
-void AOutlawEnemySpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AAtomEnemySpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AOutlawEnemySpawner, CurrentWaveIndex);
-	DOREPLIFETIME(AOutlawEnemySpawner, CurrentSpawnCount);
-	DOREPLIFETIME(AOutlawEnemySpawner, bIsSpawning);
+	DOREPLIFETIME(AAtomEnemySpawner, CurrentWaveIndex);
+	DOREPLIFETIME(AAtomEnemySpawner, CurrentSpawnCount);
+	DOREPLIFETIME(AAtomEnemySpawner, bIsSpawning);
 }
 
-void AOutlawEnemySpawner::BeginPlay()
+void AAtomEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (SpawnerMode == EOutlawSpawnerMode::WaveBased && HasAuthority())
+	if (SpawnerMode == EAtomSpawnerMode::WaveBased && HasAuthority())
 	{
 		StartSpawning();
 	}
 }
 
-void AOutlawEnemySpawner::Tick(float DeltaTime)
+void AAtomEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -40,7 +40,7 @@ void AOutlawEnemySpawner::Tick(float DeltaTime)
 		return;
 	}
 
-	if (SpawnerMode == EOutlawSpawnerMode::WaveBased)
+	if (SpawnerMode == EAtomSpawnerMode::WaveBased)
 	{
 		if (CurrentWaveIndex >= Waves.Num())
 		{
@@ -52,7 +52,7 @@ void AOutlawEnemySpawner::Tick(float DeltaTime)
 			return;
 		}
 
-		const FOutlawWaveSpawnData& CurrentWave = Waves[CurrentWaveIndex];
+		const FAtomWaveSpawnData& CurrentWave = Waves[CurrentWaveIndex];
 		SpawnTimer += DeltaTime;
 
 		if (SpawnTimer >= CurrentWave.SpawnInterval && CurrentSpawnCount < CurrentWave.Count)
@@ -78,20 +78,20 @@ void AOutlawEnemySpawner::Tick(float DeltaTime)
 			}
 		}
 	}
-	else if (SpawnerMode == EOutlawSpawnerMode::Ambient)
+	else if (SpawnerMode == EAtomSpawnerMode::Ambient)
 	{
 		AmbientSpawnTimer += DeltaTime;
 
 		if (AmbientSpawnTimer >= AmbientSpawnInterval && CanSpawn() && !Waves.IsEmpty())
 		{
-			const FOutlawWaveSpawnData& SpawnData = Waves[FMath::RandRange(0, Waves.Num() - 1)];
+			const FAtomWaveSpawnData& SpawnData = Waves[FMath::RandRange(0, Waves.Num() - 1)];
 			SpawnEnemy(SpawnData.EnemyClass);
 			AmbientSpawnTimer = 0.f;
 		}
 	}
 }
 
-void AOutlawEnemySpawner::StartSpawning()
+void AAtomEnemySpawner::StartSpawning()
 {
 	if (!HasAuthority())
 	{
@@ -104,13 +104,13 @@ void AOutlawEnemySpawner::StartSpawning()
 	SpawnTimer = 0.f;
 	AmbientSpawnTimer = 0.f;
 
-	if (SpawnerMode == EOutlawSpawnerMode::WaveBased && !Waves.IsEmpty())
+	if (SpawnerMode == EAtomSpawnerMode::WaveBased && !Waves.IsEmpty())
 	{
 		OnWaveStarted.Broadcast(CurrentWaveIndex);
 	}
 }
 
-void AOutlawEnemySpawner::StopSpawning()
+void AAtomEnemySpawner::StopSpawning()
 {
 	if (!HasAuthority())
 	{
@@ -120,9 +120,9 @@ void AOutlawEnemySpawner::StopSpawning()
 	bIsSpawning = false;
 }
 
-void AOutlawEnemySpawner::TriggerSpawn(int32 Count)
+void AAtomEnemySpawner::TriggerSpawn(int32 Count)
 {
-	if (!HasAuthority() || SpawnerMode != EOutlawSpawnerMode::Triggered)
+	if (!HasAuthority() || SpawnerMode != EAtomSpawnerMode::Triggered)
 	{
 		return;
 	}
@@ -134,12 +134,12 @@ void AOutlawEnemySpawner::TriggerSpawn(int32 Count)
 			break;
 		}
 
-		const FOutlawWaveSpawnData& SpawnData = Waves[FMath::RandRange(0, Waves.Num() - 1)];
+		const FAtomWaveSpawnData& SpawnData = Waves[FMath::RandRange(0, Waves.Num() - 1)];
 		SpawnEnemy(SpawnData.EnemyClass);
 	}
 }
 
-void AOutlawEnemySpawner::SpawnEnemy(const TSoftClassPtr<AActor>& EnemyClass)
+void AAtomEnemySpawner::SpawnEnemy(const TSoftClassPtr<AActor>& EnemyClass)
 {
 	if (!HasAuthority() || !EnemyClass.IsValid())
 	{
@@ -162,21 +162,21 @@ void AOutlawEnemySpawner::SpawnEnemy(const TSoftClassPtr<AActor>& EnemyClass)
 	if (SpawnedEnemy)
 	{
 		ActiveEnemies.Add(SpawnedEnemy);
-		SpawnedEnemy->OnDestroyed.AddDynamic(this, &AOutlawEnemySpawner::OnEnemyDestroyed);
+		SpawnedEnemy->OnDestroyed.AddDynamic(this, &AAtomEnemySpawner::OnEnemyDestroyed);
 	}
 }
 
-void AOutlawEnemySpawner::OnEnemyDestroyed(AActor* DestroyedActor)
+void AAtomEnemySpawner::OnEnemyDestroyed(AActor* DestroyedActor)
 {
 	ActiveEnemies.Remove(DestroyedActor);
 }
 
-bool AOutlawEnemySpawner::CanSpawn() const
+bool AAtomEnemySpawner::CanSpawn() const
 {
 	return ActiveEnemies.Num() < MaxActiveEnemies;
 }
 
-FVector AOutlawEnemySpawner::GetRandomSpawnLocation() const
+FVector AAtomEnemySpawner::GetRandomSpawnLocation() const
 {
 	FVector BaseLocation = GetActorLocation();
 	FVector RandomOffset = FVector(

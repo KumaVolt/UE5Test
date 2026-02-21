@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "CommonActivatableWidget.h"
-#include "OutlawHUDLayout.generated.h"
+#include "AtomHUDLayout.generated.h"
 
 UCLASS(Abstract, Blueprintable)
-class OUTLAW_API UOutlawHUDLayout : public UCommonActivatableWidget
+class OUTLAW_API UAtomHUDLayout : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawHUDLayout(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomHUDLayout(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 };

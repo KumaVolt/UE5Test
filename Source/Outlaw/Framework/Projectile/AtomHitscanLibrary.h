@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "OutlawHitscanLibrary.generated.h"
+#include "AtomHitscanLibrary.generated.h"
 
 class UAbilitySystemComponent;
 class UGameplayEffect;
 
 UCLASS()
-class OUTLAW_API UOutlawHitscanLibrary : public UBlueprintFunctionLibrary
+class OUTLAW_API UAtomHitscanLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Outlaw|Projectile", meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintCallable, Category = "Atom|Projectile", meta = (WorldContext = "WorldContextObject"))
 	static TArray<FHitResult> FireHitscan(
 		const UObject* WorldContextObject,
 		UAbilitySystemComponent* SourceASC,

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "StateTreeTaskBase.h"
-#include "OutlawSTTask_Patrol.generated.h"
+#include "AtomSTTask_Patrol.generated.h"
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTTask_PatrolInstanceData
+struct OUTLAW_API FAtomSTTask_PatrolInstanceData
 {
 	GENERATED_BODY()
 
@@ -22,13 +22,13 @@ struct OUTLAW_API FOutlawSTTask_PatrolInstanceData
 };
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTTask_Patrol : public FStateTreeTaskBase
+struct OUTLAW_API FAtomSTTask_Patrol : public FStateTreeTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FOutlawSTTask_PatrolInstanceData;
+	using FInstanceDataType = FAtomSTTask_PatrolInstanceData;
 
-	FOutlawSTTask_Patrol() = default;
+	FAtomSTTask_Patrol() = default;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

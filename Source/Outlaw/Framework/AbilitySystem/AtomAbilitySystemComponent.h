@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "OutlawAbilityTypes.h"
-#include "OutlawAbilitySystemComponent.generated.h"
+#include "AtomAbilityTypes.h"
+#include "AtomAbilitySystemComponent.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawAbilitySystemComponent : public UAbilitySystemComponent
+class OUTLAW_API UAtomAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawAbilitySystemComponent();
+	UAtomAbilitySystemComponent();
 
 	/**
 	 * Grants an entire ability set and returns handles for later revocation.
@@ -23,10 +23,10 @@ public:
 	 * @param SourceObject   The object responsible for granting (e.g. equipment).
 	 * @return Handles that can be passed to RevokeAbilitySet.
 	 */
-	FOutlawAbilitySetGrantedHandles GrantAbilitySet(const UOutlawAbilitySet* AbilitySet, UObject* SourceObject);
+	FAtomAbilitySetGrantedHandles GrantAbilitySet(const UAtomAbilitySet* AbilitySet, UObject* SourceObject);
 
 	/** Revokes everything previously granted by GrantAbilitySet. */
-	void RevokeAbilitySet(FOutlawAbilitySetGrantedHandles& Handles);
+	void RevokeAbilitySet(FAtomAbilitySetGrantedHandles& Handles);
 
 	/** Called when an input tag is pressed. Finds matching abilities and activates them. */
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);

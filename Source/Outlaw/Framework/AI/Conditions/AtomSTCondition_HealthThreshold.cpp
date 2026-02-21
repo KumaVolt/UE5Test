@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawSTCondition_HealthThreshold.h"
+#include "AtomSTCondition_HealthThreshold.h"
 #include "StateTreeExecutionContext.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 
-bool FOutlawSTCondition_HealthThreshold::TestCondition(FStateTreeExecutionContext& Context) const
+bool FAtomSTCondition_HealthThreshold::TestCondition(FStateTreeExecutionContext& Context) const
 {
 	const FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -27,7 +27,7 @@ bool FOutlawSTCondition_HealthThreshold::TestCondition(FStateTreeExecutionContex
 		return false;
 	}
 
-	const UOutlawAttributeSet* AttributeSet = ASC->GetSet<UOutlawAttributeSet>();
+	const UAtomAttributeSet* AttributeSet = ASC->GetSet<UAtomAttributeSet>();
 	if (!AttributeSet)
 	{
 		return false;

@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/Tasks/OutlawSTTask_Chase.h"
+#include "AI/Tasks/AtomSTTask_Chase.h"
 #include "AIController.h"
 #include "GameFramework/Actor.h"
 #include "StateTreeExecutionContext.h"
 #include "Navigation/PathFollowingComponent.h"
 
-EStateTreeRunStatus FOutlawSTTask_Chase::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FAtomSTTask_Chase::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -33,7 +33,7 @@ EStateTreeRunStatus FOutlawSTTask_Chase::EnterState(FStateTreeExecutionContext& 
 	return EStateTreeRunStatus::Running;
 }
 
-EStateTreeRunStatus FOutlawSTTask_Chase::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FAtomSTTask_Chase::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -76,7 +76,7 @@ EStateTreeRunStatus FOutlawSTTask_Chase::Tick(FStateTreeExecutionContext& Contex
 	return EStateTreeRunStatus::Failed;
 }
 
-void FOutlawSTTask_Chase::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
+void FAtomSTTask_Chase::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
 	const AActor* OwnerActor = Cast<AActor>(Context.GetOwner());
 	if (!OwnerActor)

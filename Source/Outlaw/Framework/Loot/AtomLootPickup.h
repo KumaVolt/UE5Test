@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "OutlawLootTypes.h"
-#include "OutlawLootPickup.generated.h"
+#include "AtomLootTypes.h"
+#include "AtomLootPickup.generated.h"
 
 class USphereComponent;
 class UStaticMeshComponent;
-class UOutlawLootBeamComponent;
-class UOutlawItemDefinition;
+class UAtomLootBeamComponent;
+class UAtomItemDefinition;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnLootPickedUp, const UOutlawItemDefinition*, ItemDef, int32, Quantity, AActor*, PickupActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnLootPickedUp, const UAtomItemDefinition*, ItemDef, int32, Quantity, AActor*, PickupActor);
 
 UCLASS()
-class OUTLAW_API AOutlawLootPickup : public AActor
+class OUTLAW_API AAtomLootPickup : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawLootPickup(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AAtomLootPickup(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -32,10 +32,10 @@ public:
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UOutlawLootBeamComponent> LootBeamComponent;
+	TObjectPtr<UAtomLootBeamComponent> LootBeamComponent;
 
 	UPROPERTY(ReplicatedUsing = OnRep_LootDrop, BlueprintReadOnly, Category = "Loot")
-	FOutlawLootDrop LootDrop;
+	FAtomLootDrop LootDrop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot|Config")
 	bool bAutoLoot = false;
@@ -47,7 +47,7 @@ public:
 	FOnLootPickedUp OnLootPickedUp;
 
 	UFUNCTION(BlueprintCallable, Category = "Loot")
-	void InitializeLoot(const FOutlawLootDrop& Drop);
+	void InitializeLoot(const FAtomLootDrop& Drop);
 
 	UFUNCTION()
 	void OnRep_LootDrop();

@@ -1,33 +1,33 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "OutlawAttributeSet.h"
+#include "AtomAttributeSet.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
-UOutlawAttributeSet::UOutlawAttributeSet()
+UAtomAttributeSet::UAtomAttributeSet()
 {
 	InitHealth(80.0f);
 	InitArmor(0.f);
 	InitMaxArmor(0.f);
 }
 
-void UOutlawAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UAtomAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Strength, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxStrength, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, Armor, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UOutlawAttributeSet, MaxArmor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, MaxStrength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAtomAttributeSet, MaxArmor, COND_None, REPNOTIFY_Always);
 }
 
-void UOutlawAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UAtomAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 	
@@ -41,7 +41,7 @@ void UOutlawAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute
 	}
 }
 
-void UOutlawAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+void UAtomAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 	
@@ -63,42 +63,42 @@ void UOutlawAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffect
 	}
 }
 
-void UOutlawAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
+void UAtomAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, Health, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, Health, OldHealth);
 }
 
-void UOutlawAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+void UAtomAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxHealth, OldMaxHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, MaxHealth, OldMaxHealth);
 }
 
-void UOutlawAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina) const
+void UAtomAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, Stamina, OldStamina);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, Stamina, OldStamina);
 }
 
-void UOutlawAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina) const
+void UAtomAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxStamina, OldMaxStamina);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, MaxStamina, OldMaxStamina);
 }
 
-void UOutlawAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+void UAtomAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, Strength, OldStrength);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, Strength, OldStrength);
 }
 
-void UOutlawAttributeSet::OnRep_MaxStrength(const FGameplayAttributeData& OldMaxStrength) const
+void UAtomAttributeSet::OnRep_MaxStrength(const FGameplayAttributeData& OldMaxStrength) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxStrength, OldMaxStrength);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, MaxStrength, OldMaxStrength);
 }
 
-void UOutlawAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+void UAtomAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, Armor, OldArmor);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, Armor, OldArmor);
 }
 
-void UOutlawAttributeSet::OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor) const
+void UAtomAttributeSet::OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UOutlawAttributeSet, MaxArmor, OldMaxArmor);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAtomAttributeSet, MaxArmor, OldMaxArmor);
 }

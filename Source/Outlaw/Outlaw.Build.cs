@@ -30,6 +30,8 @@ public class Outlaw : ModuleRules
 	PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "StateTreeModule", "GameplayStateTreeModule" });
 
 		PublicIncludePaths.Add("Outlaw");
+		PublicIncludePaths.Add("Outlaw/Framework");
+		PublicIncludePaths.Add("Outlaw/OutridersDemo");
 
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");

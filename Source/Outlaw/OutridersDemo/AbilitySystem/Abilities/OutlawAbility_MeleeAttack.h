@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/OutlawGameplayAbility.h"
+#include "AbilitySystem/AtomGameplayAbility.h"
 #include "OutlawAbility_MeleeAttack.generated.h"
 
 UCLASS()
-class OUTLAW_API UOutlawAbility_MeleeAttack : public UOutlawGameplayAbility
+class OUTLAW_API UOutlawAbility_MeleeAttack : public UAtomGameplayAbility
 {
 	GENERATED_BODY()
 

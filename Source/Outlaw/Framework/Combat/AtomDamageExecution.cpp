@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawDamageExecution.h"
-#include "OutlawCombatTags.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
-#include "AbilitySystem/OutlawWeaponAttributeSet.h"
+#include "AtomDamageExecution.h"
+#include "AtomCombatTags.h"
+#include "AbilitySystem/AtomAttributeSet.h"
+#include "AbilitySystem/AtomWeaponAttributeSet.h"
 #include "GameplayEffectTypes.h"
 
 struct FDamageStatics
@@ -19,14 +19,14 @@ struct FDamageStatics
 
 	FDamageStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawWeaponAttributeSet, Firepower, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawWeaponAttributeSet, PhysicalDamageMin, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawWeaponAttributeSet, PhysicalDamageMax, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawWeaponAttributeSet, CritMultiplier, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawWeaponAttributeSet, CriticalStrikeChance, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawAttributeSet, Strength, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawAttributeSet, Armor, Target, false);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UOutlawAttributeSet, IncomingDamage, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomWeaponAttributeSet, Firepower, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomWeaponAttributeSet, PhysicalDamageMin, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomWeaponAttributeSet, PhysicalDamageMax, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomWeaponAttributeSet, CritMultiplier, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomWeaponAttributeSet, CriticalStrikeChance, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomAttributeSet, Strength, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomAttributeSet, Armor, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAtomAttributeSet, IncomingDamage, Target, false);
 	}
 };
 
@@ -36,7 +36,7 @@ static const FDamageStatics& GetDamageStatics()
 	return DamageStatics;
 }
 
-UOutlawDamageExecution::UOutlawDamageExecution()
+UAtomDamageExecution::UAtomDamageExecution()
 {
 	RelevantAttributesToCapture.Add(GetDamageStatics().FirepowerDef);
 	RelevantAttributesToCapture.Add(GetDamageStatics().PhysicalDamageMinDef);
@@ -47,7 +47,7 @@ UOutlawDamageExecution::UOutlawDamageExecution()
 	RelevantAttributesToCapture.Add(GetDamageStatics().ArmorDef);
 }
 
-void UOutlawDamageExecution::Execute_Implementation(
+void UAtomDamageExecution::Execute_Implementation(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
@@ -78,9 +78,9 @@ void UOutlawDamageExecution::Execute_Implementation(
 	float Armor = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().ArmorDef, EvaluationParameters, Armor);
 
-	const float WeaponType = Spec.GetSetByCallerMagnitude(OutlawCombatTags::SetByCallerWeaponType, false, 0.f);
-	const float TargetLevel = Spec.GetSetByCallerMagnitude(OutlawCombatTags::SetByCallerTargetLevel, false, 1.f);
-	const float StrengthScaling = Spec.GetSetByCallerMagnitude(OutlawCombatTags::SetByCallerStrengthScaling, false, 0.5f);
+	const float WeaponType = Spec.GetSetByCallerMagnitude(AtomCombatTags::SetByCallerWeaponType, false, 0.f);
+	const float TargetLevel = Spec.GetSetByCallerMagnitude(AtomCombatTags::SetByCallerTargetLevel, false, 1.f);
+	const float StrengthScaling = Spec.GetSetByCallerMagnitude(AtomCombatTags::SetByCallerStrengthScaling, false, 0.5f);
 
 	constexpr float ArmorConstantBase = 50.f;
 	constexpr float ArmorConstantPerLevel = 10.f;

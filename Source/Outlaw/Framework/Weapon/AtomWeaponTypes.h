@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawWeaponTypes.generated.h"
+#include "AtomWeaponTypes.generated.h"
 
-class UOutlawAffixDefinition;
-class UOutlawSkillGemDefinition;
+class UAtomAffixDefinition;
+class UAtomSkillGemDefinition;
 
 // ────────────────────────────────────────────────────────────────
 // Shooter Weapon Types (Outriders-style)
 // ────────────────────────────────────────────────────────────────
 
 UENUM(BlueprintType)
-enum class EOutlawShooterWeaponType : uint8
+enum class EAtomShooterWeaponType : uint8
 {
 	AssaultRifle = 0,
 	Shotgun,
@@ -30,7 +30,7 @@ enum class EOutlawShooterWeaponType : uint8
 // ────────────────────────────────────────────────────────────────
 
 UENUM(BlueprintType)
-enum class EOutlawARPGWeaponType : uint8
+enum class EAtomARPGWeaponType : uint8
 {
 	Sword = 0,
 	Axe,
@@ -48,31 +48,31 @@ enum class EOutlawARPGWeaponType : uint8
 // ────────────────────────────────────────────────────────────────
 
 UENUM(BlueprintType)
-enum class EOutlawAffixSlot : uint8
+enum class EAtomAffixSlot : uint8
 {
 	Prefix = 0,
 	Suffix
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawItemAffix — A rolled affix on an item instance
+// FAtomItemAffix — A rolled affix on an item instance
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawItemAffix
+struct FAtomItemAffix
 {
 	GENERATED_BODY()
 
-	FOutlawItemAffix()
+	FAtomItemAffix()
 		: AffixDef(nullptr)
 		, RolledValue(0.0f)
-		, Slot(EOutlawAffixSlot::Prefix)
+		, Slot(EAtomAffixSlot::Prefix)
 	{
 	}
 
 	/** The affix definition that was rolled. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Affix")
-	TObjectPtr<UOutlawAffixDefinition> AffixDef;
+	TObjectPtr<UAtomAffixDefinition> AffixDef;
 
 	/** The rolled value within the affix's min/max range. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Affix")
@@ -80,19 +80,19 @@ struct FOutlawItemAffix
 
 	/** Whether this affix occupies a prefix or suffix slot. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Affix")
-	EOutlawAffixSlot Slot;
+	EAtomAffixSlot Slot;
 };
 
 // ────────────────────────────────────────────────────────────────
-// FOutlawSocketSlot — A single gem socket on an item instance
+// FAtomSocketSlot — A single gem socket on an item instance
 // ────────────────────────────────────────────────────────────────
 
 USTRUCT(BlueprintType)
-struct FOutlawSocketSlot
+struct FAtomSocketSlot
 {
 	GENERATED_BODY()
 
-	FOutlawSocketSlot()
+	FAtomSocketSlot()
 		: SocketedGem(nullptr)
 		, bLinkedToNext(false)
 	{
@@ -100,7 +100,7 @@ struct FOutlawSocketSlot
 
 	/** The gem currently socketed, nullptr if empty. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Socket")
-	TObjectPtr<UOutlawSkillGemDefinition> SocketedGem;
+	TObjectPtr<UAtomSkillGemDefinition> SocketedGem;
 
 	/** Socket color / type compatibility tag (e.g. Socket.Red, Socket.Blue). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Socket")

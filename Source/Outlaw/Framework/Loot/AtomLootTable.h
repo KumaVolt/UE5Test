@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawLootTypes.h"
-#include "OutlawLootTable.generated.h"
+#include "AtomLootTypes.h"
+#include "AtomLootTable.generated.h"
 
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawLootTable : public UPrimaryDataAsset
+class OUTLAW_API UAtomLootTable : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawLootTable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomLootTable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Loot Table")
-	TArray<FOutlawLootTableEntry> Entries;
+	TArray<FAtomLootTableEntry> Entries;
 
-	TArray<FOutlawLootDrop> RollLoot(int32 EnemyLevel, int32 NumDrops, float RarityBonus) const;
+	TArray<FAtomLootDrop> RollLoot(int32 EnemyLevel, int32 NumDrops, float RarityBonus) const;
 };

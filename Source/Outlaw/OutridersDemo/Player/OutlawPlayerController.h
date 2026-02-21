@@ -4,7 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "OutlawPlayerController.generated.h"
 
-class UOutlawHUDLayout;
+class UAtomHUDLayout;
 class UOutlawDemoOverlayScreen;
 class UOutlawDemoInventoryScreen;
 class UOutlawDemoEquipmentPopup;
@@ -18,7 +18,7 @@ class OUTLAW_API AOutlawPlayerController : public APlayerController
 public:
 	AOutlawPlayerController();
 
-	UOutlawHUDLayout* GetHUDLayout() const { return HUDLayoutWidget; }
+	UAtomHUDLayout* GetHUDLayout() const { return HUDLayoutWidget; }
 
 	void ToggleInventoryScreen();
 	void ToggleEquipmentPopup();
@@ -26,7 +26,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UOutlawHUDLayout> HUDLayoutClass;
+	TSubclassOf<UAtomHUDLayout> HUDLayoutClass;
 
 	virtual void BeginPlay() override;
 	virtual void BeginPlayingState() override;
@@ -37,7 +37,7 @@ private:
 	void ToggleOverlay(UOutlawDemoOverlayScreen* Screen);
 
 	UPROPERTY()
-	TObjectPtr<UOutlawHUDLayout> HUDLayoutWidget;
+	TObjectPtr<UAtomHUDLayout> HUDLayoutWidget;
 
 	UPROPERTY()
 	TObjectPtr<UOutlawDemoInventoryScreen> InventoryScreen;

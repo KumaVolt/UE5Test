@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Projectile/OutlawProjectileBase.h"
-#include "Projectile/OutlawProjectilePoolSubsystem.h"
+#include "Projectile/AtomProjectileBase.h"
+#include "Projectile/AtomProjectilePoolSubsystem.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -13,7 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
 
-AOutlawProjectileBase::AOutlawProjectileBase(const FObjectInitializer& ObjectInitializer)
+AAtomProjectileBase::AAtomProjectileBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -22,7 +22,7 @@ AOutlawProjectileBase::AOutlawProjectileBase(const FObjectInitializer& ObjectIni
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AOutlawProjectileBase::OnHit);
+	CollisionComp->OnComponentHit.AddDynamic(this, &AAtomProjectileBase::OnHit);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 	RootComponent = CollisionComp;
@@ -44,7 +44,7 @@ AOutlawProjectileBase::AOutlawProjectileBase(const FObjectInitializer& ObjectIni
 	ProjectileMovement->ProjectileGravityScale = 1.0f;
 }
 
-void AOutlawProjectileBase::InitProjectile(const FOutlawProjectileInitData& InitData)
+void AAtomProjectileBase::InitProjectile(const FAtomProjectileInitData& InitData)
 {
 	SourceASC = InitData.SourceASC;
 	DamageEffectClass = InitData.DamageEffect;
@@ -76,7 +76,7 @@ void AOutlawProjectileBase::InitProjectile(const FOutlawProjectileInitData& Init
 	}
 }
 
-void AOutlawProjectileBase::ReturnToPool()
+void AAtomProjectileBase::ReturnToPool()
 {
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
@@ -93,14 +93,14 @@ void AOutlawProjectileBase::ReturnToPool()
 
 	if (UWorld* World = GetWorld())
 	{
-		if (UOutlawProjectilePoolSubsystem* PoolSubsystem = World->GetSubsystem<UOutlawProjectilePoolSubsystem>())
+		if (UAtomProjectilePoolSubsystem* PoolSubsystem = World->GetSubsystem<UAtomProjectilePoolSubsystem>())
 		{
 			PoolSubsystem->ReturnProjectile(this);
 		}
 	}
 }
 
-void AOutlawProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AAtomProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!HasAuthority())
 	{
@@ -137,7 +137,7 @@ void AOutlawProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 	ReturnToPool();
 }
 
-void AOutlawProjectileBase::ApplyDamageToTarget(AActor* Target)
+void AAtomProjectileBase::ApplyDamageToTarget(AActor* Target)
 {
 	if (!SourceASC || !DamageEffectClass || !Target)
 	{
@@ -162,7 +162,7 @@ void AOutlawProjectileBase::ApplyDamageToTarget(AActor* Target)
 	}
 }
 
-AActor* AOutlawProjectileBase::FindNextChainTarget(const FVector& Origin, float Radius)
+AActor* AAtomProjectileBase::FindNextChainTarget(const FVector& Origin, float Radius)
 {
 	if (!GetWorld())
 	{

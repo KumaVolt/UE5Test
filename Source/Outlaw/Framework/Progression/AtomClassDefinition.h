@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawProgressionTypes.h"
-#include "OutlawClassDefinition.generated.h"
+#include "AtomProgressionTypes.h"
+#include "AtomClassDefinition.generated.h"
 
-class UOutlawAbilitySet;
-class UOutlawSkillTreeNodeDefinition;
-class UOutlawLevelingConfig;
+class UAtomAbilitySet;
+class UAtomSkillTreeNodeDefinition;
+class UAtomLevelingConfig;
 
 /**
  * Defines a character class — either a fixed class (Outriders-style) or
@@ -17,12 +17,12 @@ class UOutlawLevelingConfig;
  * and optional ascendancy sub-classes.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawClassDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomClassDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawClassDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomClassDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	// ── Identity ────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ public:
 
 	/** Determines skill tree behavior: FixedClass or AscendancyClass. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Class")
-	EOutlawClassMode ClassMode = EOutlawClassMode::FixedClass;
+	EAtomClassMode ClassMode = EAtomClassMode::FixedClass;
 
 	/** True for base classes, false for ascendancy sub-classes. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Class")
@@ -56,23 +56,23 @@ public:
 
 	/** Per-level stat scaling (e.g. MaxHealth +12/level, Strength +2/level). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats")
-	TArray<FOutlawStatGrowthEntry> StatGrowthTable;
+	TArray<FAtomStatGrowthEntry> StatGrowthTable;
 
 	// ── Abilities & Skill Tree ──────────────────────────────────
 
 	/** Abilities granted immediately upon selecting this class. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UOutlawAbilitySet> ClassAbilitySet;
+	TObjectPtr<UAtomAbilitySet> ClassAbilitySet;
 
 	/** All skill tree nodes for this class. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Tree")
-	TArray<TObjectPtr<UOutlawSkillTreeNodeDefinition>> SkillTreeNodes;
+	TArray<TObjectPtr<UAtomSkillTreeNodeDefinition>> SkillTreeNodes;
 
 	// ── Ascendancy ──────────────────────────────────────────────
 
 	/** Sub-classes selectable from this base class. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ascendancy", meta = (EditCondition = "bIsBaseClass"))
-	TArray<TObjectPtr<UOutlawClassDefinition>> AvailableAscendancies;
+	TArray<TObjectPtr<UAtomClassDefinition>> AvailableAscendancies;
 
 	/** Minimum level required to select an ascendancy. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ascendancy", meta = (ClampMin = "0", EditCondition = "bIsBaseClass"))
@@ -82,7 +82,7 @@ public:
 
 	/** XP table override for this class. If null, the component default is used. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Leveling")
-	TObjectPtr<UOutlawLevelingConfig> LevelingConfig;
+	TObjectPtr<UAtomLevelingConfig> LevelingConfig;
 
 	// ── API ─────────────────────────────────────────────────────
 
@@ -92,5 +92,5 @@ public:
 
 	/** Finds a skill tree node definition by its tag. Returns nullptr if not found. */
 	UFUNCTION(BlueprintCallable, Category = "Class")
-	UOutlawSkillTreeNodeDefinition* FindSkillNode(FGameplayTag NodeTag) const;
+	UAtomSkillTreeNodeDefinition* FindSkillNode(FGameplayTag NodeTag) const;
 };

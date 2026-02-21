@@ -20,52 +20,54 @@ Unreal Engine 5.7 action game combining Outriders-style third-person shooting wi
 ## Architecture
 
 ### GAS Ownership Pattern
-- **Players**: ASC lives on `AOutlawPlayerState` (Mixed replication mode) — survives pawn respawn
+- **Players**: ASC lives on `AAtomPlayerState` (Mixed replication mode) — survives pawn respawn
 - **Enemies**: ASC lives on `AOutlawEnemyCharacter` (Minimal replication) — dies with pawn
 - Both implement `IAbilitySystemInterface`
 
 ### Data-Driven Ability Sets
-All ability granting flows through `UOutlawAbilitySet` (a `UPrimaryDataAsset`). Grant/revoke is atomic via `FOutlawAbilitySetGrantedHandles`. No hardcoded ability arrays anywhere.
+All ability granting flows through `UAtomAbilitySet` (a `UPrimaryDataAsset`). Grant/revoke is atomic via `FAtomAbilitySetGrantedHandles`. No hardcoded ability arrays anywhere.
 
 ### Input Tag Routing
 Abilities are found by matching gameplay tags (e.g., `Input.Ability.Fire`), not hardcoded bindings. ASC scans for abilities matching the tag in their dynamic source tags.
 
 ### Dual-Mode Inventory
-`UOutlawInventoryComponent` supports flat slots (Outriders-style, `InventoryGridWidth=0`) or spatial grid (PoE 2-style, `InventoryGridWidth>0`). Equipment grants/revokes ability sets through GAS. Replication uses `FFastArraySerializer`.
+`UAtomInventoryComponent` supports flat slots (Outriders-style, `InventoryGridWidth=0`) or spatial grid (PoE 2-style, `InventoryGridWidth>0`). Equipment grants/revokes ability sets through GAS. Replication uses `FFastArraySerializer`.
 
 ### Weapon System (Composition, Not Inheritance)
-`UOutlawItemDefinition` holds optional `ShooterWeaponData` and/or `ARPGWeaponData` pointers. `UOutlawItemInstance` stores per-item mutable state (ammo, rolled affixes, socketed gems). `UOutlawWeaponManagerComponent` manages active weapon, cycling, and GAS coordination. Abilities read weapon stats from `UOutlawWeaponAttributeSet`, not weapon data directly.
+`UAtomItemDefinition` holds optional `ShooterWeaponData` and/or `ARPGWeaponData` pointers. `UAtomItemInstance` stores per-item mutable state (ammo, rolled affixes, socketed gems). `UAtomWeaponManagerComponent` manages active weapon, cycling, and GAS coordination. Abilities read weapon stats from `UAtomWeaponAttributeSet`, not weapon data directly.
 
 **SetByCaller affixes**: Each affix uses a generic GE with SetByCaller magnitude — one GE + one data asset per stat, no custom code per affix type.
 
 ### Progression System
-`UOutlawProgressionComponent` handles XP, leveling, class selection, and skill tree allocation. Two class modes via `EOutlawClassMode`: FixedClass (Outriders-style) and AscendancyClass (PoE 2-style). Stat growth uses `SetNumericAttributeBase()` on existing attributes so GE buffs stack on top.
+`UAtomProgressionComponent` handles XP, leveling, class selection, and skill tree allocation. Two class modes via `EAtomClassMode`: FixedClass (Outriders-style) and AscendancyClass (PoE 2-style). Stat growth uses `SetNumericAttributeBase()` on existing attributes so GE buffs stack on top.
 
 ### AI System
-StateTree-based (UE 5.7, not behavior trees). `AOutlawAIController` with perception, task nodes in `AI/Tasks/`, condition nodes in `AI/Conditions/`. `AOutlawEnemySpawner` handles wave-based spawning with difficulty scaling.
+StateTree-based (UE 5.7, not behavior trees). `AAtomAIController` with perception, task nodes in `AI/Tasks/`, condition nodes in `AI/Conditions/`. `AAtomEnemySpawner` handles wave-based spawning with difficulty scaling.
 
 ### Combat Pipeline
-- `UOutlawDamageExecution` — GAS execution calc (weapon damage + stats vs armor)
-- `UOutlawDeathComponent` — monitors health, fires death delegates
-- `UOutlawEnemyDeathHandler` — ragdoll, dissolve, XP award, loot drop
-- `UOutlawPlayerDeathHandler` — respawn at checkpoint
-- `UOutlawStatusEffectComponent` — DoT/CC via GAS tags + effects
+- `UAtomDamageExecution` — GAS execution calc (weapon damage + stats vs armor)
+- `UAtomDeathComponent` — monitors health, fires death delegates
+- `UAtomEnemyDeathHandler` — ragdoll, dissolve, XP award, loot drop
+- `UAtomPlayerDeathHandler` — respawn at checkpoint
+- `UAtomStatusEffectComponent` — DoT/CC via GAS tags + effects
 
 ### Projectile System
-`AOutlawProjectileBase` with `BulletProjectile` and `SpellProjectile` variants. `UOutlawProjectilePoolSubsystem` for object pooling. `UOutlawHitscanLibrary` for instant line traces.
+`AAtomProjectileBase` with `BulletProjectile` and `SpellProjectile` variants. `UAtomProjectilePoolSubsystem` for object pooling. `UAtomHitscanLibrary` for instant line traces.
 
 ### Loot System
-`UOutlawLootTable` data assets with rarity weighting. `UOutlawLootSubsystem` generates drops. `AOutlawLootPickup` world actors with rarity beams.
+`UAtomLootTable` data assets with rarity weighting. `UAtomLootSubsystem` generates drops. `AAtomLootPickup` world actors with rarity beams.
 
 ## Source Layout
 
-All source is under `Source/Outlaw/`:
+Source is split into reusable framework and game-specific demo under `Source/Outlaw/`:
+
+### `Framework/` — Reusable engine systems
 
 | Directory | Purpose |
 |-----------|---------|
 | `AbilitySystem/` | ASC, AttributeSets, AbilitySets, base GameplayAbility |
-| `Characters/` | CharacterBase, PlayerCharacter, EnemyCharacter |
-| `Player/` | PlayerState (owns ASC), PlayerController (creates HUD) |
+| `Characters/` | CharacterBase (abstract) |
+| `Player/` | PlayerState (owns ASC) |
 | `Inventory/` | ItemDefinition, ItemInstance, InventoryComponent, types |
 | `Weapon/` | ShooterData, ARPGData, Affixes, Gems, Mods, WeaponManager |
 | `Progression/` | LevelingConfig, ClassDefinition, SkillTreeNodes, ProgressionComponent |
@@ -77,17 +79,29 @@ All source is under `Source/Outlaw/`:
 | `AI/` | AIController, DifficultyConfig, Spawner, Tasks/, Conditions/ |
 | `UI/` | HUDLayout, StatBar, DamageNumberWidget |
 
+### `OutridersDemo/` — Outriders-style demo game
+
+| Directory | Purpose |
+|-----------|---------|
+| `Game/` | DemoGameMode, DemoDataSubsystem, DemoInputConfig, DemoAbilitySets |
+| `Characters/` | PlayerCharacter, EnemyCharacter (concrete demo pawns) |
+| `Player/` | PlayerController (creates HUD, overlay management) |
+| `AbilitySystem/Abilities/` | FireWeapon, MeleeAttack abilities |
+| `AbilitySystem/Effects/` | Damage, DefaultAttributes, PlayerDefaults effects |
+| `AI/` | DemoAIBehavior |
+| `UI/` | DemoHUD, DemoOverlayScreen, InventoryScreen, EquipmentPopup, SkillTree, DeathScreen, DamageNumber |
+
 ## Module Dependencies
 
 **Build.cs** (`Source/Outlaw/Outlaw.Build.cs`):
 - **Public**: Core, CoreUObject, Engine, InputCore, EnhancedInput, GameplayAbilities, GameplayTags, GameplayTasks, UMG, CommonUI, CommonInput, NetCore, AIModule, NavigationSystem, Niagara, AnimGraphRuntime
 - **Private**: Slate, SlateCore, StateTreeModule, GameplayStateTreeModule
 - PCH mode: `UseExplicitOrSharedPCHs`
-- Public include path: `Outlaw/` (allows `#include "SubDir/Header.h"`)
+- Public include paths: `Outlaw/`, `Outlaw/Framework/`, `Outlaw/OutridersDemo/` (allows `#include "SubDir/Header.h"` from either layer)
 
 ## Code Conventions
 
-- **Prefix**: `Outlaw` on all project classes/structs/enums (e.g., `AOutlawPlayerCharacter`, `FOutlawInventoryEntry`, `EOutlawItemType`)
+- **Prefix**: Framework classes use `Atom` prefix (e.g., `UAtomDeathComponent`, `FAtomInventoryEntry`, `EAtomItemType`). Demo/game classes keep `Outlaw` prefix (e.g., `AOutlawPlayerCharacter`, `UOutlawDemoHUD`). Module export macro remains `OUTLAW_API`.
 - **Delegates**: `FOnInventoryChanged`, `FOnDeathStarted` pattern
 - **Booleans**: `bCanBeEquipped`, `bAutoLoot` prefix
 - **Headers**: `#pragma once`, forward-declare where possible, CoreMinimal first
@@ -107,7 +121,7 @@ All source is under `Source/Outlaw/`:
 ## Key Design Decisions
 
 1. **ASC on PlayerState** — survives pawn respawn, standard multiplayer pattern
-2. **Atomic ability sets** — `UOutlawAbilitySet` groups abilities/effects/attributes as a single grantable unit
+2. **Atomic ability sets** — `UAtomAbilitySet` groups abilities/effects/attributes as a single grantable unit
 3. **Input tag routing** — no hardcoded ability bindings, abilities matched by gameplay tags
 4. **Dual-mode inventory** — one component, two configurations (flat vs grid), all features work in both modes
 5. **Composition weapons** — optional data pointers on ItemDefinition, not subclasses

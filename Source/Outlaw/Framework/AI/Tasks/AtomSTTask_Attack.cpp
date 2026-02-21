@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/Tasks/OutlawSTTask_Attack.h"
+#include "AI/Tasks/AtomSTTask_Attack.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "AIController.h"
 #include "GameFramework/Actor.h"
 #include "StateTreeExecutionContext.h"
 
-EStateTreeRunStatus FOutlawSTTask_Attack::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FAtomSTTask_Attack::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -16,7 +16,7 @@ EStateTreeRunStatus FOutlawSTTask_Attack::EnterState(FStateTreeExecutionContext&
 	return EStateTreeRunStatus::Running;
 }
 
-EStateTreeRunStatus FOutlawSTTask_Attack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FAtomSTTask_Attack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

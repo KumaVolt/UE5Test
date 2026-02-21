@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawClassDefinition.h"
-#include "OutlawSkillTreeNodeDefinition.h"
+#include "AtomClassDefinition.h"
+#include "AtomSkillTreeNodeDefinition.h"
 
-UOutlawClassDefinition::UOutlawClassDefinition(const FObjectInitializer& ObjectInitializer)
+UAtomClassDefinition::UAtomClassDefinition(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-float UOutlawClassDefinition::GetAttributeBaseValueAtLevel(FGameplayAttribute Attribute, int32 Level) const
+float UAtomClassDefinition::GetAttributeBaseValueAtLevel(FGameplayAttribute Attribute, int32 Level) const
 {
 	float Total = 0.0f;
-	for (const FOutlawStatGrowthEntry& Entry : StatGrowthTable)
+	for (const FAtomStatGrowthEntry& Entry : StatGrowthTable)
 	{
 		if (Entry.Attribute == Attribute)
 		{
@@ -21,9 +21,9 @@ float UOutlawClassDefinition::GetAttributeBaseValueAtLevel(FGameplayAttribute At
 	return Total;
 }
 
-UOutlawSkillTreeNodeDefinition* UOutlawClassDefinition::FindSkillNode(FGameplayTag NodeTag) const
+UAtomSkillTreeNodeDefinition* UAtomClassDefinition::FindSkillNode(FGameplayTag NodeTag) const
 {
-	for (const TObjectPtr<UOutlawSkillTreeNodeDefinition>& Node : SkillTreeNodes)
+	for (const TObjectPtr<UAtomSkillTreeNodeDefinition>& Node : SkillTreeNodes)
 	{
 		if (Node && Node->NodeTag == NodeTag)
 		{

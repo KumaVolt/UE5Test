@@ -4,25 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "OutlawLootTypes.h"
-#include "OutlawLootSubsystem.generated.h"
+#include "AtomLootTypes.h"
+#include "AtomLootSubsystem.generated.h"
 
-class UOutlawLootTable;
-class AOutlawLootPickup;
+class UAtomLootTable;
+class AAtomLootPickup;
 
 UCLASS()
-class OUTLAW_API UOutlawLootSubsystem : public UWorldSubsystem
+class OUTLAW_API UAtomLootSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawLootSubsystem();
+	UAtomLootSubsystem();
 
 	UFUNCTION(BlueprintCallable, Category = "Loot")
-	void SpawnLoot(const FVector& DeathLocation, UOutlawLootTable* LootTable, int32 EnemyLevel, float RarityBonus, int32 NumDrops = 1);
+	void SpawnLoot(const FVector& DeathLocation, UAtomLootTable* LootTable, int32 EnemyLevel, float RarityBonus, int32 NumDrops = 1);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Loot|Config")
-	TSubclassOf<AOutlawLootPickup> LootPickupClass;
+	TSubclassOf<AAtomLootPickup> LootPickupClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Loot|Config")
 	float ScatterRadius = 150.0f;
@@ -34,5 +34,5 @@ public:
 	bool bAutoLootPickups = false;
 
 private:
-	void SpawnSinglePickup(const FOutlawLootDrop& Drop, const FVector& SpawnLocation);
+	void SpawnSinglePickup(const FAtomLootDrop& Drop, const FVector& SpawnLocation);
 };

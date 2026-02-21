@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "StateTreeConditionBase.h"
-#include "OutlawSTCondition_HasTarget.generated.h"
+#include "AtomSTCondition_HasTarget.generated.h"
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTCondition_HasTargetInstanceData
+struct OUTLAW_API FAtomSTCondition_HasTargetInstanceData
 {
 	GENERATED_BODY()
 
@@ -16,13 +16,13 @@ struct OUTLAW_API FOutlawSTCondition_HasTargetInstanceData
 };
 
 USTRUCT()
-struct OUTLAW_API FOutlawSTCondition_HasTarget : public FStateTreeConditionBase
+struct OUTLAW_API FAtomSTCondition_HasTarget : public FStateTreeConditionBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FOutlawSTCondition_HasTargetInstanceData;
+	using FInstanceDataType = FAtomSTCondition_HasTargetInstanceData;
 
-	FOutlawSTCondition_HasTarget() = default;
+	FAtomSTCondition_HasTarget() = default;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

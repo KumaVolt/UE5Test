@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
 #include "AbilitySystemComponent.h"
-#include "OutlawStatBar.generated.h"
+#include "AtomStatBar.generated.h"
 
 UCLASS()
-class OUTLAW_API UOutlawStatBar : public UCommonUserWidget
+class OUTLAW_API UAtomStatBar : public UCommonUserWidget
 {
 	GENERATED_BODY()
 

@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawLootSubsystem.h"
-#include "OutlawLootTable.h"
-#include "OutlawLootPickup.h"
+#include "AtomLootSubsystem.h"
+#include "AtomLootTable.h"
+#include "AtomLootPickup.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawLootSubsystem, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomLootSubsystem, Log, All);
 
-UOutlawLootSubsystem::UOutlawLootSubsystem()
+UAtomLootSubsystem::UAtomLootSubsystem()
 {
 }
 
-void UOutlawLootSubsystem::SpawnLoot(const FVector& DeathLocation, UOutlawLootTable* LootTable, int32 EnemyLevel, float RarityBonus, int32 NumDrops)
+void UAtomLootSubsystem::SpawnLoot(const FVector& DeathLocation, UAtomLootTable* LootTable, int32 EnemyLevel, float RarityBonus, int32 NumDrops)
 {
 	UWorld* World = GetWorld();
 	if (!World || !World->GetAuthGameMode() || !LootTable || !LootPickupClass)
@@ -20,7 +20,7 @@ void UOutlawLootSubsystem::SpawnLoot(const FVector& DeathLocation, UOutlawLootTa
 		return;
 	}
 
-	TArray<FOutlawLootDrop> Drops = LootTable->RollLoot(EnemyLevel, NumDrops, RarityBonus);
+	TArray<FAtomLootDrop> Drops = LootTable->RollLoot(EnemyLevel, NumDrops, RarityBonus);
 
 	if (Drops.Num() == 0)
 	{
@@ -31,7 +31,7 @@ void UOutlawLootSubsystem::SpawnLoot(const FVector& DeathLocation, UOutlawLootTa
 	
 	for (int32 Index = 0; Index < Drops.Num(); ++Index)
 	{
-		const FOutlawLootDrop& Drop = Drops[Index];
+		const FAtomLootDrop& Drop = Drops[Index];
 		if (!Drop.ItemDefinition)
 		{
 			continue;
@@ -50,7 +50,7 @@ void UOutlawLootSubsystem::SpawnLoot(const FVector& DeathLocation, UOutlawLootTa
 	}
 }
 
-void UOutlawLootSubsystem::SpawnSinglePickup(const FOutlawLootDrop& Drop, const FVector& SpawnLocation)
+void UAtomLootSubsystem::SpawnSinglePickup(const FAtomLootDrop& Drop, const FVector& SpawnLocation)
 {
 	UWorld* World = GetWorld();
 	if (!World || !LootPickupClass)
@@ -61,7 +61,7 @@ void UOutlawLootSubsystem::SpawnSinglePickup(const FOutlawLootDrop& Drop, const 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	AOutlawLootPickup* Pickup = World->SpawnActor<AOutlawLootPickup>(LootPickupClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+	AAtomLootPickup* Pickup = World->SpawnActor<AAtomLootPickup>(LootPickupClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 	if (Pickup)
 	{
 		Pickup->InitializeLoot(Drop);

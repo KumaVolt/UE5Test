@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "OutlawPlayerDeathHandler.generated.h"
+#include "AtomPlayerDeathHandler.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawPlayerDeathHandler : public UActorComponent
+class OUTLAW_API UAtomPlayerDeathHandler : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawPlayerDeathHandler(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomPlayerDeathHandler(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 

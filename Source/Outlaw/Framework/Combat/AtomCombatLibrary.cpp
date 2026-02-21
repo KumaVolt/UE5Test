@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawCombatLibrary.h"
+#include "AtomCombatLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "GameplayEffect.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-FHitResult UOutlawCombatLibrary::PerformLineTrace(
+FHitResult UAtomCombatLibrary::PerformLineTrace(
 	const UObject* WorldContextObject,
 	const FVector& Origin,
 	const FVector& Direction,
@@ -50,7 +50,7 @@ FHitResult UOutlawCombatLibrary::PerformLineTrace(
 	return HitResult;
 }
 
-TArray<FHitResult> UOutlawCombatLibrary::PerformSphereOverlap(
+TArray<FHitResult> UAtomCombatLibrary::PerformSphereOverlap(
 	const UObject* WorldContextObject,
 	const FVector& Origin,
 	float Radius,
@@ -91,7 +91,7 @@ TArray<FHitResult> UOutlawCombatLibrary::PerformSphereOverlap(
 	return HitResults;
 }
 
-TArray<FHitResult> UOutlawCombatLibrary::PerformMeleeBoxTrace(
+TArray<FHitResult> UAtomCombatLibrary::PerformMeleeBoxTrace(
 	const UObject* WorldContextObject,
 	const FVector& Origin,
 	const FVector& Direction,
@@ -139,7 +139,7 @@ TArray<FHitResult> UOutlawCombatLibrary::PerformMeleeBoxTrace(
 	return HitResults;
 }
 
-void UOutlawCombatLibrary::ApplyDamageToTarget(
+void UAtomCombatLibrary::ApplyDamageToTarget(
 	UAbilitySystemComponent* SourceASC,
 	UAbilitySystemComponent* TargetASC,
 	TSubclassOf<UGameplayEffect> DamageEffectClass,

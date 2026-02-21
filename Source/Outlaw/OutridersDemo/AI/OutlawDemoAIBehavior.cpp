@@ -1,10 +1,10 @@
 #include "AI/OutlawDemoAIBehavior.h"
-#include "AI/OutlawAIController.h"
+#include "AI/AtomAIController.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -22,7 +22,7 @@ void UOutlawDemoAIBehavior::BeginPlay()
 
 	if (APawn* Pawn = Cast<APawn>(GetOwner()))
 	{
-		AIController = Cast<AOutlawAIController>(Pawn->GetController());
+		AIController = Cast<AAtomAIController>(Pawn->GetController());
 	}
 
 	TransitionTo(EOutlawDemoAIState::Idle);
@@ -257,8 +257,8 @@ float UOutlawDemoAIBehavior::GetHealthPercent() const
 		if (UAbilitySystemComponent* ASC = ASCOwner->GetAbilitySystemComponent())
 		{
 			bool bFound = false;
-			float Health = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetHealthAttribute(), bFound);
-			float MaxHealth = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetMaxHealthAttribute(), bFound);
+			float Health = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetHealthAttribute(), bFound);
+			float MaxHealth = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetMaxHealthAttribute(), bFound);
 			if (bFound && MaxHealth > 0.f)
 			{
 				return Health / MaxHealth;

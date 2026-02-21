@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawAbilityTypes.h"
-#include "OutlawAbilitySet.generated.h"
+#include "AtomAbilityTypes.h"
+#include "AtomAbilitySet.generated.h"
 
 class UAbilitySystemComponent;
 class UDataTable;
@@ -15,12 +15,12 @@ class UDataTable;
  * Designed after the Lyra AbilitySet pattern.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawAbilitySet : public UPrimaryDataAsset
+class OUTLAW_API UAtomAbilitySet : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawAbilitySet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomAbilitySet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/**
 	 * Grants all abilities, effects, and attribute sets to the given ASC.
@@ -28,24 +28,24 @@ public:
 	 * @param SourceObject   The object responsible for granting (e.g. equipment actor).
 	 * @param OutHandles     Filled with handles for later revocation.
 	 */
-	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObject* SourceObject, FOutlawAbilitySetGrantedHandles& OutHandles) const;
+	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, UObject* SourceObject, FAtomAbilitySetGrantedHandles& OutHandles) const;
 
 	/**
-	 * Populates the Abilities array from a DataTable of FOutlawAbilityTableRow rows.
+	 * Populates the Abilities array from a DataTable of FAtomAbilityTableRow rows.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Outlaw|AbilitySet")
+	UFUNCTION(BlueprintCallable, Category = "Atom|AbilitySet")
 	void PopulateFromDataTable(const UDataTable* DataTable);
 
 protected:
 	/** Gameplay abilities to grant. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TArray<FOutlawAbilityBindInfo> Abilities;
+	TArray<FAtomAbilityBindInfo> Abilities;
 
 	/** Gameplay effects to apply (passives, auras). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
-	TArray<FOutlawGrantedEffect> Effects;
+	TArray<FAtomGrantedEffect> Effects;
 
 	/** Attribute sets to grant. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	TArray<FOutlawGrantedAttributeSet> AttributeSets;
+	TArray<FAtomGrantedAttributeSet> AttributeSets;
 };

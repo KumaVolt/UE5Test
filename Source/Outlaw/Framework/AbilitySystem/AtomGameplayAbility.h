@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
-#include "OutlawGameplayAbility.generated.h"
+#include "AtomGameplayAbility.generated.h"
 
 /**
  * How this ability is activated.
  */
 UENUM(BlueprintType)
-enum class EOutlawAbilityActivationPolicy : uint8
+enum class EAtomAbilityActivationPolicy : uint8
 {
 	/** Activated when the bound input is triggered. */
 	OnInputTriggered,
@@ -24,23 +24,23 @@ enum class EOutlawAbilityActivationPolicy : uint8
 };
 
 /**
- * Base gameplay ability class for the Outlaw project.
+ * Base gameplay ability class for the Atom project.
  * All project abilities should derive from this.
  */
 UCLASS(Abstract)
-class OUTLAW_API UOutlawGameplayAbility : public UGameplayAbility
+class OUTLAW_API UAtomGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** How this ability is activated. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Outlaw|Activation")
-	EOutlawAbilityActivationPolicy ActivationPolicy = EOutlawAbilityActivationPolicy::OnInputTriggered;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Atom|Activation")
+	EAtomAbilityActivationPolicy ActivationPolicy = EAtomAbilityActivationPolicy::OnInputTriggered;
 
 	/** Returns the activation policy. */
-	EOutlawAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
+	EAtomAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 
 protected:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;

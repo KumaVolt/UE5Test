@@ -1,12 +1,12 @@
 #include "Game/OutlawDemoGameMode.h"
 #include "Characters/OutlawPlayerCharacter.h"
 #include "Characters/OutlawEnemyCharacter.h"
-#include "Player/OutlawPlayerState.h"
+#include "Player/AtomPlayerState.h"
 #include "Player/OutlawPlayerController.h"
-#include "AI/OutlawEnemySpawner.h"
-#include "AI/OutlawAITypes.h"
-#include "Loot/OutlawLootSubsystem.h"
-#include "Loot/OutlawLootPickup.h"
+#include "AI/AtomEnemySpawner.h"
+#include "AI/AtomAITypes.h"
+#include "Loot/AtomLootSubsystem.h"
+#include "Loot/AtomLootPickup.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/DirectionalLight.h"
@@ -19,7 +19,7 @@
 AOutlawDemoGameMode::AOutlawDemoGameMode()
 {
 	DefaultPawnClass = AOutlawPlayerCharacter::StaticClass();
-	PlayerStateClass = AOutlawPlayerState::StaticClass();
+	PlayerStateClass = AAtomPlayerState::StaticClass();
 	PlayerControllerClass = AOutlawPlayerController::StaticClass();
 }
 
@@ -167,7 +167,7 @@ void AOutlawDemoGameMode::SpawnEnemySpawner()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AOutlawEnemySpawner* Spawner = World->SpawnActor<AOutlawEnemySpawner>(
+	AAtomEnemySpawner* Spawner = World->SpawnActor<AAtomEnemySpawner>(
 		FVector(0.f, -1100.f, 100.f), FRotator::ZeroRotator, SpawnParams);
 
 	if (!Spawner)
@@ -176,26 +176,26 @@ void AOutlawDemoGameMode::SpawnEnemySpawner()
 		return;
 	}
 
-	Spawner->SpawnerMode = EOutlawSpawnerMode::WaveBased;
+	Spawner->SpawnerMode = EAtomSpawnerMode::WaveBased;
 	Spawner->SpawnRadius = 500.f;
 	Spawner->MaxActiveEnemies = 10;
 
 	// Wave 1: 3 enemies
-	FOutlawWaveSpawnData Wave1;
+	FAtomWaveSpawnData Wave1;
 	Wave1.EnemyClass = AOutlawEnemyCharacter::StaticClass();
 	Wave1.Count = 3;
 	Wave1.SpawnInterval = 1.0f;
 	Spawner->Waves.Add(Wave1);
 
 	// Wave 2: 5 enemies
-	FOutlawWaveSpawnData Wave2;
+	FAtomWaveSpawnData Wave2;
 	Wave2.EnemyClass = AOutlawEnemyCharacter::StaticClass();
 	Wave2.Count = 5;
 	Wave2.SpawnInterval = 0.8f;
 	Spawner->Waves.Add(Wave2);
 
 	// Wave 3: 8 enemies
-	FOutlawWaveSpawnData Wave3;
+	FAtomWaveSpawnData Wave3;
 	Wave3.EnemyClass = AOutlawEnemyCharacter::StaticClass();
 	Wave3.Count = 8;
 	Wave3.SpawnInterval = 0.5f;
@@ -212,10 +212,10 @@ void AOutlawDemoGameMode::ConfigureLootSubsystem()
 		return;
 	}
 
-	UOutlawLootSubsystem* LootSub = World->GetSubsystem<UOutlawLootSubsystem>();
+	UAtomLootSubsystem* LootSub = World->GetSubsystem<UAtomLootSubsystem>();
 	if (LootSub)
 	{
-		LootSub->LootPickupClass = AOutlawLootPickup::StaticClass();
+		LootSub->LootPickupClass = AAtomLootPickup::StaticClass();
 		LootSub->bAutoLootPickups = true;
 		UE_LOG(LogTemp, Log, TEXT("OutlawDemoGameMode: Loot subsystem configured — auto-loot enabled"));
 	}

@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Camera/OutlawLockOnComponent.h"
+#include "Camera/AtomLockOnComponent.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
@@ -8,18 +8,18 @@
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 
-UOutlawLockOnComponent::UOutlawLockOnComponent(const FObjectInitializer& ObjectInitializer)
+UAtomLockOnComponent::UAtomLockOnComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UOutlawLockOnComponent::BeginPlay()
+void UAtomLockOnComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void UOutlawLockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UAtomLockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -29,7 +29,7 @@ void UOutlawLockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-void UOutlawLockOnComponent::ToggleLockOn()
+void UAtomLockOnComponent::ToggleLockOn()
 {
 	if (CurrentTarget)
 	{
@@ -47,7 +47,7 @@ void UOutlawLockOnComponent::ToggleLockOn()
 	}
 }
 
-void UOutlawLockOnComponent::CycleLockOnTarget(bool bNext)
+void UAtomLockOnComponent::CycleLockOnTarget(bool bNext)
 {
 	TArray<AActor*> Candidates = FindCandidates();
 	if (Candidates.Num() == 0)
@@ -73,7 +73,7 @@ void UOutlawLockOnComponent::CycleLockOnTarget(bool bNext)
 	}
 }
 
-void UOutlawLockOnComponent::BreakLockOn()
+void UAtomLockOnComponent::BreakLockOn()
 {
 	if (!CurrentTarget) return;
 
@@ -81,7 +81,7 @@ void UOutlawLockOnComponent::BreakLockOn()
 	OnLockOnBroken.Broadcast();
 }
 
-TArray<AActor*> UOutlawLockOnComponent::FindCandidates() const
+TArray<AActor*> UAtomLockOnComponent::FindCandidates() const
 {
 	TArray<AActor*> Candidates;
 
@@ -126,7 +126,7 @@ TArray<AActor*> UOutlawLockOnComponent::FindCandidates() const
 	return Candidates;
 }
 
-AActor* UOutlawLockOnComponent::FindNearestCandidate(const TArray<AActor*>& Candidates) const
+AActor* UAtomLockOnComponent::FindNearestCandidate(const TArray<AActor*>& Candidates) const
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || Candidates.Num() == 0) return nullptr;
@@ -150,7 +150,7 @@ AActor* UOutlawLockOnComponent::FindNearestCandidate(const TArray<AActor*>& Cand
 	return Nearest;
 }
 
-bool UOutlawLockOnComponent::IsTargetValid(AActor* Target) const
+bool UAtomLockOnComponent::IsTargetValid(AActor* Target) const
 {
 	if (!Target || Target->IsPendingKillPending()) return false;
 

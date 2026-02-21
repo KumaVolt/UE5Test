@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "OutlawProjectileTypes.h"
-#include "OutlawProjectileBase.generated.h"
+#include "AtomProjectileTypes.h"
+#include "AtomProjectileBase.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -15,14 +15,14 @@ class UAbilitySystemComponent;
 class UGameplayEffect;
 
 UCLASS(Abstract)
-class OUTLAW_API AOutlawProjectileBase : public AActor
+class OUTLAW_API AAtomProjectileBase : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawProjectileBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AAtomProjectileBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void InitProjectile(const FOutlawProjectileInitData& InitData);
+	virtual void InitProjectile(const FAtomProjectileInitData& InitData);
 
 	void ReturnToPool();
 

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "OutlawAITypes.h"
-#include "OutlawAIController.generated.h"
+#include "AtomAITypes.h"
+#include "AtomAIController.generated.h"
 
 class UAIPerceptionComponent;
 class UStateTreeComponent;
@@ -14,12 +14,12 @@ class UAISenseConfig_Hearing;
 class UAISenseConfig_Damage;
 
 UCLASS()
-class OUTLAW_API AOutlawAIController : public AAIController
+class OUTLAW_API AAtomAIController : public AAIController
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawAIController();
+	AAtomAIController();
 
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -30,8 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	void SetTargetActor(AActor* NewTarget);
 
-	FOutlawAIContext& GetAIContext() { return AIContext; }
-	const FOutlawAIContext& GetAIContext() const { return AIContext; }
+	FAtomAIContext& GetAIContext() { return AIContext; }
+	const FAtomAIContext& GetAIContext() const { return AIContext; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
@@ -55,7 +55,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Perception")
 	float MaxAge = 5.f;
 
-	FOutlawAIContext AIContext;
+	FAtomAIContext AIContext;
 
 private:
 	UFUNCTION()

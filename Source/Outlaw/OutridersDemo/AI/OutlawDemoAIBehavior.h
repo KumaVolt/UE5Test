@@ -4,7 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "OutlawDemoAIBehavior.generated.h"
 
-class AOutlawAIController;
+class AAtomAIController;
 
 /** Simple AI states for the demo — replaces StateTree which needs editor assets. */
 UENUM(BlueprintType)
@@ -64,7 +64,7 @@ private:
 	void TryMeleeAttack();
 
 	UPROPERTY()
-	TObjectPtr<AOutlawAIController> AIController;
+	TObjectPtr<AAtomAIController> AIController;
 
 	UPROPERTY()
 	TObjectPtr<AActor> TargetActor;

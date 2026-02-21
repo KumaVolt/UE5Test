@@ -1,12 +1,12 @@
 #include "AbilitySystem/Abilities/OutlawAbility_MeleeAttack.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "GameFramework/Character.h"
 
 UOutlawAbility_MeleeAttack::UOutlawAbility_MeleeAttack()
 {
-	ActivationPolicy = EOutlawAbilityActivationPolicy::OnInputTriggered;
+	ActivationPolicy = EAtomAbilityActivationPolicy::OnInputTriggered;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
@@ -63,7 +63,7 @@ void UOutlawAbility_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandl
 			// Directly reduce Health — ApplyModToAttribute fires the attribute change delegate
 			// which DeathComponent monitors. Using IncomingDamage would require a GE to trigger
 			// PostGameplayEffectExecute, so we modify Health directly instead.
-			TargetASC->ApplyModToAttribute(UOutlawAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -AttackDamage);
+			TargetASC->ApplyModToAttribute(UAtomAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -AttackDamage);
 		}
 		break;
 	}

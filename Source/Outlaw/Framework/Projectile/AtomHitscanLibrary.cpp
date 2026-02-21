@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Projectile/OutlawHitscanLibrary.h"
+#include "Projectile/AtomHitscanLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffect.h"
 #include "Kismet/KismetMathLibrary.h"
 
-TArray<FHitResult> UOutlawHitscanLibrary::FireHitscan(
+TArray<FHitResult> UAtomHitscanLibrary::FireHitscan(
 	const UObject* WorldContextObject,
 	UAbilitySystemComponent* SourceASC,
 	FVector Origin,

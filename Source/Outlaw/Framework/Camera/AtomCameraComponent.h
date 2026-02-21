@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "GameplayTagContainer.h"
-#include "Camera/OutlawCameraTypes.h"
-#include "OutlawCameraComponent.generated.h"
+#include "Camera/AtomCameraTypes.h"
+#include "AtomCameraComponent.generated.h"
 
 class USpringArmComponent;
 class UCameraShakeBase;
@@ -16,18 +16,18 @@ class UCameraShakeBase;
  * Features: ADS (aim down sights), recoil, screen shake, spring arm integration.
  */
 UCLASS(ClassGroup=(Camera), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawCameraComponent : public UCameraComponent
+class OUTLAW_API UAtomCameraComponent : public UCameraComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawCameraComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomCameraComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Camera")
-	void SetCameraMode(EOutlawCameraMode NewMode);
+	void SetCameraMode(EAtomCameraMode NewMode);
 
 	UFUNCTION(BlueprintCallable, Category = "Camera|ADS")
 	void EnterADS();
@@ -42,10 +42,10 @@ public:
 	void ApplyScreenShake(TSubclassOf<UCameraShakeBase> ShakeClass, float Scale = 1.f);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|Config")
-	FOutlawCameraConfig OTSConfig;
+	FAtomCameraConfig OTSConfig;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|Config")
-	FOutlawCameraConfig IsometricConfig;
+	FAtomCameraConfig IsometricConfig;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera|ADS")
 	float ADSFieldOfView = 60.f;
@@ -66,13 +66,13 @@ public:
 	float CameraModeBlendSpeed = 5.f;
 
 	UFUNCTION(BlueprintPure, Category = "Camera")
-	EOutlawCameraMode GetCurrentCameraMode() const { return CurrentMode; }
+	EAtomCameraMode GetCurrentCameraMode() const { return CurrentMode; }
 
 	UFUNCTION(BlueprintPure, Category = "Camera|ADS")
 	bool IsADS() const { return bIsADS; }
 
 private:
-	EOutlawCameraMode CurrentMode = EOutlawCameraMode::OTS;
+	EAtomCameraMode CurrentMode = EAtomCameraMode::OTS;
 	bool bIsADS = false;
 	FVector2D CurrentRecoilOffset = FVector2D::ZeroVector;
 

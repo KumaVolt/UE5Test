@@ -7,7 +7,7 @@
 #include "Engine/DataTable.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "OutlawAbilityTypes.generated.h"
+#include "AtomAbilityTypes.generated.h"
 
 class UGameplayAbility;
 class UGameplayEffect;
@@ -18,7 +18,7 @@ class UAbilitySystemComponent;
  * Single ability entry within an ability set.
  */
 USTRUCT(BlueprintType)
-struct FOutlawAbilityBindInfo
+struct FAtomAbilityBindInfo
 {
 	GENERATED_BODY()
 
@@ -47,7 +47,7 @@ struct FOutlawAbilityBindInfo
  * Gameplay effect entry granted as part of an ability set (passives, auras).
  */
 USTRUCT(BlueprintType)
-struct FOutlawGrantedEffect
+struct FAtomGrantedEffect
 {
 	GENERATED_BODY()
 
@@ -64,7 +64,7 @@ struct FOutlawGrantedEffect
  * Attribute set entry granted as part of an ability set.
  */
 USTRUCT(BlueprintType)
-struct FOutlawGrantedAttributeSet
+struct FAtomGrantedAttributeSet
 {
 	GENERATED_BODY()
 
@@ -77,7 +77,7 @@ struct FOutlawGrantedAttributeSet
  * DataTable row struct for authoring abilities in spreadsheet format.
  */
 USTRUCT(BlueprintType)
-struct FOutlawAbilityTableRow : public FTableRowBase
+struct FAtomAbilityTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -110,7 +110,7 @@ struct FOutlawAbilityTableRow : public FTableRowBase
  * Tracks all handles granted by an ability set so they can be atomically revoked.
  */
 USTRUCT(BlueprintType)
-struct FOutlawAbilitySetGrantedHandles
+struct FAtomAbilitySetGrantedHandles
 {
 	GENERATED_BODY()
 

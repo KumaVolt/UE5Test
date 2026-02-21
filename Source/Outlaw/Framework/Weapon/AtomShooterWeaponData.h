@@ -5,28 +5,28 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "OutlawWeaponTypes.h"
-#include "OutlawShooterWeaponData.generated.h"
+#include "AtomWeaponTypes.h"
+#include "AtomShooterWeaponData.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 class USkeletalMesh;
 class UAnimMontage;
 
 /**
  * Data asset defining a shooter-style weapon's properties (Outriders-style).
- * Referenced from UOutlawItemDefinition via composition.
+ * Referenced from UAtomItemDefinition via composition.
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawShooterWeaponData : public UPrimaryDataAsset
+class OUTLAW_API UAtomShooterWeaponData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawShooterWeaponData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomShooterWeaponData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Weapon archetype (AssaultRifle, Shotgun, etc.). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	EOutlawShooterWeaponType WeaponType = EOutlawShooterWeaponType::AssaultRifle;
+	EAtomShooterWeaponType WeaponType = EAtomShooterWeaponType::AssaultRifle;
 
 	// ── Fire Mode ──────────────────────────────────────────────
 
@@ -90,9 +90,9 @@ public:
 
 	/** Ability set granted when this weapon fires (includes the fire ability). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UOutlawAbilitySet> FireAbilitySet;
+	TObjectPtr<UAtomAbilitySet> FireAbilitySet;
 
 	/** Ability set granted for reload behavior. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UOutlawAbilitySet> ReloadAbilitySet;
+	TObjectPtr<UAtomAbilitySet> ReloadAbilitySet;
 };

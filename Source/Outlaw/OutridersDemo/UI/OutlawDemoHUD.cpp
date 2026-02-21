@@ -2,12 +2,12 @@
 #include "GameFramework/PlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
-#include "Weapon/OutlawWeaponManagerComponent.h"
-#include "Weapon/OutlawShooterWeaponData.h"
-#include "Inventory/OutlawItemInstance.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Progression/OutlawProgressionComponent.h"
+#include "AbilitySystem/AtomAttributeSet.h"
+#include "Weapon/AtomWeaponManagerComponent.h"
+#include "Weapon/AtomShooterWeaponData.h"
+#include "Inventory/AtomItemInstance.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Progression/AtomProgressionComponent.h"
 #include "Characters/OutlawEnemyCharacter.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/SLeafWidget.h"
@@ -389,10 +389,10 @@ void UOutlawDemoHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		if (UAbilitySystemComponent* ASC = ASCOwner->GetAbilitySystemComponent())
 		{
 			bool bFound = false;
-			float Health = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetHealthAttribute(), bFound);
-			float MaxHealth = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetMaxHealthAttribute(), bFound);
-			float Stamina = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetStaminaAttribute(), bFound);
-			float MaxStamina = ASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetMaxStaminaAttribute(), bFound);
+			float Health = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetHealthAttribute(), bFound);
+			float MaxHealth = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetMaxHealthAttribute(), bFound);
+			float Stamina = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetStaminaAttribute(), bFound);
+			float MaxStamina = ASC->GetGameplayAttributeValue(UAtomAttributeSet::GetMaxStaminaAttribute(), bFound);
 
 			SlateHUD->UpdateHealth(Health, MaxHealth);
 			SlateHUD->UpdateStamina(Stamina, MaxStamina);
@@ -400,9 +400,9 @@ void UOutlawDemoHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 
 	// Read Ammo from WeaponManager
-	if (UOutlawWeaponManagerComponent* WeaponMgr = Pawn->FindComponentByClass<UOutlawWeaponManagerComponent>())
+	if (UAtomWeaponManagerComponent* WeaponMgr = Pawn->FindComponentByClass<UAtomWeaponManagerComponent>())
 	{
-		UOutlawItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
+		UAtomItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
 		if (ActiveWeapon)
 		{
 			int32 CurrentAmmo = ActiveWeapon->CurrentAmmo;
@@ -420,7 +420,7 @@ void UOutlawDemoHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 
 	// Read Level/XP from ProgressionComponent
-	if (UOutlawProgressionComponent* Prog = Pawn->FindComponentByClass<UOutlawProgressionComponent>())
+	if (UAtomProgressionComponent* Prog = Pawn->FindComponentByClass<UAtomProgressionComponent>())
 	{
 		SlateHUD->UpdateLevel(Prog->GetCurrentLevel(), Prog->GetXPProgress());
 	}
@@ -457,8 +457,8 @@ void UOutlawDemoHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			}
 
 			bool bFound = false;
-			float EHealth = EnemyASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetHealthAttribute(), bFound);
-			float EMaxHealth = EnemyASC->GetGameplayAttributeValue(UOutlawAttributeSet::GetMaxHealthAttribute(), bFound);
+			float EHealth = EnemyASC->GetGameplayAttributeValue(UAtomAttributeSet::GetHealthAttribute(), bFound);
+			float EMaxHealth = EnemyASC->GetGameplayAttributeValue(UAtomAttributeSet::GetMaxHealthAttribute(), bFound);
 			if (EMaxHealth <= 0.f || EHealth <= 0.f)
 			{
 				continue;

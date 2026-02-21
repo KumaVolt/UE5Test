@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
-#include "AbilitySystem/OutlawAbilityTypes.h"
-#include "OutlawWeaponManagerComponent.generated.h"
+#include "AbilitySystem/AtomAbilityTypes.h"
+#include "AtomWeaponManagerComponent.generated.h"
 
-class UOutlawItemInstance;
-class UOutlawWeaponAttributeSet;
+class UAtomItemInstance;
+class UAtomWeaponAttributeSet;
 class UAbilitySystemComponent;
-class UOutlawInventoryComponent;
+class UAtomInventoryComponent;
 
 /** Reserve ammo entry — maps an ammo type tag to a count. */
 USTRUCT(BlueprintType)
-struct FOutlawReserveAmmoEntry
+struct FAtomReserveAmmoEntry
 {
 	GENERATED_BODY()
 
@@ -26,7 +26,7 @@ struct FOutlawReserveAmmoEntry
 	int32 Amount = 0;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveWeaponChanged, UOutlawItemInstance*, NewWeapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActiveWeaponChanged, UAtomItemInstance*, NewWeapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSetSwapped, int32, NewSetIndex);
 
 /**
@@ -38,12 +38,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSetSwapped, int32, NewSetIn
  * - ARPGWeaponSetI/II: PoE2-style weapon swap sets
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawWeaponManagerComponent : public UActorComponent
+class OUTLAW_API UAtomWeaponManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawWeaponManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomWeaponManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -63,7 +63,7 @@ public:
 
 	/** Get the currently active weapon instance. */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	UOutlawItemInstance* GetActiveWeapon() const;
+	UAtomItemInstance* GetActiveWeapon() const;
 
 	/** Get the slot tag of the currently active weapon. */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
@@ -96,21 +96,21 @@ public:
 
 	/** Get all weapon instances in the specified set. */
 	UFUNCTION(BlueprintCallable, Category = "Weapon|ARPG")
-	TArray<UOutlawItemInstance*> GetWeaponsInSet(int32 SetIndex) const;
+	TArray<UAtomItemInstance*> GetWeaponsInSet(int32 SetIndex) const;
 
 	// ── Inventory Callbacks ─────────────────────────────────────
 
 	/** Called by the inventory component when a weapon is equipped into a slot. */
-	void OnWeaponEquipped(UOutlawItemInstance* Instance, FGameplayTag SlotTag);
+	void OnWeaponEquipped(UAtomItemInstance* Instance, FGameplayTag SlotTag);
 
 	/** Called by the inventory component when a weapon is unequipped from a slot. */
-	void OnWeaponUnequipped(UOutlawItemInstance* Instance, FGameplayTag SlotTag);
+	void OnWeaponUnequipped(UAtomItemInstance* Instance, FGameplayTag SlotTag);
 
 	// ── Attribute Management ────────────────────────────────────
 
-	/** Push the active weapon's stats into UOutlawWeaponAttributeSet on the ASC. */
+	/** Push the active weapon's stats into UAtomWeaponAttributeSet on the ASC. */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void ApplyWeaponStatsToASC(UOutlawItemInstance* Instance);
+	void ApplyWeaponStatsToASC(UAtomItemInstance* Instance);
 
 	/** Clear all weapon stats from the ASC attribute set. */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
@@ -145,16 +145,16 @@ private:
 	UAbilitySystemComponent* GetASC() const;
 
 	/** Resolve the inventory component from the owning actor. */
-	UOutlawInventoryComponent* GetInventoryComponent() const;
+	UAtomInventoryComponent* GetInventoryComponent() const;
 
 	/** Get the item instance equipped in a given slot via the inventory component. */
-	UOutlawItemInstance* GetWeaponInSlot(FGameplayTag SlotTag) const;
+	UAtomItemInstance* GetWeaponInSlot(FGameplayTag SlotTag) const;
 
 	/** Internal: activate a weapon (grant abilities, push stats, fire delegate). */
-	void ActivateWeapon(UOutlawItemInstance* Instance);
+	void ActivateWeapon(UAtomItemInstance* Instance);
 
 	/** Internal: deactivate a weapon (revoke abilities, clear stats). */
-	void DeactivateWeapon(UOutlawItemInstance* Instance);
+	void DeactivateWeapon(UAtomItemInstance* Instance);
 
 	/** Grant/revoke gem abilities for all weapons in a set. */
 	void GrantWeaponSetAbilities(int32 SetIndex);
@@ -172,13 +172,13 @@ private:
 
 	/** Reserve ammo pools by ammo type tag. */
 	UPROPERTY(Replicated)
-	TArray<FOutlawReserveAmmoEntry> ReserveAmmo;
+	TArray<FAtomReserveAmmoEntry> ReserveAmmo;
 
 	// ── Server-Only Handles ─────────────────────────────────────
 
 	/** Handles for the currently active weapon's fire/reload/attack ability sets. */
-	FOutlawAbilitySetGrantedHandles ActiveWeaponAbilityHandles;
+	FAtomAbilitySetGrantedHandles ActiveWeaponAbilityHandles;
 
 	/** Handles for ARPG weapon set gem abilities — index 0 = Set I, index 1 = Set II. */
-	TArray<FOutlawAbilitySetGrantedHandles> WeaponSetGemHandles;
+	TArray<FAtomAbilitySetGrantedHandles> WeaponSetGemHandles;
 };

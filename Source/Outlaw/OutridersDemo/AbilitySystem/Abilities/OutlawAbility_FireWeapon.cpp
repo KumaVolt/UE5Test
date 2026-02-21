@@ -1,19 +1,19 @@
 #include "AbilitySystem/Abilities/OutlawAbility_FireWeapon.h"
-#include "AbilitySystem/OutlawAbilitySystemComponent.h"
+#include "AbilitySystem/AtomAbilitySystemComponent.h"
 #include "AbilitySystem/Effects/OutlawEffect_Damage.h"
-#include "AbilitySystem/OutlawWeaponAttributeSet.h"
-#include "Weapon/OutlawWeaponManagerComponent.h"
-#include "Inventory/OutlawItemInstance.h"
-#include "Inventory/OutlawItemDefinition.h"
-#include "Weapon/OutlawShooterWeaponData.h"
-#include "Projectile/OutlawHitscanLibrary.h"
-#include "Camera/OutlawCameraComponent.h"
+#include "AbilitySystem/AtomWeaponAttributeSet.h"
+#include "Weapon/AtomWeaponManagerComponent.h"
+#include "Inventory/AtomItemInstance.h"
+#include "Inventory/AtomItemDefinition.h"
+#include "Weapon/AtomShooterWeaponData.h"
+#include "Projectile/AtomHitscanLibrary.h"
+#include "Camera/AtomCameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 
 UOutlawAbility_FireWeapon::UOutlawAbility_FireWeapon()
 {
-	ActivationPolicy = EOutlawAbilityActivationPolicy::OnInputTriggered;
+	ActivationPolicy = EAtomAbilityActivationPolicy::OnInputTriggered;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
@@ -51,14 +51,14 @@ void UOutlawAbility_FireWeapon::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
-	UOutlawWeaponManagerComponent* WeaponMgr = AvatarActor->FindComponentByClass<UOutlawWeaponManagerComponent>();
+	UAtomWeaponManagerComponent* WeaponMgr = AvatarActor->FindComponentByClass<UAtomWeaponManagerComponent>();
 	if (!WeaponMgr)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
-	UOutlawItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
+	UAtomItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
 	if (!ActiveWeapon || !ActiveWeapon->ItemDef || !ActiveWeapon->ItemDef->ShooterWeaponData)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
@@ -67,7 +67,7 @@ void UOutlawAbility_FireWeapon::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	ShotsFired = 0;
 	BurstRemaining = 0;
-	const UOutlawShooterWeaponData* WeaponData = ActiveWeapon->ItemDef->ShooterWeaponData;
+	const UAtomShooterWeaponData* WeaponData = ActiveWeapon->ItemDef->ShooterWeaponData;
 
 	// Fire first shot immediately
 	FireSingleShot();
@@ -126,14 +126,14 @@ void UOutlawAbility_FireWeapon::FireSingleShot()
 		return;
 	}
 
-	UOutlawWeaponManagerComponent* WeaponMgr = AvatarActor->FindComponentByClass<UOutlawWeaponManagerComponent>();
+	UAtomWeaponManagerComponent* WeaponMgr = AvatarActor->FindComponentByClass<UAtomWeaponManagerComponent>();
 	if (!WeaponMgr)
 	{
 		StopFiring();
 		return;
 	}
 
-	UOutlawItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
+	UAtomItemInstance* ActiveWeapon = WeaponMgr->GetActiveWeapon();
 	if (!ActiveWeapon || ActiveWeapon->CurrentAmmo <= 0)
 	{
 		StopFiring();
@@ -159,7 +159,7 @@ void UOutlawAbility_FireWeapon::FireSingleShot()
 	float WeaponRange = 5000.f;
 	float Accuracy = 80.f;
 	float Stability = 70.f;
-	if (const UOutlawWeaponAttributeSet* WeaponAttrs = ASC ? ASC->GetSet<UOutlawWeaponAttributeSet>() : nullptr)
+	if (const UAtomWeaponAttributeSet* WeaponAttrs = ASC ? ASC->GetSet<UAtomWeaponAttributeSet>() : nullptr)
 	{
 		WeaponRange = WeaponAttrs->GetWeaponRange();
 		Accuracy = WeaponAttrs->GetAccuracy();
@@ -169,7 +169,7 @@ void UOutlawAbility_FireWeapon::FireSingleShot()
 	// Spread: base from accuracy + grows during sustained fire
 	float SpreadAngle = (100.f - Accuracy) * 0.05f + ShotsFired * 0.002f;
 
-	UOutlawHitscanLibrary::FireHitscan(
+	UAtomHitscanLibrary::FireHitscan(
 		AvatarActor,
 		ASC,
 		EyeLocation,
@@ -182,7 +182,7 @@ void UOutlawAbility_FireWeapon::FireSingleShot()
 	);
 
 	// Apply recoil scaled by stability
-	if (UOutlawCameraComponent* Camera = AvatarActor->FindComponentByClass<UOutlawCameraComponent>())
+	if (UAtomCameraComponent* Camera = AvatarActor->FindComponentByClass<UAtomCameraComponent>())
 	{
 		float RecoilScale = (100.f - Stability) / 100.f;
 		Camera->ApplyRecoil(

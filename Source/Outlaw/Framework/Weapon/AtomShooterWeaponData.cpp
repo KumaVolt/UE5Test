@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawShooterWeaponData.h"
+#include "AtomShooterWeaponData.h"
 
-UOutlawShooterWeaponData::UOutlawShooterWeaponData(const FObjectInitializer& ObjectInitializer)
+UAtomShooterWeaponData::UAtomShooterWeaponData(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }

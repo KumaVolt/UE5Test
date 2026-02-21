@@ -5,23 +5,23 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "AbilitySystemComponent.h"
-#include "OutlawDamageNumberComponent.generated.h"
+#include "AtomDamageNumberComponent.generated.h"
 
-class UOutlawDamageNumberWidget;
+class UAtomDamageNumberWidget;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawDamageNumberComponent : public UActorComponent
+class OUTLAW_API UAtomDamageNumberComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawDamageNumberComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomDamageNumberComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Number")
-	TSubclassOf<UOutlawDamageNumberWidget> DamageNumberWidgetClass;
+	TSubclassOf<UAtomDamageNumberWidget> DamageNumberWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Number")
 	FVector SpawnOffset = FVector(0.f, 0.f, 100.f);

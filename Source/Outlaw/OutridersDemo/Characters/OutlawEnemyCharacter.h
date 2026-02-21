@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OutlawCharacterBase.h"
+#include "Characters/AtomCharacterBase.h"
 #include "OutlawEnemyCharacter.generated.h"
 
-class UOutlawDeathComponent;
-class UOutlawEnemyDeathHandler;
-class UOutlawDamageNumberComponent;
-class UOutlawHitReactionComponent;
-class UOutlawStatusEffectComponent;
+class UAtomDeathComponent;
+class UAtomEnemyDeathHandler;
+class UAtomDamageNumberComponent;
+class UAtomHitReactionComponent;
+class UAtomStatusEffectComponent;
 class UOutlawDemoAIBehavior;
 class UStaticMeshComponent;
 
 UCLASS()
-class OUTLAW_API AOutlawEnemyCharacter : public AOutlawCharacterBase
+class OUTLAW_API AOutlawEnemyCharacter : public AAtomCharacterBase
 {
 	GENERATED_BODY()
 
@@ -26,19 +26,19 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawDeathComponent> DeathComponent;
+	TObjectPtr<UAtomDeathComponent> DeathComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawEnemyDeathHandler> EnemyDeathHandler;
+	TObjectPtr<UAtomEnemyDeathHandler> EnemyDeathHandler;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawDamageNumberComponent> DamageNumberComponent;
+	TObjectPtr<UAtomDamageNumberComponent> DamageNumberComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	TObjectPtr<UOutlawHitReactionComponent> HitReactionComponent;
+	TObjectPtr<UAtomHitReactionComponent> HitReactionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UOutlawStatusEffectComponent> StatusEffectComponent;
+	TObjectPtr<UAtomStatusEffectComponent> StatusEffectComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<UOutlawDemoAIBehavior> AIBehaviorComponent;

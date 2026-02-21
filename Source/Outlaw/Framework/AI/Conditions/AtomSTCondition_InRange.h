@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "StateTreeConditionBase.h"
-#include "OutlowSTCondition_InRange.generated.h"
+#include "AtomSTCondition_InRange.generated.h"
 
 USTRUCT()
-struct OUTLAW_API FOutlowSTCondition_InRangeInstanceData
+struct OUTLAW_API FAtomSTCondition_InRangeInstanceData
 {
 	GENERATED_BODY()
 
@@ -22,13 +22,13 @@ struct OUTLAW_API FOutlowSTCondition_InRangeInstanceData
 };
 
 USTRUCT()
-struct OUTLAW_API FOutlowSTCondition_InRange : public FStateTreeConditionBase
+struct OUTLAW_API FAtomSTCondition_InRange : public FStateTreeConditionBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FOutlowSTCondition_InRangeInstanceData;
+	using FInstanceDataType = FAtomSTCondition_InRangeInstanceData;
 
-	FOutlowSTCondition_InRange() = default;
+	FAtomSTCondition_InRange() = default;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

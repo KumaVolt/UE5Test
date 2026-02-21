@@ -9,7 +9,7 @@
  * Namespace for Combat Gameplay Tags.
  * Register these tags in your project's DefaultGameplayTags.ini or via data asset.
  */
-namespace OutlawCombatTags
+namespace AtomCombatTags
 {
 	// Combat.CriticalHit — added to spec on critical strike
 	inline const FGameplayTag CriticalHit = FGameplayTag::RequestGameplayTag(TEXT("Combat.CriticalHit"));

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "OutlawProgressionTypes.h"
-#include "OutlawSkillTreeNodeDefinition.generated.h"
+#include "AtomProgressionTypes.h"
+#include "AtomSkillTreeNodeDefinition.generated.h"
 
-class UOutlawAbilitySet;
+class UAtomAbilitySet;
 
 /**
  * Defines a single skill tree node — an allocable point on a class skill tree.
@@ -15,12 +15,12 @@ class UOutlawAbilitySet;
  * (e.g. +5% damage per rank, up to 5 ranks).
  */
 UCLASS(BlueprintType, Const)
-class OUTLAW_API UOutlawSkillTreeNodeDefinition : public UPrimaryDataAsset
+class OUTLAW_API UAtomSkillTreeNodeDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawSkillTreeNodeDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomSkillTreeNodeDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Unique identity tag (e.g. Skill.Devastator.GravityLeap). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node", meta = (Categories = "Skill"))
@@ -40,7 +40,7 @@ public:
 
 	/** How this node is unlocked. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node")
-	EOutlawSkillNodeUnlockType UnlockType = EOutlawSkillNodeUnlockType::Manual;
+	EAtomSkillNodeUnlockType UnlockType = EAtomSkillNodeUnlockType::Manual;
 
 	/** Maximum number of times this node can be allocated. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node", meta = (ClampMin = "1"))
@@ -55,24 +55,24 @@ public:
 	int32 RequiredLevel = 1;
 
 	/** If UnlockType == AutoOnLevel, auto-grant at this level. 0 = disabled. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node", meta = (ClampMin = "0", EditCondition = "UnlockType == EOutlawSkillNodeUnlockType::AutoOnLevel"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node", meta = (ClampMin = "0", EditCondition = "UnlockType == EAtomSkillNodeUnlockType::AutoOnLevel"))
 	int32 AutoUnlockLevel = 0;
 
 	/** Other nodes that must be at a required rank before this node can be allocated. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node")
-	TArray<FOutlawSkillNodePrerequisite> Prerequisites;
+	TArray<FAtomSkillNodePrerequisite> Prerequisites;
 
 	/** Ability set granted at rank 1 (for single-rank nodes). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grants")
-	TObjectPtr<UOutlawAbilitySet> GrantedAbilitySet;
+	TObjectPtr<UAtomAbilitySet> GrantedAbilitySet;
 
 	/** Per-rank ability sets — index 0 = rank 1. Overrides GrantedAbilitySet if populated. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grants")
-	TArray<TObjectPtr<UOutlawAbilitySet>> PerRankAbilitySets;
+	TArray<TObjectPtr<UAtomAbilitySet>> PerRankAbilitySets;
 
 	/** Stat bonuses applied per rank (cumulative). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grants")
-	TArray<FOutlawStatGrowthEntry> StatBonusesPerRank;
+	TArray<FAtomStatGrowthEntry> StatBonusesPerRank;
 
 	/** X position on the skill tree canvas (grid units, for UI layout). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Node|Layout")
@@ -84,5 +84,5 @@ public:
 
 	/** Returns the ability set for the given rank (1-based). */
 	UFUNCTION(BlueprintCallable, Category = "Node")
-	UOutlawAbilitySet* GetAbilitySetForRank(int32 Rank) const;
+	UAtomAbilitySet* GetAbilitySetForRank(int32 Rank) const;
 };

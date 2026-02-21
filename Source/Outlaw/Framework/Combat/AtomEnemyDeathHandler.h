@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "OutlawDeathTypes.h"
-#include "OutlawEnemyDeathHandler.generated.h"
+#include "AtomDeathTypes.h"
+#include "AtomEnemyDeathHandler.generated.h"
 
-class UOutlawLootTable;
+class UAtomLootTable;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawEnemyDeathHandler : public UActorComponent
+class OUTLAW_API UAtomEnemyDeathHandler : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawEnemyDeathHandler(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomEnemyDeathHandler(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 
@@ -32,7 +32,7 @@ public:
 	int32 BaseXPReward = 50;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
-	TObjectPtr<UOutlawLootTable> LootTable;
+	TObjectPtr<UAtomLootTable> LootTable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
 	int32 NumLootDrops = 1;

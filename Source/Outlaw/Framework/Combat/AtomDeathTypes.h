@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "OutlawDeathTypes.generated.h"
+#include "AtomDeathTypes.generated.h"
 
 // ── Death Delegates ────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnXPAwarded, int32, XPAmount);
  * Tracks damage events, kills, source/target info, and ability tags.
  */
 USTRUCT(BlueprintType)
-struct FOutlawCombatLogEntry
+struct FAtomCombatLogEntry
 {
 	GENERATED_BODY()
 
@@ -55,7 +55,7 @@ struct FOutlawCombatLogEntry
 	UPROPERTY(BlueprintReadOnly, Category = "CombatLog")
 	FGameplayTag AbilityTag;
 
-	FOutlawCombatLogEntry()
+	FAtomCombatLogEntry()
 		: Timestamp(FDateTime::Now())
 		, DamageAmount(0.f)
 		, bKilled(false)
@@ -63,4 +63,4 @@ struct FOutlawCombatLogEntry
 };
 
 /** Delegate for combat log entry additions (for UI binding). */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatLogEntryAdded, const FOutlawCombatLogEntry&, Entry);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatLogEntryAdded, const FAtomCombatLogEntry&, Entry);

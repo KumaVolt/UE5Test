@@ -4,11 +4,11 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "OutlawDemoDataSubsystem.generated.h"
 
-class UOutlawShooterWeaponData;
-class UOutlawItemDefinition;
-class UOutlawLootTable;
-class UOutlawClassDefinition;
-class UOutlawLevelingConfig;
+class UAtomShooterWeaponData;
+class UAtomItemDefinition;
+class UAtomLootTable;
+class UAtomClassDefinition;
+class UAtomLevelingConfig;
 
 /** World subsystem that creates and holds all demo data assets in C++ (no Blueprint assets). */
 UCLASS()
@@ -19,55 +19,55 @@ class OUTLAW_API UOutlawDemoDataSubsystem : public UWorldSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	UOutlawShooterWeaponData* GetAssaultRifleData() const { return AssaultRifleData; }
-	UOutlawItemDefinition* GetAssaultRifleItemDef() const { return AssaultRifleItemDef; }
-	UOutlawItemDefinition* GetHealthPackItemDef() const { return HealthPackItemDef; }
-	UOutlawItemDefinition* GetAmmoPackItemDef() const { return AmmoPackItemDef; }
-	UOutlawItemDefinition* GetRareRifleItemDef() const { return RareRifleItemDef; }
-	UOutlawShooterWeaponData* GetHandCannonData() const { return HandCannonData; }
-	UOutlawItemDefinition* GetHandCannonItemDef() const { return HandCannonItemDef; }
-	UOutlawItemDefinition* GetRareHandCannonItemDef() const { return RareHandCannonItemDef; }
-	UOutlawLootTable* GetBasicEnemyLootTable() const { return BasicEnemyLootTable; }
-	UOutlawClassDefinition* GetDemoClassDef() const { return DemoClassDef; }
-	UOutlawLevelingConfig* GetDemoLevelingConfig() const { return DemoLevelingConfig; }
+	UAtomShooterWeaponData* GetAssaultRifleData() const { return AssaultRifleData; }
+	UAtomItemDefinition* GetAssaultRifleItemDef() const { return AssaultRifleItemDef; }
+	UAtomItemDefinition* GetHealthPackItemDef() const { return HealthPackItemDef; }
+	UAtomItemDefinition* GetAmmoPackItemDef() const { return AmmoPackItemDef; }
+	UAtomItemDefinition* GetRareRifleItemDef() const { return RareRifleItemDef; }
+	UAtomShooterWeaponData* GetHandCannonData() const { return HandCannonData; }
+	UAtomItemDefinition* GetHandCannonItemDef() const { return HandCannonItemDef; }
+	UAtomItemDefinition* GetRareHandCannonItemDef() const { return RareHandCannonItemDef; }
+	UAtomLootTable* GetBasicEnemyLootTable() const { return BasicEnemyLootTable; }
+	UAtomClassDefinition* GetDemoClassDef() const { return DemoClassDef; }
+	UAtomLevelingConfig* GetDemoLevelingConfig() const { return DemoLevelingConfig; }
 
 private:
 	UPROPERTY()
-	TObjectPtr<UOutlawShooterWeaponData> AssaultRifleData;
+	TObjectPtr<UAtomShooterWeaponData> AssaultRifleData;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawShooterWeaponData> RareAssaultRifleData;
+	TObjectPtr<UAtomShooterWeaponData> RareAssaultRifleData;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawShooterWeaponData> HandCannonData;
+	TObjectPtr<UAtomShooterWeaponData> HandCannonData;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawShooterWeaponData> RareHandCannonData;
+	TObjectPtr<UAtomShooterWeaponData> RareHandCannonData;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> AssaultRifleItemDef;
+	TObjectPtr<UAtomItemDefinition> AssaultRifleItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> HealthPackItemDef;
+	TObjectPtr<UAtomItemDefinition> HealthPackItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> AmmoPackItemDef;
+	TObjectPtr<UAtomItemDefinition> AmmoPackItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> RareRifleItemDef;
+	TObjectPtr<UAtomItemDefinition> RareRifleItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> HandCannonItemDef;
+	TObjectPtr<UAtomItemDefinition> HandCannonItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawItemDefinition> RareHandCannonItemDef;
+	TObjectPtr<UAtomItemDefinition> RareHandCannonItemDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawLootTable> BasicEnemyLootTable;
+	TObjectPtr<UAtomLootTable> BasicEnemyLootTable;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawClassDefinition> DemoClassDef;
+	TObjectPtr<UAtomClassDefinition> DemoClassDef;
 
 	UPROPERTY()
-	TObjectPtr<UOutlawLevelingConfig> DemoLevelingConfig;
+	TObjectPtr<UAtomLevelingConfig> DemoLevelingConfig;
 };

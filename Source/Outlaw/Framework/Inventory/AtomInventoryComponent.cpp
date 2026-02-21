@@ -1,28 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawInventoryComponent.h"
-#include "OutlawItemDefinition.h"
-#include "OutlawItemInstance.h"
+#include "AtomInventoryComponent.h"
+#include "AtomItemDefinition.h"
+#include "AtomItemInstance.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/PlayerState.h"
-#include "AbilitySystem/OutlawAbilitySet.h"
-#include "Weapon/OutlawWeaponManagerComponent.h"
-#include "Weapon/OutlawShooterWeaponData.h"
-#include "Weapon/OutlawARPGWeaponData.h"
-#include "Weapon/OutlawAffixDefinition.h"
-#include "Weapon/OutlawSkillGemDefinition.h"
-#include "Weapon/OutlawWeaponModDefinition.h"
-#include "Weapon/OutlawWeaponTypes.h"
+#include "AbilitySystem/AtomAbilitySet.h"
+#include "Weapon/AtomWeaponManagerComponent.h"
+#include "Weapon/AtomShooterWeaponData.h"
+#include "Weapon/AtomARPGWeaponData.h"
+#include "Weapon/AtomAffixDefinition.h"
+#include "Weapon/AtomSkillGemDefinition.h"
+#include "Weapon/AtomWeaponModDefinition.h"
+#include "Weapon/AtomWeaponTypes.h"
 #include "Net/UnrealNetwork.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogOutlawInventory, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogAtomInventory, Log, All);
 
 // ════════════════════════════════════════════════════════════════
-// FOutlawInventoryEntry — FFastArraySerializerItem callbacks
+// FAtomInventoryEntry — FFastArraySerializerItem callbacks
 // ════════════════════════════════════════════════════════════════
 
-void FOutlawInventoryEntry::PreReplicatedRemove(const FOutlawInventoryList& InArraySerializer)
+void FAtomInventoryEntry::PreReplicatedRemove(const FAtomInventoryList& InArraySerializer)
 {
 	if (InArraySerializer.OwnerComponent)
 	{
@@ -30,7 +30,7 @@ void FOutlawInventoryEntry::PreReplicatedRemove(const FOutlawInventoryList& InAr
 	}
 }
 
-void FOutlawInventoryEntry::PostReplicatedAdd(const FOutlawInventoryList& InArraySerializer)
+void FAtomInventoryEntry::PostReplicatedAdd(const FAtomInventoryList& InArraySerializer)
 {
 	if (InArraySerializer.OwnerComponent)
 	{
@@ -38,7 +38,7 @@ void FOutlawInventoryEntry::PostReplicatedAdd(const FOutlawInventoryList& InArra
 	}
 }
 
-void FOutlawInventoryEntry::PostReplicatedChange(const FOutlawInventoryList& InArraySerializer)
+void FAtomInventoryEntry::PostReplicatedChange(const FAtomInventoryList& InArraySerializer)
 {
 	if (InArraySerializer.OwnerComponent)
 	{
@@ -47,12 +47,12 @@ void FOutlawInventoryEntry::PostReplicatedChange(const FOutlawInventoryList& InA
 }
 
 // ════════════════════════════════════════════════════════════════
-// FOutlawInventoryList — Helpers
+// FAtomInventoryList — Helpers
 // ════════════════════════════════════════════════════════════════
 
-int32 FOutlawInventoryList::AddEntry(UOutlawItemDefinition* ItemDef, int32 StackCount, int32 InstanceId, int32 GridX, int32 GridY)
+int32 FAtomInventoryList::AddEntry(UAtomItemDefinition* ItemDef, int32 StackCount, int32 InstanceId, int32 GridX, int32 GridY)
 {
-	FOutlawInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+	FAtomInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
 	NewEntry.ItemDef = ItemDef;
 	NewEntry.StackCount = StackCount;
 	NewEntry.InstanceId = InstanceId;
@@ -63,7 +63,7 @@ int32 FOutlawInventoryList::AddEntry(UOutlawItemDefinition* ItemDef, int32 Stack
 	return Entries.Num() - 1;
 }
 
-bool FOutlawInventoryList::RemoveEntry(int32 InstanceId)
+bool FAtomInventoryList::RemoveEntry(int32 InstanceId)
 {
 	for (int32 i = 0; i < Entries.Num(); ++i)
 	{
@@ -77,9 +77,9 @@ bool FOutlawInventoryList::RemoveEntry(int32 InstanceId)
 	return false;
 }
 
-FOutlawInventoryEntry* FOutlawInventoryList::FindEntry(int32 InstanceId)
+FAtomInventoryEntry* FAtomInventoryList::FindEntry(int32 InstanceId)
 {
-	for (FOutlawInventoryEntry& Entry : Entries)
+	for (FAtomInventoryEntry& Entry : Entries)
 	{
 		if (Entry.InstanceId == InstanceId)
 		{
@@ -89,9 +89,9 @@ FOutlawInventoryEntry* FOutlawInventoryList::FindEntry(int32 InstanceId)
 	return nullptr;
 }
 
-const FOutlawInventoryEntry* FOutlawInventoryList::FindEntry(int32 InstanceId) const
+const FAtomInventoryEntry* FAtomInventoryList::FindEntry(int32 InstanceId) const
 {
-	for (const FOutlawInventoryEntry& Entry : Entries)
+	for (const FAtomInventoryEntry& Entry : Entries)
 	{
 		if (Entry.InstanceId == InstanceId)
 		{
@@ -102,17 +102,17 @@ const FOutlawInventoryEntry* FOutlawInventoryList::FindEntry(int32 InstanceId) c
 }
 
 // ════════════════════════════════════════════════════════════════
-// UOutlawInventoryComponent
+// UAtomInventoryComponent
 // ════════════════════════════════════════════════════════════════
 
-UOutlawInventoryComponent::UOutlawInventoryComponent(const FObjectInitializer& ObjectInitializer)
+UAtomInventoryComponent::UAtomInventoryComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, InventoryList(this)
 {
 	SetIsReplicatedByDefault(true);
 }
 
-void UOutlawInventoryComponent::BeginPlay()
+void UAtomInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -122,17 +122,17 @@ void UOutlawInventoryComponent::BeginPlay()
 	}
 }
 
-void UOutlawInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UAtomInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UOutlawInventoryComponent, InventoryList);
-	DOREPLIFETIME(UOutlawInventoryComponent, EquipmentSlots);
+	DOREPLIFETIME(UAtomInventoryComponent, InventoryList);
+	DOREPLIFETIME(UAtomInventoryComponent, EquipmentSlots);
 }
 
 // ── Core Inventory ──────────────────────────────────────────────
 
-int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 Count)
+int32 UAtomInventoryComponent::AddItem(UAtomItemDefinition* ItemDef, int32 Count)
 {
 	if (!ItemDef || Count <= 0)
 	{
@@ -141,7 +141,7 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 
 	if (!GetOwner()->HasAuthority())
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("AddItem called on client. Item: %s"), *ItemDef->DisplayName.ToString());
+		UE_LOG(LogAtomInventory, Warning, TEXT("AddItem called on client. Item: %s"), *ItemDef->DisplayName.ToString());
 		return 0;
 	}
 
@@ -150,7 +150,7 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 	// First pass: fill existing stacks
 	if (ItemDef->MaxStackSize > 1)
 	{
-		for (FOutlawInventoryEntry& Entry : InventoryList.Entries)
+		for (FAtomInventoryEntry& Entry : InventoryList.Entries)
 		{
 			if (Remaining <= 0)
 			{
@@ -277,14 +277,14 @@ int32 UOutlawInventoryComponent::AddItem(UOutlawItemDefinition* ItemDef, int32 C
 	return Added;
 }
 
-bool UOutlawInventoryComponent::RemoveItem(int32 InstanceId, int32 Count)
+bool UAtomInventoryComponent::RemoveItem(int32 InstanceId, int32 Count)
 {
 	if (!GetOwner()->HasAuthority())
 	{
 		return false;
 	}
 
-	FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	FAtomInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
 	if (!Entry)
 	{
 		return false;
@@ -309,7 +309,7 @@ bool UOutlawInventoryComponent::RemoveItem(int32 InstanceId, int32 Count)
 	return true;
 }
 
-int32 UOutlawInventoryComponent::RemoveItemByDef(UOutlawItemDefinition* ItemDef, int32 Count)
+int32 UAtomInventoryComponent::RemoveItemByDef(UAtomItemDefinition* ItemDef, int32 Count)
 {
 	if (!ItemDef || Count <= 0 || !GetOwner()->HasAuthority())
 	{
@@ -321,7 +321,7 @@ int32 UOutlawInventoryComponent::RemoveItemByDef(UOutlawItemDefinition* ItemDef,
 	// Iterate in reverse so removals don't invalidate indices
 	for (int32 i = InventoryList.Entries.Num() - 1; i >= 0 && Remaining > 0; --i)
 	{
-		FOutlawInventoryEntry& Entry = InventoryList.Entries[i];
+		FAtomInventoryEntry& Entry = InventoryList.Entries[i];
 		if (Entry.ItemDef != ItemDef)
 		{
 			continue;
@@ -353,10 +353,10 @@ int32 UOutlawInventoryComponent::RemoveItemByDef(UOutlawItemDefinition* ItemDef,
 	return Removed;
 }
 
-TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByTag(FGameplayTag Tag) const
+TArray<FAtomInventoryEntry> UAtomInventoryComponent::FindItemsByTag(FGameplayTag Tag) const
 {
-	TArray<FOutlawInventoryEntry> Result;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	TArray<FAtomInventoryEntry> Result;
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef && Entry.ItemDef->ItemTags.HasTag(Tag))
 		{
@@ -366,10 +366,10 @@ TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByTag(FGamepla
 	return Result;
 }
 
-int32 UOutlawInventoryComponent::GetItemCount(const UOutlawItemDefinition* ItemDef) const
+int32 UAtomInventoryComponent::GetItemCount(const UAtomItemDefinition* ItemDef) const
 {
 	int32 Total = 0;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef == ItemDef)
 		{
@@ -379,15 +379,15 @@ int32 UOutlawInventoryComponent::GetItemCount(const UOutlawItemDefinition* ItemD
 	return Total;
 }
 
-bool UOutlawInventoryComponent::HasItem(const UOutlawItemDefinition* ItemDef, int32 Count) const
+bool UAtomInventoryComponent::HasItem(const UAtomItemDefinition* ItemDef, int32 Count) const
 {
 	return GetItemCount(ItemDef) >= Count;
 }
 
-float UOutlawInventoryComponent::GetCurrentWeight() const
+float UAtomInventoryComponent::GetCurrentWeight() const
 {
 	float Total = 0.0f;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef)
 		{
@@ -397,7 +397,7 @@ float UOutlawInventoryComponent::GetCurrentWeight() const
 	return Total;
 }
 
-int32 UOutlawInventoryComponent::GetRemainingSlots() const
+int32 UAtomInventoryComponent::GetRemainingSlots() const
 {
 	if (IsGridMode())
 	{
@@ -414,10 +414,10 @@ int32 UOutlawInventoryComponent::GetRemainingSlots() const
 	return MaxSlots - InventoryList.Entries.Num();
 }
 
-TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsForSlot(FGameplayTag SlotTag) const
+TArray<FAtomInventoryEntry> UAtomInventoryComponent::FindItemsForSlot(FGameplayTag SlotTag) const
 {
-	TArray<FOutlawInventoryEntry> Result;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	TArray<FAtomInventoryEntry> Result;
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef && Entry.ItemDef->bCanBeEquipped && Entry.ItemDef->EquipmentSlotTag == SlotTag)
 		{
@@ -427,10 +427,10 @@ TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsForSlot(FGamep
 	return Result;
 }
 
-TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByType(EOutlawItemType ItemType) const
+TArray<FAtomInventoryEntry> UAtomInventoryComponent::FindItemsByType(EAtomItemType ItemType) const
 {
-	TArray<FOutlawInventoryEntry> Result;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	TArray<FAtomInventoryEntry> Result;
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef && Entry.ItemDef->ItemType == ItemType)
 		{
@@ -440,10 +440,10 @@ TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByType(EOutlaw
 	return Result;
 }
 
-TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByRarity(EOutlawItemRarity Rarity) const
+TArray<FAtomInventoryEntry> UAtomInventoryComponent::FindItemsByRarity(EAtomItemRarity Rarity) const
 {
-	TArray<FOutlawInventoryEntry> Result;
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	TArray<FAtomInventoryEntry> Result;
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef && Entry.ItemDef->Rarity == Rarity)
 		{
@@ -455,14 +455,14 @@ TArray<FOutlawInventoryEntry> UOutlawInventoryComponent::FindItemsByRarity(EOutl
 
 // ── Sorting ─────────────────────────────────────────────────────
 
-void UOutlawInventoryComponent::SortInventory(EOutlawInventorySortMode SortMode, bool bDescending)
+void UAtomInventoryComponent::SortInventory(EAtomInventorySortMode SortMode, bool bDescending)
 {
 	if (!GetOwner()->HasAuthority())
 	{
 		return;
 	}
 
-	InventoryList.Entries.Sort([SortMode, bDescending](const FOutlawInventoryEntry& A, const FOutlawInventoryEntry& B)
+	InventoryList.Entries.Sort([SortMode, bDescending](const FAtomInventoryEntry& A, const FAtomInventoryEntry& B)
 	{
 		// Null-def entries sink to the bottom
 		if (!A.ItemDef) return false;
@@ -472,15 +472,15 @@ void UOutlawInventoryComponent::SortInventory(EOutlawInventorySortMode SortMode,
 
 		switch (SortMode)
 		{
-		case EOutlawInventorySortMode::ByName:
+		case EAtomInventorySortMode::ByName:
 			Result = A.ItemDef->DisplayName.CompareTo(B.ItemDef->DisplayName);
 			break;
 
-		case EOutlawInventorySortMode::ByRarity:
+		case EAtomInventorySortMode::ByRarity:
 			Result = static_cast<int32>(A.ItemDef->Rarity) - static_cast<int32>(B.ItemDef->Rarity);
 			break;
 
-		case EOutlawInventorySortMode::ByType:
+		case EAtomInventorySortMode::ByType:
 			Result = static_cast<int32>(A.ItemDef->ItemType) - static_cast<int32>(B.ItemDef->ItemType);
 			// Secondary sort by name within same type
 			if (Result == 0)
@@ -489,7 +489,7 @@ void UOutlawInventoryComponent::SortInventory(EOutlawInventorySortMode SortMode,
 			}
 			break;
 
-		case EOutlawInventorySortMode::ByWeight:
+		case EAtomInventorySortMode::ByWeight:
 			{
 				const float WeightDiff = (A.ItemDef->Weight * A.StackCount) - (B.ItemDef->Weight * B.StackCount);
 				Result = (WeightDiff > 0.0f) ? 1 : (WeightDiff < 0.0f) ? -1 : 0;
@@ -506,31 +506,31 @@ void UOutlawInventoryComponent::SortInventory(EOutlawInventorySortMode SortMode,
 
 // ── Equipment ───────────────────────────────────────────────────
 
-bool UOutlawInventoryComponent::EquipItem(int32 InstanceId)
+bool UAtomInventoryComponent::EquipItem(int32 InstanceId)
 {
 	if (!GetOwner()->HasAuthority())
 	{
 		return false;
 	}
 
-	FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	FAtomInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
 	if (!Entry || !Entry->ItemDef)
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("EquipItem: Invalid InstanceId %d"), InstanceId);
+		UE_LOG(LogAtomInventory, Warning, TEXT("EquipItem: Invalid InstanceId %d"), InstanceId);
 		return false;
 	}
 
-	const UOutlawItemDefinition* ItemDef = Entry->ItemDef;
+	const UAtomItemDefinition* ItemDef = Entry->ItemDef;
 	if (!ItemDef->bCanBeEquipped)
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("EquipItem: Item '%s' cannot be equipped."), *ItemDef->DisplayName.ToString());
+		UE_LOG(LogAtomInventory, Warning, TEXT("EquipItem: Item '%s' cannot be equipped."), *ItemDef->DisplayName.ToString());
 		return false;
 	}
 
-	FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(ItemDef->EquipmentSlotTag);
+	FAtomEquipmentSlotInfo* Slot = FindEquipmentSlot(ItemDef->EquipmentSlotTag);
 	if (!Slot)
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("EquipItem: No equipment slot '%s' configured."), *ItemDef->EquipmentSlotTag.ToString());
+		UE_LOG(LogAtomInventory, Warning, TEXT("EquipItem: No equipment slot '%s' configured."), *ItemDef->EquipmentSlotTag.ToString());
 		return false;
 	}
 
@@ -555,7 +555,7 @@ bool UOutlawInventoryComponent::EquipItem(int32 InstanceId)
 	// Notify weapon manager if this is a weapon with an instance
 	if (Entry->ItemInstance)
 	{
-		if (UOutlawWeaponManagerComponent* WeaponMgr = GetWeaponManager())
+		if (UAtomWeaponManagerComponent* WeaponMgr = GetWeaponManager())
 		{
 			WeaponMgr->OnWeaponEquipped(Entry->ItemInstance, Slot->SlotTag);
 		}
@@ -566,26 +566,26 @@ bool UOutlawInventoryComponent::EquipItem(int32 InstanceId)
 	return true;
 }
 
-bool UOutlawInventoryComponent::UnequipItem(FGameplayTag SlotTag)
+bool UAtomInventoryComponent::UnequipItem(FGameplayTag SlotTag)
 {
 	if (!GetOwner()->HasAuthority())
 	{
 		return false;
 	}
 
-	FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
+	FAtomEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
 	if (!Slot || Slot->EquippedItemInstanceId == INDEX_NONE)
 	{
 		return false;
 	}
 
-	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
-	const UOutlawItemDefinition* ItemDef = Entry ? Entry->ItemDef : nullptr;
+	const FAtomInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
+	const UAtomItemDefinition* ItemDef = Entry ? Entry->ItemDef : nullptr;
 
 	// Notify weapon manager before revoking
 	if (Entry && Entry->ItemInstance)
 	{
-		if (UOutlawWeaponManagerComponent* WeaponMgr = GetWeaponManager())
+		if (UAtomWeaponManagerComponent* WeaponMgr = GetWeaponManager())
 		{
 			WeaponMgr->OnWeaponUnequipped(Entry->ItemInstance, SlotTag);
 		}
@@ -608,50 +608,50 @@ bool UOutlawInventoryComponent::UnequipItem(FGameplayTag SlotTag)
 	return true;
 }
 
-UOutlawItemDefinition* UOutlawInventoryComponent::GetEquippedItem(FGameplayTag SlotTag) const
+UAtomItemDefinition* UAtomInventoryComponent::GetEquippedItem(FGameplayTag SlotTag) const
 {
-	const FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
+	const FAtomEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
 	if (!Slot || Slot->EquippedItemInstanceId == INDEX_NONE)
 	{
 		return nullptr;
 	}
 
-	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
-	return Entry ? const_cast<UOutlawItemDefinition*>(Entry->ItemDef.Get()) : nullptr;
+	const FAtomInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
+	return Entry ? const_cast<UAtomItemDefinition*>(Entry->ItemDef.Get()) : nullptr;
 }
 
-bool UOutlawInventoryComponent::IsSlotOccupied(FGameplayTag SlotTag) const
+bool UAtomInventoryComponent::IsSlotOccupied(FGameplayTag SlotTag) const
 {
-	const FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
+	const FAtomEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
 	return Slot && Slot->EquippedItemInstanceId != INDEX_NONE;
 }
 
 // ── Use ─────────────────────────────────────────────────────────
 
-bool UOutlawInventoryComponent::UseItem(int32 InstanceId)
+bool UAtomInventoryComponent::UseItem(int32 InstanceId)
 {
 	if (!GetOwner()->HasAuthority())
 	{
 		return false;
 	}
 
-	FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	FAtomInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
 	if (!Entry || !Entry->ItemDef)
 	{
 		return false;
 	}
 
-	const UOutlawItemDefinition* ItemDef = Entry->ItemDef;
+	const UAtomItemDefinition* ItemDef = Entry->ItemDef;
 	if (!ItemDef->UseAbility)
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("UseItem: Item '%s' has no UseAbility."), *ItemDef->DisplayName.ToString());
+		UE_LOG(LogAtomInventory, Warning, TEXT("UseItem: Item '%s' has no UseAbility."), *ItemDef->DisplayName.ToString());
 		return false;
 	}
 
 	UAbilitySystemComponent* ASC = GetASC();
 	if (!ASC)
 	{
-		UE_LOG(LogOutlawInventory, Warning, TEXT("UseItem: No ASC found on owning actor."));
+		UE_LOG(LogAtomInventory, Warning, TEXT("UseItem: No ASC found on owning actor."));
 		return false;
 	}
 
@@ -677,25 +677,25 @@ bool UOutlawInventoryComponent::UseItem(int32 InstanceId)
 
 // ── Save/Load ───────────────────────────────────────────────────
 
-FOutlawInventorySaveData UOutlawInventoryComponent::SaveInventory() const
+FAtomInventorySaveData UAtomInventoryComponent::SaveInventory() const
 {
-	FOutlawInventorySaveData SaveData;
+	FAtomInventorySaveData SaveData;
 
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (!Entry.ItemDef)
 		{
 			continue;
 		}
 
-		FOutlawInventoryItemSaveEntry SaveEntry;
+		FAtomInventoryItemSaveEntry SaveEntry;
 		SaveEntry.ItemDefPath = FSoftObjectPath(Entry.ItemDef);
 		SaveEntry.StackCount = Entry.StackCount;
 		SaveEntry.GridX = Entry.GridX;
 		SaveEntry.GridY = Entry.GridY;
 
 		// Check if this item is currently equipped
-		for (const FOutlawEquipmentSlotInfo& Slot : EquipmentSlots)
+		for (const FAtomEquipmentSlotInfo& Slot : EquipmentSlots)
 		{
 			if (Slot.EquippedItemInstanceId == Entry.InstanceId)
 			{
@@ -707,14 +707,14 @@ FOutlawInventorySaveData UOutlawInventoryComponent::SaveInventory() const
 		// Save weapon instance state
 		if (Entry.ItemInstance)
 		{
-			UOutlawItemInstance* Inst = Entry.ItemInstance;
+			UAtomItemInstance* Inst = Entry.ItemInstance;
 			SaveEntry.CurrentAmmo = Inst->CurrentAmmo;
 			SaveEntry.Quality = Inst->Quality;
 
 			// Save affixes
-			for (const FOutlawItemAffix& Affix : Inst->Affixes)
+			for (const FAtomItemAffix& Affix : Inst->Affixes)
 			{
-				FOutlawSavedAffix SavedAffix;
+				FAtomSavedAffix SavedAffix;
 				SavedAffix.AffixDefPath = FSoftObjectPath(Affix.AffixDef);
 				SavedAffix.RolledValue = Affix.RolledValue;
 				SavedAffix.Slot = static_cast<uint8>(Affix.Slot);
@@ -722,7 +722,7 @@ FOutlawInventorySaveData UOutlawInventoryComponent::SaveInventory() const
 			}
 
 			// Save socketed gems
-			for (const FOutlawSocketSlot& Socket : Inst->SocketSlots)
+			for (const FAtomSocketSlot& Socket : Inst->SocketSlots)
 			{
 				SaveEntry.SavedSocketedGems.Add(Socket.SocketedGem ? FSoftObjectPath(Socket.SocketedGem) : FSoftObjectPath());
 			}
@@ -744,7 +744,7 @@ FOutlawInventorySaveData UOutlawInventoryComponent::SaveInventory() const
 	return SaveData;
 }
 
-void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Data)
+void UAtomInventoryComponent::LoadInventory(const FAtomInventorySaveData& Data)
 {
 	if (!GetOwner()->HasAuthority())
 	{
@@ -752,7 +752,7 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 	}
 
 	// Unequip all slots first
-	for (FOutlawEquipmentSlotInfo& Slot : EquipmentSlots)
+	for (FAtomEquipmentSlotInfo& Slot : EquipmentSlots)
 	{
 		if (Slot.EquippedItemInstanceId != INDEX_NONE)
 		{
@@ -772,12 +772,12 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 	// Restore items
 	TArray<TPair<int32, FGameplayTag>> ItemsToEquip;
 
-	for (const FOutlawInventoryItemSaveEntry& SaveEntry : Data.Items)
+	for (const FAtomInventoryItemSaveEntry& SaveEntry : Data.Items)
 	{
-		UOutlawItemDefinition* ItemDef = Cast<UOutlawItemDefinition>(SaveEntry.ItemDefPath.TryLoad());
+		UAtomItemDefinition* ItemDef = Cast<UAtomItemDefinition>(SaveEntry.ItemDefPath.TryLoad());
 		if (!ItemDef)
 		{
-			UE_LOG(LogOutlawInventory, Warning, TEXT("LoadInventory: Failed to load item at path '%s'"), *SaveEntry.ItemDefPath.ToString());
+			UE_LOG(LogAtomInventory, Warning, TEXT("LoadInventory: Failed to load item at path '%s'"), *SaveEntry.ItemDefPath.ToString());
 			continue;
 		}
 
@@ -792,7 +792,7 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 		// Restore weapon instance if this is a weapon
 		if (ItemDef->IsWeapon())
 		{
-			UOutlawItemInstance* Inst = CreateItemInstance(ItemDef, NewInstanceId);
+			UAtomItemInstance* Inst = CreateItemInstance(ItemDef, NewInstanceId);
 			InventoryList.Entries[EntryIdx].ItemInstance = Inst;
 
 			Inst->CurrentAmmo = SaveEntry.CurrentAmmo;
@@ -800,15 +800,15 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 
 			// Restore affixes
 			Inst->Affixes.Reset();
-			for (const FOutlawSavedAffix& SavedAffix : SaveEntry.SavedAffixes)
+			for (const FAtomSavedAffix& SavedAffix : SaveEntry.SavedAffixes)
 			{
-				UOutlawAffixDefinition* AffixDef = Cast<UOutlawAffixDefinition>(SavedAffix.AffixDefPath.TryLoad());
+				UAtomAffixDefinition* AffixDef = Cast<UAtomAffixDefinition>(SavedAffix.AffixDefPath.TryLoad());
 				if (AffixDef)
 				{
-					FOutlawItemAffix Affix;
+					FAtomItemAffix Affix;
 					Affix.AffixDef = AffixDef;
 					Affix.RolledValue = SavedAffix.RolledValue;
-					Affix.Slot = static_cast<EOutlawAffixSlot>(SavedAffix.Slot);
+					Affix.Slot = static_cast<EAtomAffixSlot>(SavedAffix.Slot);
 					Inst->Affixes.Add(Affix);
 				}
 			}
@@ -818,7 +818,7 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 			{
 				if (SaveEntry.SavedSocketedGems[i].IsValid())
 				{
-					UOutlawSkillGemDefinition* GemDef = Cast<UOutlawSkillGemDefinition>(SaveEntry.SavedSocketedGems[i].TryLoad());
+					UAtomSkillGemDefinition* GemDef = Cast<UAtomSkillGemDefinition>(SaveEntry.SavedSocketedGems[i].TryLoad());
 					if (GemDef)
 					{
 						Inst->SocketSlots[i].SocketedGem = GemDef;
@@ -829,11 +829,11 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 			// Restore mods
 			if (SaveEntry.SavedModTier1.IsValid())
 			{
-				Inst->InstalledModTier1 = Cast<UOutlawWeaponModDefinition>(SaveEntry.SavedModTier1.TryLoad());
+				Inst->InstalledModTier1 = Cast<UAtomWeaponModDefinition>(SaveEntry.SavedModTier1.TryLoad());
 			}
 			if (SaveEntry.SavedModTier2.IsValid())
 			{
-				Inst->InstalledModTier2 = Cast<UOutlawWeaponModDefinition>(SaveEntry.SavedModTier2.TryLoad());
+				Inst->InstalledModTier2 = Cast<UAtomWeaponModDefinition>(SaveEntry.SavedModTier2.TryLoad());
 			}
 		}
 
@@ -854,34 +854,34 @@ void UOutlawInventoryComponent::LoadInventory(const FOutlawInventorySaveData& Da
 
 // ── Item Instance API ────────────────────────────────────────────
 
-UOutlawItemInstance* UOutlawInventoryComponent::GetItemInstance(FGameplayTag SlotTag) const
+UAtomItemInstance* UAtomInventoryComponent::GetItemInstance(FGameplayTag SlotTag) const
 {
-	const FOutlawEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
+	const FAtomEquipmentSlotInfo* Slot = FindEquipmentSlot(SlotTag);
 	if (!Slot || Slot->EquippedItemInstanceId == INDEX_NONE)
 	{
 		return nullptr;
 	}
 
-	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
+	const FAtomInventoryEntry* Entry = InventoryList.FindEntry(Slot->EquippedItemInstanceId);
 	return Entry ? Entry->ItemInstance : nullptr;
 }
 
-UOutlawItemInstance* UOutlawInventoryComponent::GetItemInstanceById(int32 InstanceId) const
+UAtomItemInstance* UAtomInventoryComponent::GetItemInstanceById(int32 InstanceId) const
 {
-	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	const FAtomInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
 	return Entry ? Entry->ItemInstance : nullptr;
 }
 
 // ── Private Helpers ─────────────────────────────────────────────
 
-UOutlawItemInstance* UOutlawInventoryComponent::CreateItemInstance(UOutlawItemDefinition* ItemDef, int32 InstanceId)
+UAtomItemInstance* UAtomInventoryComponent::CreateItemInstance(UAtomItemDefinition* ItemDef, int32 InstanceId)
 {
 	if (!ItemDef || !ItemDef->IsWeapon())
 	{
 		return nullptr;
 	}
 
-	UOutlawItemInstance* Instance = NewObject<UOutlawItemInstance>(GetOwner());
+	UAtomItemInstance* Instance = NewObject<UAtomItemInstance>(GetOwner());
 	Instance->ItemDef = ItemDef;
 	Instance->InstanceId = InstanceId;
 
@@ -900,13 +900,13 @@ UOutlawItemInstance* UOutlawInventoryComponent::CreateItemInstance(UOutlawItemDe
 	return Instance;
 }
 
-UOutlawWeaponManagerComponent* UOutlawInventoryComponent::GetWeaponManager() const
+UAtomWeaponManagerComponent* UAtomInventoryComponent::GetWeaponManager() const
 {
 	AActor* Owner = GetOwner();
-	return Owner ? Owner->FindComponentByClass<UOutlawWeaponManagerComponent>() : nullptr;
+	return Owner ? Owner->FindComponentByClass<UAtomWeaponManagerComponent>() : nullptr;
 }
 
-UAbilitySystemComponent* UOutlawInventoryComponent::GetASC() const
+UAbilitySystemComponent* UAtomInventoryComponent::GetASC() const
 {
 	AActor* Owner = GetOwner();
 	if (!Owner)
@@ -935,9 +935,9 @@ UAbilitySystemComponent* UOutlawInventoryComponent::GetASC() const
 	return nullptr;
 }
 
-FOutlawEquipmentSlotInfo* UOutlawInventoryComponent::FindEquipmentSlot(FGameplayTag SlotTag)
+FAtomEquipmentSlotInfo* UAtomInventoryComponent::FindEquipmentSlot(FGameplayTag SlotTag)
 {
-	for (FOutlawEquipmentSlotInfo& Slot : EquipmentSlots)
+	for (FAtomEquipmentSlotInfo& Slot : EquipmentSlots)
 	{
 		if (Slot.SlotTag == SlotTag)
 		{
@@ -947,9 +947,9 @@ FOutlawEquipmentSlotInfo* UOutlawInventoryComponent::FindEquipmentSlot(FGameplay
 	return nullptr;
 }
 
-const FOutlawEquipmentSlotInfo* UOutlawInventoryComponent::FindEquipmentSlot(FGameplayTag SlotTag) const
+const FAtomEquipmentSlotInfo* UAtomInventoryComponent::FindEquipmentSlot(FGameplayTag SlotTag) const
 {
-	for (const FOutlawEquipmentSlotInfo& Slot : EquipmentSlots)
+	for (const FAtomEquipmentSlotInfo& Slot : EquipmentSlots)
 	{
 		if (Slot.SlotTag == SlotTag)
 		{
@@ -959,7 +959,7 @@ const FOutlawEquipmentSlotInfo* UOutlawInventoryComponent::FindEquipmentSlot(FGa
 	return nullptr;
 }
 
-void UOutlawInventoryComponent::BroadcastInventoryChanged()
+void UAtomInventoryComponent::BroadcastInventoryChanged()
 {
 	// On clients, rebuild the occupancy grid from replicated entries
 	if (IsGridMode() && GetOwner() && !GetOwner()->HasAuthority())
@@ -970,24 +970,24 @@ void UOutlawInventoryComponent::BroadcastInventoryChanged()
 	OnInventoryChanged.Broadcast();
 }
 
-int32 UOutlawInventoryComponent::GenerateInstanceId()
+int32 UAtomInventoryComponent::GenerateInstanceId()
 {
 	return NextInstanceId++;
 }
 
 // ── Grid Mode ───────────────────────────────────────────────────
 
-bool UOutlawInventoryComponent::IsGridMode() const
+bool UAtomInventoryComponent::IsGridMode() const
 {
 	return InventoryGridWidth > 0 && InventoryGridHeight > 0;
 }
 
-bool UOutlawInventoryComponent::CanPlaceItemAt(const UOutlawItemDefinition* ItemDef, int32 X, int32 Y) const
+bool UAtomInventoryComponent::CanPlaceItemAt(const UAtomItemDefinition* ItemDef, int32 X, int32 Y) const
 {
 	return CanPlaceItemAtIgnoring(ItemDef, X, Y, INDEX_NONE);
 }
 
-bool UOutlawInventoryComponent::CanPlaceItemAtIgnoring(const UOutlawItemDefinition* ItemDef, int32 X, int32 Y, int32 IgnoreInstanceId) const
+bool UAtomInventoryComponent::CanPlaceItemAtIgnoring(const UAtomItemDefinition* ItemDef, int32 X, int32 Y, int32 IgnoreInstanceId) const
 {
 	if (!IsGridMode() || !ItemDef)
 	{
@@ -997,7 +997,7 @@ bool UOutlawInventoryComponent::CanPlaceItemAtIgnoring(const UOutlawItemDefiniti
 	return IsRectFree(X, Y, ItemDef->GridWidth, ItemDef->GridHeight, IgnoreInstanceId);
 }
 
-int32 UOutlawInventoryComponent::AddItemAtPosition(UOutlawItemDefinition* ItemDef, int32 X, int32 Y, int32 Count)
+int32 UAtomInventoryComponent::AddItemAtPosition(UAtomItemDefinition* ItemDef, int32 X, int32 Y, int32 Count)
 {
 	if (!ItemDef || Count <= 0 || !IsGridMode())
 	{
@@ -1012,7 +1012,7 @@ int32 UOutlawInventoryComponent::AddItemAtPosition(UOutlawItemDefinition* ItemDe
 	// Try stacking at this position first
 	if (ItemDef->MaxStackSize > 1)
 	{
-		for (FOutlawInventoryEntry& Entry : InventoryList.Entries)
+		for (FAtomInventoryEntry& Entry : InventoryList.Entries)
 		{
 			if (Entry.ItemDef == ItemDef && Entry.GridX == X && Entry.GridY == Y && Entry.StackCount < ItemDef->MaxStackSize)
 			{
@@ -1065,14 +1065,14 @@ int32 UOutlawInventoryComponent::AddItemAtPosition(UOutlawItemDefinition* ItemDe
 	return StackSize;
 }
 
-bool UOutlawInventoryComponent::MoveItem(int32 InstanceId, int32 NewX, int32 NewY)
+bool UAtomInventoryComponent::MoveItem(int32 InstanceId, int32 NewX, int32 NewY)
 {
 	if (!IsGridMode() || !GetOwner()->HasAuthority())
 	{
 		return false;
 	}
 
-	FOutlawInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
+	FAtomInventoryEntry* Entry = InventoryList.FindEntry(InstanceId);
 	if (!Entry || !Entry->ItemDef)
 	{
 		return false;
@@ -1100,7 +1100,7 @@ bool UOutlawInventoryComponent::MoveItem(int32 InstanceId, int32 NewX, int32 New
 	return true;
 }
 
-bool UOutlawInventoryComponent::FindFreeSpace(const UOutlawItemDefinition* ItemDef, int32& OutX, int32& OutY) const
+bool UAtomInventoryComponent::FindFreeSpace(const UAtomItemDefinition* ItemDef, int32& OutX, int32& OutY) const
 {
 	if (!IsGridMode() || !ItemDef)
 	{
@@ -1124,26 +1124,26 @@ bool UOutlawInventoryComponent::FindFreeSpace(const UOutlawItemDefinition* ItemD
 	return false;
 }
 
-FOutlawInventoryEntry UOutlawInventoryComponent::GetItemAtGridPosition(int32 X, int32 Y) const
+FAtomInventoryEntry UAtomInventoryComponent::GetItemAtGridPosition(int32 X, int32 Y) const
 {
 	if (!IsGridMode() || X < 0 || X >= InventoryGridWidth || Y < 0 || Y >= InventoryGridHeight)
 	{
-		return FOutlawInventoryEntry();
+		return FAtomInventoryEntry();
 	}
 
 	const int32 Id = OccupancyGrid[GridIndex(X, Y)];
 	if (Id == INDEX_NONE)
 	{
-		return FOutlawInventoryEntry();
+		return FAtomInventoryEntry();
 	}
 
-	const FOutlawInventoryEntry* Entry = InventoryList.FindEntry(Id);
-	return Entry ? *Entry : FOutlawInventoryEntry();
+	const FAtomInventoryEntry* Entry = InventoryList.FindEntry(Id);
+	return Entry ? *Entry : FAtomInventoryEntry();
 }
 
 // ── Grid Internals ──────────────────────────────────────────────
 
-void UOutlawInventoryComponent::RebuildOccupancyGrid()
+void UAtomInventoryComponent::RebuildOccupancyGrid()
 {
 	if (!IsGridMode())
 	{
@@ -1152,7 +1152,7 @@ void UOutlawInventoryComponent::RebuildOccupancyGrid()
 
 	OccupancyGrid.Init(INDEX_NONE, InventoryGridWidth * InventoryGridHeight);
 
-	for (const FOutlawInventoryEntry& Entry : InventoryList.Entries)
+	for (const FAtomInventoryEntry& Entry : InventoryList.Entries)
 	{
 		if (Entry.ItemDef && Entry.GridX != INDEX_NONE)
 		{
@@ -1161,7 +1161,7 @@ void UOutlawInventoryComponent::RebuildOccupancyGrid()
 	}
 }
 
-void UOutlawInventoryComponent::SetOccupancy(int32 GridX, int32 GridY, int32 W, int32 H, int32 InstanceId)
+void UAtomInventoryComponent::SetOccupancy(int32 GridX, int32 GridY, int32 W, int32 H, int32 InstanceId)
 {
 	for (int32 Y = GridY; Y < GridY + H && Y < InventoryGridHeight; ++Y)
 	{
@@ -1172,7 +1172,7 @@ void UOutlawInventoryComponent::SetOccupancy(int32 GridX, int32 GridY, int32 W, 
 	}
 }
 
-void UOutlawInventoryComponent::ClearOccupancy(int32 GridX, int32 GridY, int32 W, int32 H)
+void UAtomInventoryComponent::ClearOccupancy(int32 GridX, int32 GridY, int32 W, int32 H)
 {
 	for (int32 Y = GridY; Y < GridY + H && Y < InventoryGridHeight; ++Y)
 	{
@@ -1183,7 +1183,7 @@ void UOutlawInventoryComponent::ClearOccupancy(int32 GridX, int32 GridY, int32 W
 	}
 }
 
-bool UOutlawInventoryComponent::IsRectFree(int32 X, int32 Y, int32 W, int32 H, int32 IgnoreInstanceId) const
+bool UAtomInventoryComponent::IsRectFree(int32 X, int32 Y, int32 W, int32 H, int32 IgnoreInstanceId) const
 {
 	if (X < 0 || Y < 0 || X + W > InventoryGridWidth || Y + H > InventoryGridHeight)
 	{
@@ -1205,7 +1205,7 @@ bool UOutlawInventoryComponent::IsRectFree(int32 X, int32 Y, int32 W, int32 H, i
 	return true;
 }
 
-int32 UOutlawInventoryComponent::GridIndex(int32 X, int32 Y) const
+int32 UAtomInventoryComponent::GridIndex(int32 X, int32 Y) const
 {
 	return Y * InventoryGridWidth + X;
 }

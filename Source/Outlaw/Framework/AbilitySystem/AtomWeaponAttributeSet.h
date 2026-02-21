@@ -5,65 +5,65 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
-#include "OutlawWeaponAttributeSet.generated.h"
+#include "AtomWeaponAttributeSet.generated.h"
 
 /**
  * Weapon stats exposed as GAS attributes so abilities and effects can read/modify them.
  * Populated by the weapon manager when a weapon becomes active.
- * Follows the same pattern as UOutlawAttributeSet.
+ * Follows the same pattern as UAtomAttributeSet.
  */
 UCLASS()
-class OUTLAW_API UOutlawWeaponAttributeSet : public UAttributeSet
+class OUTLAW_API UAtomWeaponAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawWeaponAttributeSet();
+	UAtomWeaponAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// ── Shooter Attributes ──────────────────────────────────────
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Firepower, Category = "Weapon|Shooter")
 	FGameplayAttributeData Firepower;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, Firepower);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, Firepower);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_RPM, Category = "Weapon|Shooter")
 	FGameplayAttributeData RPM;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, RPM);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, RPM);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Accuracy, Category = "Weapon|Shooter")
 	FGameplayAttributeData Accuracy;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, Accuracy);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, Accuracy);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Stability, Category = "Weapon|Shooter")
 	FGameplayAttributeData Stability;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, Stability);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, Stability);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CritMultiplier, Category = "Weapon|Shooter")
 	FGameplayAttributeData CritMultiplier;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, CritMultiplier);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, CritMultiplier);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_WeaponRange, Category = "Weapon|Shooter")
 	FGameplayAttributeData WeaponRange;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, WeaponRange);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, WeaponRange);
 
 	// ── ARPG Attributes ─────────────────────────────────────────
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalDamageMin, Category = "Weapon|ARPG")
 	FGameplayAttributeData PhysicalDamageMin;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, PhysicalDamageMin);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, PhysicalDamageMin);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalDamageMax, Category = "Weapon|ARPG")
 	FGameplayAttributeData PhysicalDamageMax;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, PhysicalDamageMax);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, PhysicalDamageMax);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AttackSpeed, Category = "Weapon|ARPG")
 	FGameplayAttributeData AttackSpeed;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, AttackSpeed);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, AttackSpeed);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CriticalStrikeChance, Category = "Weapon|ARPG")
 	FGameplayAttributeData CriticalStrikeChance;
-	ATTRIBUTE_ACCESSORS_BASIC(UOutlawWeaponAttributeSet, CriticalStrikeChance);
+	ATTRIBUTE_ACCESSORS_BASIC(UAtomWeaponAttributeSet, CriticalStrikeChance);
 
 	// ── Rep Notifies ────────────────────────────────────────────
 

@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/Tasks/OutlawSTTask_Patrol.h"
+#include "AI/Tasks/AtomSTTask_Patrol.h"
 #include "AIController.h"
 #include "GameFramework/Actor.h"
 #include "StateTreeExecutionContext.h"
 #include "Navigation/PathFollowingComponent.h"
 
-EStateTreeRunStatus FOutlawSTTask_Patrol::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FAtomSTTask_Patrol::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -38,7 +38,7 @@ EStateTreeRunStatus FOutlawSTTask_Patrol::EnterState(FStateTreeExecutionContext&
 	return EStateTreeRunStatus::Running;
 }
 
-EStateTreeRunStatus FOutlawSTTask_Patrol::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FAtomSTTask_Patrol::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

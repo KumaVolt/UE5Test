@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OutlawProjectileBase.h"
-#include "OutlawSpellProjectile.generated.h"
+#include "AtomProjectileBase.h"
+#include "AtomSpellProjectile.generated.h"
 
 UCLASS()
-class OUTLAW_API AOutlawSpellProjectile : public AOutlawProjectileBase
+class OUTLAW_API AAtomSpellProjectile : public AAtomProjectileBase
 {
 	GENERATED_BODY()
 
 public:
-	AOutlawSpellProjectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AAtomSpellProjectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	float SplashRadius = 0.f;

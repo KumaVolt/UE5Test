@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/OutlawDamageNumberWidget.h"
+#include "UI/AtomDamageNumberWidget.h"
 #include "OutlawDemoDamageNumber.generated.h"
 
 /**
@@ -9,7 +9,7 @@
  * Pure C++ — shows damage text that floats up and fades out.
  */
 UCLASS()
-class OUTLAW_API UOutlawDemoDamageNumber : public UOutlawDamageNumberWidget
+class OUTLAW_API UOutlawDemoDamageNumber : public UAtomDamageNumberWidget
 {
 	GENERATED_BODY()
 

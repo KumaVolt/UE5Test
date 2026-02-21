@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
-#include "OutlawLockOnComponent.generated.h"
+#include "AtomLockOnComponent.generated.h"
 
 class UAbilitySystemComponent;
 
@@ -17,12 +17,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLockOnBroken);
  * Finds nearest targetable enemy via Combat.Targetable tag, camera interpolates to keep target in view.
  */
 UCLASS(ClassGroup=(Camera), meta=(BlueprintSpawnableComponent))
-class OUTLAW_API UOutlawLockOnComponent : public UActorComponent
+class OUTLAW_API UAtomLockOnComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UOutlawLockOnComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UAtomLockOnComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

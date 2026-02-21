@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "OutlawCombatLogComponent.h"
+#include "AtomCombatLogComponent.h"
 
-UOutlawCombatLogComponent::UOutlawCombatLogComponent(const FObjectInitializer& ObjectInitializer)
+UAtomCombatLogComponent::UAtomCombatLogComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawCombatLogComponent::AddEntry(const FOutlawCombatLogEntry& Entry)
+void UAtomCombatLogComponent::AddEntry(const FAtomCombatLogEntry& Entry)
 {
 	CombatLogEntries.Add(Entry);
 

@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Animation/OutlawHitReactionComponent.h"
+#include "Animation/AtomHitReactionComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/OutlawAttributeSet.h"
+#include "AbilitySystem/AtomAttributeSet.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "GameFramework/Character.h"
@@ -11,12 +11,12 @@
 #include "GameplayEffectTypes.h"
 #include "Kismet/KismetMathLibrary.h"
 
-UOutlawHitReactionComponent::UOutlawHitReactionComponent()
+UAtomHitReactionComponent::UAtomHitReactionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UOutlawHitReactionComponent::BeginPlay()
+void UAtomHitReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -44,17 +44,17 @@ void UOutlawHitReactionComponent::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		IncomingDamageHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetIncomingDamageAttribute()
-		).AddUObject(this, &UOutlawHitReactionComponent::OnIncomingDamageChanged);
+			UAtomAttributeSet::GetIncomingDamageAttribute()
+		).AddUObject(this, &UAtomHitReactionComponent::OnIncomingDamageChanged);
 	}
 }
 
-void UOutlawHitReactionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UAtomHitReactionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (AbilitySystemComponent && IncomingDamageHandle.IsValid())
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			UOutlawAttributeSet::GetIncomingDamageAttribute()
+			UAtomAttributeSet::GetIncomingDamageAttribute()
 		).Remove(IncomingDamageHandle);
 		IncomingDamageHandle.Reset();
 	}
@@ -62,7 +62,7 @@ void UOutlawHitReactionComponent::EndPlay(const EEndPlayReason::Type EndPlayReas
 	Super::EndPlay(EndPlayReason);
 }
 
-void UOutlawHitReactionComponent::OnIncomingDamageChanged(const FOnAttributeChangeData& Data)
+void UAtomHitReactionComponent::OnIncomingDamageChanged(const FOnAttributeChangeData& Data)
 {
 	if (!bCanBeStaggered || Data.NewValue <= 0.f)
 	{
@@ -72,26 +72,26 @@ void UOutlawHitReactionComponent::OnIncomingDamageChanged(const FOnAttributeChan
 	PlayHitReaction(Data.NewValue, nullptr);
 }
 
-void UOutlawHitReactionComponent::PlayHitReaction(float DamageAmount, AActor* DamageSource)
+void UAtomHitReactionComponent::PlayHitReaction(float DamageAmount, AActor* DamageSource)
 {
 	if (!AbilitySystemComponent)
 	{
 		return;
 	}
 
-	float MaxHealth = AbilitySystemComponent->GetNumericAttribute(UOutlawAttributeSet::GetMaxHealthAttribute());
+	float MaxHealth = AbilitySystemComponent->GetNumericAttribute(UAtomAttributeSet::GetMaxHealthAttribute());
 	if (MaxHealth <= 0.f)
 	{
 		return;
 	}
 
-	EOutlawHitReactionType ReactionType = DetermineReactionType(DamageAmount, MaxHealth);
-	if (ReactionType == EOutlawHitReactionType::None)
+	EAtomHitReactionType ReactionType = DetermineReactionType(DamageAmount, MaxHealth);
+	if (ReactionType == EAtomHitReactionType::None)
 	{
 		return;
 	}
 
-	EOutlawHitDirection HitDir = DetermineHitDirection(DamageSource);
+	EAtomHitDirection HitDir = DetermineHitDirection(DamageSource);
 	UAnimMontage* Montage = FindHitReactionMontage(ReactionType, HitDir);
 	if (!Montage)
 	{
@@ -110,7 +110,7 @@ void UOutlawHitReactionComponent::PlayHitReaction(float DamageAmount, AActor* Da
 		return;
 	}
 
-	AbilitySystemComponent->AddLooseGameplayTag(OutlawAnimTags::Staggered);
+	AbilitySystemComponent->AddLooseGameplayTag(AtomAnimTags::Staggered);
 	AnimInstance->Montage_Play(Montage);
 
 	FOnMontageEnded MontageEndedDelegate;
@@ -118,36 +118,36 @@ void UOutlawHitReactionComponent::PlayHitReaction(float DamageAmount, AActor* Da
 	{
 		if (AbilitySystemComponent)
 		{
-			AbilitySystemComponent->RemoveLooseGameplayTag(OutlawAnimTags::Staggered);
+			AbilitySystemComponent->RemoveLooseGameplayTag(AtomAnimTags::Staggered);
 		}
 	});
 	AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, Montage);
 }
 
-EOutlawHitReactionType UOutlawHitReactionComponent::DetermineReactionType(float DamageAmount, float MaxHealth) const
+EAtomHitReactionType UAtomHitReactionComponent::DetermineReactionType(float DamageAmount, float MaxHealth) const
 {
 	float Percent = (DamageAmount / MaxHealth) * 100.f;
 
 	if (Percent < LightHitThresholdPercent)
 	{
-		return EOutlawHitReactionType::None;
+		return EAtomHitReactionType::None;
 	}
 	else if (Percent < MediumHitThresholdPercent)
 	{
-		return EOutlawHitReactionType::Light;
+		return EAtomHitReactionType::Light;
 	}
 	else
 	{
-		return EOutlawHitReactionType::Medium;
+		return EAtomHitReactionType::Medium;
 	}
 }
 
-EOutlawHitDirection UOutlawHitReactionComponent::DetermineHitDirection(AActor* DamageSource) const
+EAtomHitDirection UAtomHitReactionComponent::DetermineHitDirection(AActor* DamageSource) const
 {
 	AActor* Owner = GetOwner();
 	if (!Owner || !DamageSource)
 	{
-		return EOutlawHitDirection::Front;
+		return EAtomHitDirection::Front;
 	}
 
 	FVector ToSource = (DamageSource->GetActorLocation() - Owner->GetActorLocation()).GetSafeNormal();
@@ -159,17 +159,17 @@ EOutlawHitDirection UOutlawHitReactionComponent::DetermineHitDirection(AActor* D
 
 	if (FMath::Abs(ForwardDot) > FMath::Abs(RightDot))
 	{
-		return (ForwardDot > 0.f) ? EOutlawHitDirection::Front : EOutlawHitDirection::Back;
+		return (ForwardDot > 0.f) ? EAtomHitDirection::Front : EAtomHitDirection::Back;
 	}
 	else
 	{
-		return (RightDot > 0.f) ? EOutlawHitDirection::Right : EOutlawHitDirection::Left;
+		return (RightDot > 0.f) ? EAtomHitDirection::Right : EAtomHitDirection::Left;
 	}
 }
 
-UAnimMontage* UOutlawHitReactionComponent::FindHitReactionMontage(EOutlawHitReactionType ReactionType, EOutlawHitDirection Direction) const
+UAnimMontage* UAtomHitReactionComponent::FindHitReactionMontage(EAtomHitReactionType ReactionType, EAtomHitDirection Direction) const
 {
-	for (const FOutlawHitReactionConfig& Config : HitReactionMontages)
+	for (const FAtomHitReactionConfig& Config : HitReactionMontages)
 	{
 		if (Config.ReactionType == ReactionType && Config.Direction == Direction && Config.Montage)
 		{
@@ -177,7 +177,7 @@ UAnimMontage* UOutlawHitReactionComponent::FindHitReactionMontage(EOutlawHitReac
 		}
 	}
 
-	for (const FOutlawHitReactionConfig& Config : HitReactionMontages)
+	for (const FAtomHitReactionConfig& Config : HitReactionMontages)
 	{
 		if (Config.ReactionType == ReactionType && Config.Montage)
 		{
